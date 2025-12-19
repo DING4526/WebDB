@@ -53,8 +53,14 @@ class SignupForm extends Model
         $user->email = $this->email;
         $user->setPassword($this->password);
         $user->generateAuthKey();
-        $user->generateEmailVerificationToken();
-        return $user->save() && $this->sendEmail($user);
+
+        // 关键：注册即激活
+        $user->status = User::STATUS_ACTIVE;
+        return $user->save();
+
+        // 可选：不走邮箱验证就不要生成token/发邮件
+        // $user->generateEmailVerificationToken();
+        // return $user->save() && $this->sendEmail($user);
 
     }
 
