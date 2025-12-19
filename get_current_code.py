@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 # 用法：
-# python3 get_current_code.py
+# python get_current_code.py
 
 # =====================================================
 # 你只要编辑这里即可，每个 preset 只需要两个字段：
@@ -44,6 +44,19 @@ PRESETS = {
             "console/migrations/*.php",
         ],
         "output": "_current_code/console.txt"
+    },
+    "team": {
+        "files": [
+            "common/models/Team.php",
+            "common/models/TeamMember.php",
+            "backend/views/team/index.php",
+            "backend/views/team-member/index.php",
+            "backend/controllers/TeamController.php",
+            "backend/controllers/TeamMemberController.php",
+            "backend/models/TeamSearch.php",
+            "backend/models/TeamMemberSearch.php",
+        ],
+        "output": "_current_code/team_module.txt"
     },
 }
 # =====================================================
