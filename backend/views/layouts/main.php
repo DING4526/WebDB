@@ -193,7 +193,7 @@ AppAsset::register($this);
           </a>
         </li>
       </ul>
- <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-right">
 
         <li class="hidden-xs">
                      <a href="<?php echo Url::to(['site/logout']) ?>" data-method="post">
