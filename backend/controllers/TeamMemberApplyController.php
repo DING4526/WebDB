@@ -11,7 +11,6 @@ use Yii;
 use common\models\TeamMemberApply;
 use backend\models\TeamMemberApplySearch;
 use common\models\User;
-use common\models\Team;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -71,7 +70,10 @@ class TeamMemberApplyController extends Controller
             $model->email = $user->email;
         }
 
-        $teamOptions = Team::find()->select(['name', 'id'])->indexBy('id')->column();
+        $team = Yii::$app->teamProvider->getTeam();
+        if ($team) {
+            $model->team_id = $team->id;
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', '申请已提交，请等待审核。');
@@ -80,7 +82,7 @@ class TeamMemberApplyController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'teamOptions' => $teamOptions,
+            'team' => $team,
         ]);
     }
 

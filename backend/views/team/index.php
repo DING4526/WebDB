@@ -12,7 +12,8 @@ use common\models\Team;
 
 $this->title = '团队管理';
 $this->params['breadcrumbs'][] = $this->title;
-$isRoot = !Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot();
+$currentUser = Yii::$app->user->getUser();
+$isRoot = $currentUser && $currentUser->isRoot();
 ?>
 <div class="team-index">
 

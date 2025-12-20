@@ -214,7 +214,7 @@ AppAsset::register($this);
           <a href="#" class="dropdown-toggle fw600 p15" data-toggle="dropdown">
           	<img src="../statics/assets/img/avatars/1.jpg" alt="avatar" class="mw30 br64">
           	<span class="hidden-xs pl15"> 
-                <?= Yii::$app->user->isGuest ? '游客' : Yii::$app->user->identity->username ?>
+                <?= Yii::$app->user->isGuest ? '游客' : (Yii::$app->user->getUser()->username ?? '') ?>
             </span>
             <span class="caret caret-tp hidden-xs"></span>
           </a>
@@ -228,7 +228,7 @@ AppAsset::register($this);
                   <?php if (Yii::$app->user->isGuest): ?>
                     游客 (guest)
                   <?php else: ?>
-                    <?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
+                    <?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
                   <?php endif; ?>
                 </strong></div>
               </div>
@@ -268,7 +268,7 @@ AppAsset::register($this);
                    <a href="#" class="sidebar-menu-toggle">用户菜单-</a> <a href="<?php echo Url::to(['site/logout']) ?>" data-method="post">登出 </a>
                 </div>
                 <div class="media-author">
-                    <?= Yii::$app->user->isGuest ? '游客' : Yii::$app->user->identity->username ?>
+                    <?= Yii::$app->user->isGuest ? '游客' : (Yii::$app->user->getUser()->username ?? '') ?>
                 </div>
               </div>
             </div>

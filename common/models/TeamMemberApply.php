@@ -40,6 +40,20 @@ class TeamMemberApply extends ActiveRecord
         return '{{%team_member_apply}}';
     }
 
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            if (empty($this->team_id) && Yii::$app->has('teamProvider')) {
+                $teamId = Yii::$app->teamProvider->getId();
+                if ($teamId) {
+                    $this->team_id = $teamId;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     public function behaviors()
     {
         return [TimestampBehavior::class];

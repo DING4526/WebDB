@@ -7,6 +7,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Team;
@@ -45,7 +46,7 @@ class TeamSearch extends Team
      */
     public function search($params)
     {
-        $query = Team::find();
+        $query = Team::find()->andWhere(['id' => Yii::$app->teamProvider->getId()]);
 
         // add conditions that should always apply here
 

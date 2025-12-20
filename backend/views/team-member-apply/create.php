@@ -19,7 +19,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <?php $form = ActiveForm::begin(); ?>
 
-            <?= $form->field($model, 'team_id')->dropDownList($teamOptions, ['prompt' => '请选择目标团队']) ?>
+            <?php if (!empty($team)): ?>
+              <?= $form->field($model, 'team_id')->hiddenInput()->label(false) ?>
+              <div class="form-group">
+                <label class="control-label">目标团队</label>
+                <div class="form-control" disabled><?= \yii\helpers\Html::encode($team->name) ?></div>
+              </div>
+            <?php endif; ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => true]) ?>
             <?= $form->field($model, 'student_no')->textInput(['maxlength' => true, 'readonly' => true]) ?>
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true]) ?>

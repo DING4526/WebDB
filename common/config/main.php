@@ -9,5 +9,8 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'teamProvider' => [
+            'class' => \common\components\TeamProvider::class,
+        ],
     ],
 ];

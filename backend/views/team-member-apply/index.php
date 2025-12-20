@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                   'value' => function ($model) {
                       return $model->team->name ?? '';
                   },
-                  'filter' => \common\models\Team::find()->select(['name','id'])->indexBy('id')->column(),
+                  'filter' => false,
               ],
               'name',
               'student_no',

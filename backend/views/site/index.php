@@ -52,7 +52,7 @@ $contentPipelines = [
     ],
 ];
 
-$teamInfo = \common\models\Team::find()->orderBy(['id' => SORT_ASC])->one();
+$teamInfo = Yii::$app->teamProvider->getTeam();
 ?>
 
 <div class="site-index">
@@ -70,7 +70,7 @@ $teamInfo = \common\models\Team::find()->orderBy(['id' => SORT_ASC])->one();
                 <?php if (Yii::$app->user->isGuest): ?>
                   游客（仅浏览）
                 <?php else: ?>
-                  <?= Html::encode(Yii::$app->user->identity->username) ?> · 角色：<?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
+                  <?= Html::encode(Yii::$app->user->getUser()->username ?? '') ?> · 角色：<?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
                 <?php endif; ?>
               </p>
             </div>

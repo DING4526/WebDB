@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\TeamMemberApply;
@@ -26,7 +27,7 @@ class TeamMemberApplySearch extends TeamMemberApply
 
     public function search($params)
     {
-        $query = TeamMemberApply::find();
+        $query = TeamMemberApply::find()->andWhere(['team_id' => Yii::$app->teamProvider->getId()]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
