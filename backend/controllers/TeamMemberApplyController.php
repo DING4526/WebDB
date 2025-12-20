@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Ding 2310724
+ * 成员申请与审批控制模块
+ */
+
 namespace backend\controllers;
 
 use Yii;

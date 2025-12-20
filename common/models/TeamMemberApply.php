@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Ding 2310724
+ * 团队成员申请模型
+ */
+
 namespace common\models;
 
 use Yii;

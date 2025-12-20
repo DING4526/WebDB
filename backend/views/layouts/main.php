@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Ding 2310724
+ * 后台主布局文件
+ */
+
 /* @var $this \yii\web\View */
 /* @var $content string */
 
