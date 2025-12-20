@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use common\models\TeamMember;
 
 /* @var $this yii\web\View */
 
@@ -11,6 +12,15 @@ $this->params['breadcrumbs'][] = $this->title;
 $currentUser = Yii::$app->user->getUser();
 $isRoot = $currentUser && $currentUser->isRoot();
 $isMember = $currentUser && $currentUser->isMember();
+$memberRecord = null;
+if ($currentUser && Yii::$app->teamProvider) {
+    $teamId = Yii::$app->teamProvider->getId();
+    if ($teamId) {
+        $memberRecord = TeamMember::find()
+            ->andWhere(['team_id' => $teamId, 'user_id' => $currentUser->id])
+            ->one();
+    }
+}
 
 $roleMatrix = [
     [
@@ -77,6 +87,16 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                   <?= Html::encode(Yii::$app->user->getUser()->username ?? '') ?> · 角色：<?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
                 <?php endif; ?>
               </p>
+              <?php if ($memberRecord && $memberRecord->student_no): ?>
+                <div class="text-muted">学号：<?= Html::encode($memberRecord->student_no) ?></div>
+              <?php elseif ($isMember): ?>
+                <div class="text-warning">学号未登记，请补充。</div>
+              <?php endif; ?>
+              <?php if ($isMember): ?>
+                <div style="margin-top:6px;">
+                  <a class="btn btn-default btn-xs" href="<?= Url::to(['team-member/my']) ?>">更新学号</a>
+                </div>
+              <?php endif; ?>
             </div>
             <div class="col-sm-4">
               <p class="text-muted mb5">团队信息：</p>

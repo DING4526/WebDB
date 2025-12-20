@@ -33,12 +33,20 @@ class TeamMember extends \yii\db\ActiveRecord
     const STATUS_DELETED = -1;
     const STATUS_DISABLED = 0;
     const STATUS_ACTIVE = 1;
+    const SCENARIO_SELF_UPDATE = 'self-update';
 
     public function behaviors()
     {
         return [
             TimestampBehavior::class,
         ];
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_SELF_UPDATE] = ['student_no'];
+        return $scenarios;
     }
 
     public static function getStatusList()

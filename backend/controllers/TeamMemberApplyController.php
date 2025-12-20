@@ -70,7 +70,6 @@ class TeamMemberApplyController extends Controller
         if ($user) {
             $model->user_id = $user->id;
             $model->name = $user->username;
-            $model->student_no = $user->username;
             $model->email = $user->email;
         }
 
@@ -104,18 +103,27 @@ class TeamMemberApplyController extends Controller
                 User::updateAll(['role' => User::ROLE_MEMBER], ['id' => $model->user_id]);
                 $teamId = $model->team_id ?: (Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null);
                 if ($teamId) {
-                    $exists = TeamMember::find()
+                    $tm = TeamMember::find()
                         ->andWhere(['team_id' => $teamId, 'user_id' => $model->user_id])
-                        ->exists();
-                    if (!$exists) {
-                        $user = User::findOne($model->user_id);
+                        ->one();
+                    if (!$tm) {
                         $tm = new TeamMember();
                         $tm->team_id = $teamId;
                         $tm->user_id = $model->user_id;
-                        $tm->name = $user ? $user->username : $model->name;
-                        $tm->student_no = $user ? $user->username : $model->student_no;
                         $tm->status = TeamMember::STATUS_ACTIVE;
-                        $tm->save(false);
+                    }
+                    if (!$tm->name) {
+                        $tm->name = $model->name;
+                    }
+                    if (!$tm->team_id) {
+                        $tm->team_id = $teamId;
+                    }
+                    if (!$tm->user_id && $model->user_id) {
+                        $tm->user_id = $model->user_id;
+                    }
+                    $tm->student_no = $model->student_no;
+                    if (!$tm->save()) {
+                        Yii::$app->session->setFlash('error', '成员信息同步失败：' . current($tm->firstErrors));
                     }
                 }
             }

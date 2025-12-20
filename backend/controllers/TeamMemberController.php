@@ -32,7 +32,7 @@ class TeamMemberController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index', 'view', 'my'],
                         'roles' => ['@'],
                     ],
                     [
@@ -66,6 +66,38 @@ class TeamMemberController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * 成员自助查看/修改学号
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionMy()
+    {
+        $user = Yii::$app->user->getUser();
+        if (!$user) {
+            throw new \yii\web\ForbiddenHttpException('请先登录');
+        }
+        $teamId = Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null;
+        if (!$teamId) {
+            throw new NotFoundHttpException('未配置团队信息');
+        }
+
+        $model = TeamMember::find()->andWhere(['team_id' => $teamId, 'user_id' => $user->id])->one();
+        if (!$model) {
+            throw new NotFoundHttpException('未找到您的成员信息');
+        }
+
+        $model->scenario = TeamMember::SCENARIO_SELF_UPDATE;
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', '学号已更新');
+            return $this->redirect(['site/index']);
+        }
+
+        return $this->render('my', [
+            'model' => $model,
         ]);
     }
 
