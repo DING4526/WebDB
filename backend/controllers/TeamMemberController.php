@@ -32,8 +32,14 @@ class TeamMemberController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
+                        'actions' => ['index', 'view'],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'update', 'delete'],
                         'matchCallback' => function () {
-                            $user = Yii::$app->user->getUser();
+                            $user = Yii::$app->user->identity;
                             return $user && $user->isRoot();
                         },
                     ],
@@ -83,6 +89,7 @@ class TeamMemberController extends Controller
      */
     public function actionCreate()
     {
+        $this->requireRoot();
         $model = new TeamMember();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -103,6 +110,7 @@ class TeamMemberController extends Controller
      */
     public function actionUpdate($id)
     {
+        $this->requireRoot();
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -123,9 +131,18 @@ class TeamMemberController extends Controller
      */
     public function actionDelete($id)
     {
+        $this->requireRoot();
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    protected function requireRoot()
+    {
+        $user = Yii::$app->user->identity;
+        if (!$user || !$user->isRoot()) {
+            throw new \yii\web\ForbiddenHttpException('仅 root 可执行此操作');
+        }
     }
 
     /**

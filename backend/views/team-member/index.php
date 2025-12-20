@@ -13,8 +13,10 @@ use common\models\User;
 /* @var $searchModel backend\models\TeamMemberSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Team Members';
+$this->title = '成员管理';
 $this->params['breadcrumbs'][] = $this->title;
+
+$isRoot = !Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot();
 
 $teamFilter = ArrayHelper::map(Team::find()->all(), 'id', 'name');
 
@@ -26,47 +28,52 @@ $userList = ArrayHelper::map(
 
 ?>
 <div class="team-member-index">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <span class="glyphicon glyphicon-user"></span>
+      成员管理
+      <?php if (!$isRoot): ?>
+        <span class="label label-default ml10">只读</span>
+      <?php endif; ?>
+    </div>
+    <div class="panel-body">
+      <p>
+        <?php if ($isRoot): ?>
+          <?= Html::a('新增成员', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php else: ?>
+          <span class="text-muted">仅 root 可新增/编辑成员，当前为只读模式。</span>
+        <?php endif; ?>
+      </p>
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Create Team Member', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            [
-                'attribute' => 'team_id',
-                'value' => fn($m) => $m->team ? $m->team->name : '',
-                'filter' => $teamFilter,
-            ],
-            [
-                'attribute' => 'user_id',
-                'value' => fn($m) => $m->user ? $m->user->username : '',
-                'filter' => $userList,
-            ],
-            'name',
-            'student_no',
-            //'role',
-            //'work_scope:ntext',
-            [
-                'attribute' => 'status',
-                'value' => fn($m) => TeamMember::getStatusList()[$m->status] ?? $m->status,
-                'filter' => TeamMember::getStatusList(),
-            ],
-            //'created_at',
-            //'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
-
-
+      <?= GridView::widget([
+          'dataProvider' => $dataProvider,
+          'filterModel' => $searchModel,
+          'tableOptions' => ['class' => 'table table-striped table-condensed'],
+          'columns' => [
+              ['class' => 'yii\grid\SerialColumn'],
+              [
+                  'attribute' => 'team_id',
+                  'value' => fn($m) => $m->team ? $m->team->name : '',
+                  'filter' => $teamFilter,
+              ],
+              [
+                  'attribute' => 'user_id',
+                  'value' => fn($m) => $m->user ? $m->user->username : '',
+                  'filter' => $userList,
+              ],
+              'name',
+              'student_no',
+              [
+                  'attribute' => 'status',
+                  'value' => fn($m) => TeamMember::getStatusList()[$m->status] ?? $m->status,
+                  'filter' => TeamMember::getStatusList(),
+              ],
+              [
+                  'class' => 'yii\grid\ActionColumn',
+                  'template' => $isRoot ? '{view} {update} {delete}' : '{view}',
+              ],
+          ],
+      ]); ?>
+    </div>
+  </div>
 </div>

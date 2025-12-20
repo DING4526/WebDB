@@ -54,31 +54,64 @@ $contentPipelines = [
 ?>
 
 <div class="site-index">
-  <div class="panel panel-info panel-border top">
-    <div class="panel-heading">
-      <span class="panel-title">
-        <i class="glyphicon glyphicon-dashboard"></i>
-        基于 Absolute 模板的后台导航与治理说明
-      </span>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="panel panel-info panel-border top">
+        <div class="panel-heading">
+          <span class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> 后台概览</span>
+        </div>
+        <div class="panel-body" style="padding:18px 22px;">
+          <p class="text-muted" style="margin-bottom: 8px;">
+            当前身份：
+            <?php if (Yii::$app->user->isGuest): ?>
+              游客（仅浏览）
+            <?php else: ?>
+              <?= Html::encode(Yii::$app->user->identity->username) ?> · 角色：<?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
+            <?php endif; ?>
+          </p>
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="well well-sm text-center">
+                <div class="text-muted">作业</div>
+                <a href="<?= Url::to(['teamwork/index']) ?>" class="btn btn-primary btn-xs">团队作业</a>
+                <a href="<?= Url::to(['personalwork/index']) ?>" class="btn btn-default btn-xs">个人作业</a>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="well well-sm text-center">
+                <div class="text-muted">成员</div>
+                <a href="<?= Url::to(['team-member/index']) ?>" class="btn btn-warning btn-xs">成员管理</a>
+                <a href="<?= Url::to(['team-member-apply/create']) ?>" class="btn btn-info btn-xs">申请成为成员</a>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="well well-sm text-center">
+                <div class="text-muted">任务</div>
+                <a href="<?= Url::to(['taskboard/index']) ?>" class="btn btn-success btn-xs">任务分工板</a>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info" style="margin-bottom:0;">
+            当前重点：成员申请/审批上线；作业列表仍基于目录扫描，后续引入上传与任务 CRUD。
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="panel-body" style="padding: 18px 22px;">
-      <h3 style="margin-top: 0; font-weight: 600;">团队后台信息架构</h3>
-      <p class="text-muted" style="margin-bottom: 10px;">
-        参考 Absolute 后台模板的分栏与卡片样式，明确角色边界、成员管理与内容链路，并为作业/任务提供统一入口。
-      </p>
-      <p class="text-muted" style="margin-bottom: 0;">
-        当前身份：
-        <?php if (Yii::$app->user->isGuest): ?>
-          游客（仅浏览）
-        <?php else: ?>
-          <?= Html::encode(Yii::$app->user->identity->username) ?> · 角色：<?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
-        <?php endif; ?>
-      </p>
-      <div style="margin-top: 14px;">
-        <a class="btn btn-primary" href="<?= Url::to(['teamwork/index']) ?>">查看团队作业</a>
-        <a class="btn btn-default" href="<?= Url::to(['personalwork/index']) ?>">查看个人作业</a>
-        <a class="btn btn-warning" href="<?= Url::to(['team-member/index']) ?>">成员管理面板</a>
-        <a class="btn btn-success" href="<?= Url::to(['taskboard/index']) ?>">任务分工板</a>
+
+    <div class="col-md-4">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <span class="glyphicon glyphicon-list-alt"></span> 进度速览
+        </div>
+        <div class="panel-body p15">
+          <ul class="list-unstyled mb10">
+            <li><span class="label label-success">已完成</span> 角色字段 & 默认 root</li>
+            <li><span class="label label-success">已完成</span> 成员申请/审批</li>
+            <li><span class="label label-warning">进行中</span> 成员管理/审批界面美化</li>
+            <li><span class="label label-warning">进行中</span> 主页概览精简</li>
+            <li><span class="label label-default">待办</span> 任务表 CRUD、作业上传表单</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -137,76 +170,9 @@ $contentPipelines = [
           </ol>
           <div class="well well-sm" style="margin-bottom: 0;">
             管理员入口：
-            <a href="<?= Url::to(['team-member/index']) ?>">成员管理</a>
-            <span class="text-muted">（列表/编辑/启用禁用，后续可加审批状态）</span>
+            <a href="<?= Url::to(['team-member-apply/index']) ?>">成员申请审批</a>
+            <span class="text-muted">（root 可审批并授予 member）</span>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <?php foreach ($contentPipelines as $block): ?>
-      <div class="col-md-6">
-        <div class="panel panel-primary">
-          <div class="panel-heading">
-            <span class="glyphicon glyphicon-folder-open"></span>
-            <?= Html::encode($block['title']) ?> 上传与管理
-            <span class="label label-default pull-right">当前：目录扫描</span>
-          </div>
-          <div class="panel-body p15">
-            <p class="text-muted mb10">后台展示来源：<?= Html::encode($block['path']) ?></p>
-            <ul class="mb10" style="padding-left: 18px;">
-              <?php foreach ($block['items'] as $item): ?>
-                <li><?= Html::encode($item) ?></li>
-              <?php endforeach; ?>
-            </ul>
-            <div class="alert alert-info" style="margin-bottom: 8px;">
-              待办：增加后台上传表单与存储策略（数据库/对象存储），当前先使用目录方式。
-            </div>
-            <a class="btn btn-sm btn-default" href="<?= Url::to($block['route']) ?>">查看列表</a>
-          </div>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-home"></span>
-          首页信息架构
-        </div>
-        <div class="panel-body p15">
-          <ul class="list-unstyled mb10">
-            <li><strong>公告/待办：</strong>首屏展示团队公告、审批提醒、最新作业变更。</li>
-            <li><strong>导航与模块：</strong>左侧菜单分组：成员/作业/任务/项目。</li>
-            <li><strong>统计：</strong>近期提交数、任务完成度（可接入 dashboard）。</li>
-          </ul>
-          <div class="alert alert-success" style="margin-bottom: 0;">
-            目标：让“当前身份能做什么”“需要我处理什么”在首页即清晰可见。
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-check"></span>
-          团队任务分工（新增）
-          <span class="label label-success pull-right">New</span>
-        </div>
-        <div class="panel-body p15">
-          <p class="text-muted mb10">
-            用于记录后台建设/课程作业的分工与进度，支持按待办/进行中/已完成拆分。
-          </p>
-          <ul class="mb10" style="padding-left: 18px;">
-            <li>典型场景：作业提交规则调整、文件上传重构、审批功能开发。</li>
-            <li>入口：左侧“任务分工板”，先以内置列表形式呈现，可逐步演进为 CRUD。</li>
-          </ul>
-          <a class="btn btn-sm btn-success" href="<?= Url::to(['taskboard/index']) ?>">进入任务分工板</a>
         </div>
       </div>
     </div>
