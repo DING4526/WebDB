@@ -9,7 +9,7 @@ namespace backend\controllers;
 
 use Yii;
 use common\models\Team;
-use backend\models\TeamSearch;
+use backend\models\TeamMemberSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
@@ -59,12 +59,27 @@ class TeamController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new TeamSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $team = Yii::$app->teamProvider->getTeam();
+        if (!$team) {
+            throw new NotFoundHttpException('未找到团队，请检查配置 params[\'team\'] 是否包含 id');
+        }
+
+        $user = Yii::$app->user->getUser();
+        $isRoot = $user && $user->isRoot();
+
+        if ($isRoot && $team->load(Yii::$app->request->post()) && $team->save()) {
+            Yii::$app->session->setFlash('success', '团队信息已更新');
+            return $this->refresh();
+        }
+
+        $memberSearchModel = new TeamMemberSearch();
+        $memberDataProvider = $memberSearchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'team' => $team,
+            'isRoot' => $isRoot,
+            'memberSearchModel' => $memberSearchModel,
+            'memberDataProvider' => $memberDataProvider,
         ]);
     }
 
