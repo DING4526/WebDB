@@ -48,6 +48,7 @@ class TeamworkController extends Controller
         $files = [];
         $meta = $this->loadMeta($basePath);
         $ownerIds = [];
+        $fileCount = 0;
 
         if (is_dir($basePath)) {
             foreach (scandir($basePath) as $f) {
@@ -64,6 +65,7 @@ class TeamworkController extends Controller
                         'size' => filesize($full),
                         'mtime' => filemtime($full),
                     ];
+                    $fileCount++;
                 }
             }
         }
@@ -81,6 +83,7 @@ class TeamworkController extends Controller
             'canUpload' => $canUpload,
             'isRoot' => $isRoot,
             'ownerMap' => $ownerMap,
+            'fileCount' => $fileCount,
         ]);
     }
 

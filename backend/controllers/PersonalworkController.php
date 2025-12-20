@@ -48,6 +48,7 @@ class PersonalworkController extends Controller
 
         $basePath = Yii::getAlias('@data/personal');
         $members = [];
+        $totalFiles = 0;
 
         if (is_dir($basePath)) {
             foreach (scandir($basePath) as $dir) {
@@ -65,6 +66,7 @@ class PersonalworkController extends Controller
                             'size' => filesize($full),
                             'mtime' => filemtime($full),
                         ];
+                        $totalFiles++;
                     }
                 }
                 usort($files, fn($a,$b) => $b['mtime'] <=> $a['mtime']);
@@ -80,6 +82,8 @@ class PersonalworkController extends Controller
             'canUpload' => $canUpload,
             'isRoot' => $isRoot,
             'currentStudentNo' => $currentStudentNo,
+            'memberCount' => count($members),
+            'fileCount' => $totalFiles,
         ]);
     }
 

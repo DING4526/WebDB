@@ -9,7 +9,9 @@ class UploadHelper
      */
     public static function sanitizeBaseName($baseName, $default = 'file')
     {
-        $safe = preg_replace('/[^A-Za-z0-9_.-]/', '_', $baseName);
+        // 允许中文及其他文字字符、数字、下划线、短横线、空格与点号，其余替换为下划线
+        $safe = preg_replace('/[^\p{L}\p{N}\s._-]/u', '_', (string)$baseName);
+        $safe = trim($safe);
         return $safe === '' ? $default : $safe;
     }
 
