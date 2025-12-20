@@ -337,6 +337,23 @@ AppAsset::register($this);
             </a>
           </li>
 
+          <li>
+            <a href="<?= Url::to(['team-member-apply/create']) ?>">
+              <span class="glyphicon glyphicon-send"></span>
+              <span class="sidebar-title">申请成为成员</span>
+            </a>
+          </li>
+
+          <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot()): ?>
+          <li>
+            <a href="<?= Url::to(['team-member-apply/index']) ?>">
+              <span class="glyphicon glyphicon-check"></span>
+              <span class="sidebar-title">成员申请审批</span>
+              <span class="label label-sm label-primary ml10">root</span>
+            </a>
+          </li>
+          <?php endif; ?>
+
           <!-- 项目管理（占位） -->
           <li class="sidebar-label pt20">项目管理</li>
           <li>
