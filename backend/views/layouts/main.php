@@ -216,22 +216,14 @@ AppAsset::register($this);
           <ul class="dropdown-menu list-group dropdown-persist w250" role="menu">
 
             <li class="dropdown-header clearfix">
-            
               <div class="pull-left ml10">
-                <select id="user-status">
-                  <optgroup label="Current Status:">
-                    <option value="1-3" selected="selected">Online</option>
-                  </optgroup>
-                </select>
+                <div class="text-muted">当前身份</div>
+                <div><strong><?= Yii::$app->user->isGuest ? '游客 (guest)' : '已登录（默认 member）' ?></strong></div>
               </div>
 
-              <div class="pull-right mr10">
-                <select id="user-role">
-                  <optgroup label="Logged in As:">
-
-                    <option value="1-3" selected="selected">Admin</option>
-                  </optgroup>
-                </select>
+              <div class="pull-right mr10 text-right">
+                <div class="text-muted">可访问范围</div>
+                <div class="label label-primary">作业/任务</div>
               </div>
             </li>
    
@@ -299,16 +291,29 @@ AppAsset::register($this);
         <!-- Start: Sidebar Menu -->
         <ul class="nav sidebar-menu">
 
-          <!-- 作业展示 -->
-          <li class="sidebar-label pt15">作业展示</li>
+          <!-- 首页与权限 -->
+          <li class="sidebar-label pt15">主页与权限</li>
+          <li>
+            <a href="<?= Url::to(['site/index']) ?>">
+              <span class="glyphicon glyphicon-home"></span>
+              <span class="sidebar-title">后台主页概览</span>
+            </a>
+          </li>
+          <li>
+            <a href="<?= Url::to(['team-member/index']) ?>">
+              <span class="glyphicon glyphicon-king"></span>
+              <span class="sidebar-title">成员管理</span>
+            </a>
+          </li>
 
+          <!-- 作业展示 -->
+          <li class="sidebar-label pt20">作业与内容</li>
           <li>
             <a href="<?= Url::to(['teamwork/index']) ?>">
               <span class="glyphicon glyphicon-folder-open"></span>
               <span class="sidebar-title">团队作业</span>
             </a>
           </li>
-
           <li>
             <a href="<?= Url::to(['personalwork/index']) ?>">
               <span class="glyphicon glyphicon-user"></span>
@@ -316,9 +321,18 @@ AppAsset::register($this);
             </a>
           </li>
 
+          <!-- 任务分工 -->
+          <li class="sidebar-label pt20">任务与协作</li>
+          <li>
+            <a href="<?= Url::to(['taskboard/index']) ?>">
+              <span class="glyphicon glyphicon-check"></span>
+              <span class="sidebar-title">任务分工板</span>
+              <span class="label label-sm label-success ml10">NEW</span>
+            </a>
+          </li>
+
           <!-- 项目管理（占位） -->
           <li class="sidebar-label pt20">项目管理</li>
-
           <li>
             <a href="<?= Url::to(['project/index']) ?>">
               <span class="glyphicon glyphicon-wrench"></span>
@@ -328,15 +342,15 @@ AppAsset::register($this);
           </li>
 
           <!-- 状态（可留可删） -->
-          <li class="sidebar-label pt25 pb10">系统状态</li>
+          <li class="sidebar-label pt25 pb10">治理进度</li>
           <li class="sidebar-stat">
             <a href="#" class="fs11">
               <span class="fa fa-inbox text-info"></span>
-              <span class="sidebar-title text-muted">框架搭建</span>
-              <span class="pull-right mr20 text-muted">50%</span>
+              <span class="sidebar-title text-muted">后台信息梳理</span>
+              <span class="pull-right mr20 text-muted">70%</span>
               <div class="progress progress-bar-xs mh20 mb10">
-                <div class="progress-bar progress-bar-info" role="progressbar" style="width: 50%">
-                  <span class="sr-only">50% Complete</span>
+                <div class="progress-bar progress-bar-info" role="progressbar" style="width: 70%">
+                  <span class="sr-only">70% Complete</span>
                 </div>
               </div>
             </a>
