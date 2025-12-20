@@ -19,6 +19,7 @@ PRESETS = {
             "backend/models/*.php",
             "backend/views/layouts/*.php",
             "backend/views/site/*.php",
+            # "backend/views/*/*.php",
         ],
         "output": "_current_code/backend.txt"
     },

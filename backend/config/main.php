@@ -29,7 +29,7 @@ return [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
 
-                // 1️⃣ 全局错误 / 警告（最重要）
+                // 全局错误 / 警告（最重要）
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
@@ -37,7 +37,15 @@ return [
                     'logFile' => '@runtime/logs/error.log',
                 ],
 
-                // 3️⃣ 调试日志（可选）
+                // info 日志
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info'],
+                    'logVars' => [],
+                    'logFile' => '@runtime/logs/info.log',
+                ],
+
+                // 调试日志（可选）
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['info', 'trace'],
