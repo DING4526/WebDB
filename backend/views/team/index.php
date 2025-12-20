@@ -10,40 +10,51 @@ use common\models\Team;
 /* @var $searchModel backend\models\TeamSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Teams';
+$this->title = '团队管理';
 $this->params['breadcrumbs'][] = $this->title;
+$isRoot = !Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot();
 ?>
 <div class="team-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-briefcase"></span>
+            团队信息
+            <?php if (!$isRoot): ?><span class="label label-default ml10">只读</span><?php endif; ?>
+        </div>
+        <div class="panel-body">
+            <p>
+                <?php if ($isRoot): ?>
+                    <?= Html::a('新增团队', ['create'], ['class' => 'btn btn-success']) ?>
+                <?php else: ?>
+                    <span class="text-muted">仅 root 可新增/编辑团队。</span>
+                <?php endif; ?>
+            </p>
 
-    <p>
-        <?= Html::a('Create Team', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
-            'topic',
-            'intro:ntext',
-            [
-                'attribute' => 'status',
-                'value' => fn($m) => Team::getStatusList()[$m->status] ?? $m->status,
-                'filter' => Team::getStatusList(),
-            ],
-            //'created_at',
-            //'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
-
-
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                'filterModel' => $searchModel,
+                'tableOptions' => ['class' => 'table table-striped table-condensed'],
+                'columns' => [
+                    ['class' => 'yii\grid\SerialColumn'],
+                    'name',
+                    'topic',
+                    [
+                        'attribute' => 'intro',
+                        'format' => 'ntext',
+                        'contentOptions' => ['style' => 'max-width:320px; white-space:normal;'],
+                    ],
+                    [
+                        'attribute' => 'status',
+                        'value' => fn($m) => Team::getStatusList()[$m->status] ?? $m->status,
+                        'filter' => Team::getStatusList(),
+                    ],
+                    [
+                        'class' => 'yii\grid\ActionColumn',
+                        'template' => $isRoot ? '{view} {update} {delete}' : '{view}',
+                    ],
+                ],
+            ]); ?>
+        </div>
+    </div>
 </div>

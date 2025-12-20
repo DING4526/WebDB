@@ -12,6 +12,7 @@ use common\models\Team;
 use backend\models\TeamSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
 /**
@@ -25,6 +26,24 @@ class TeamController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view'],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'update', 'delete'],
+                        'matchCallback' => function () {
+                            $user = Yii::$app->user->identity;
+                            return $user && $user->isRoot();
+                        },
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -69,6 +88,7 @@ class TeamController extends Controller
      */
     public function actionCreate()
     {
+        $this->requireRoot();
         $model = new Team();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -89,6 +109,7 @@ class TeamController extends Controller
      */
     public function actionUpdate($id)
     {
+        $this->requireRoot();
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -109,9 +130,18 @@ class TeamController extends Controller
      */
     public function actionDelete($id)
     {
+        $this->requireRoot();
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    protected function requireRoot()
+    {
+        $user = Yii::$app->user->identity;
+        if (!$user || !$user->isRoot()) {
+            throw new \yii\web\ForbiddenHttpException('仅 root 可执行此操作');
+        }
     }
 
     /**

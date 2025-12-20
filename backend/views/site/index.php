@@ -51,66 +51,44 @@ $contentPipelines = [
         'items' => ['个人提交的作业文件', '按成员独立目录放置'],
     ],
 ];
+
+$teamInfo = \common\models\Team::find()->orderBy(['id' => SORT_ASC])->one();
 ?>
 
 <div class="site-index">
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
       <div class="panel panel-info panel-border top">
         <div class="panel-heading">
           <span class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> 后台概览</span>
         </div>
         <div class="panel-body" style="padding:18px 22px;">
-          <p class="text-muted" style="margin-bottom: 8px;">
-            当前身份：
-            <?php if (Yii::$app->user->isGuest): ?>
-              游客（仅浏览）
-            <?php else: ?>
-              <?= Html::encode(Yii::$app->user->identity->username) ?> · 角色：<?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
-            <?php endif; ?>
-          </p>
           <div class="row">
             <div class="col-sm-4">
-              <div class="well well-sm text-center">
-                <div class="text-muted">作业</div>
-                <a href="<?= Url::to(['teamwork/index']) ?>" class="btn btn-primary btn-xs">团队作业</a>
-                <a href="<?= Url::to(['personalwork/index']) ?>" class="btn btn-default btn-xs">个人作业</a>
-              </div>
+              <p class="text-muted mb5">当前身份：</p>
+              <p class="lead" style="margin:0;">
+                <?php if (Yii::$app->user->isGuest): ?>
+                  游客（仅浏览）
+                <?php else: ?>
+                  <?= Html::encode(Yii::$app->user->identity->username) ?> · 角色：<?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
+                <?php endif; ?>
+              </p>
             </div>
             <div class="col-sm-4">
-              <div class="well well-sm text-center">
-                <div class="text-muted">成员</div>
-                <a href="<?= Url::to(['team-member/index']) ?>" class="btn btn-warning btn-xs">成员管理</a>
-                <a href="<?= Url::to(['team-member-apply/create']) ?>" class="btn btn-info btn-xs">申请成为成员</a>
-              </div>
+              <p class="text-muted mb5">团队信息：</p>
+              <?php if (!empty($teamInfo)): ?>
+                <div><strong><?= Html::encode($teamInfo->name) ?></strong></div>
+                <div class="text-muted">主题：<?= Html::encode($teamInfo->topic) ?></div>
+              <?php else: ?>
+                <div class="text-muted">尚未创建团队</div>
+              <?php endif; ?>
             </div>
-            <div class="col-sm-4">
-              <div class="well well-sm text-center">
-                <div class="text-muted">任务</div>
-                <a href="<?= Url::to(['taskboard/index']) ?>" class="btn btn-success btn-xs">任务分工板</a>
-              </div>
+            <div class="col-sm-4 text-right">
+              <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">团队管理</a>
+              <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/create']) ?>">申请成员</a>
+              <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">任务分工板</a>
             </div>
           </div>
-          <div class="alert alert-info" style="margin-bottom:0;">
-            当前重点：成员申请/审批上线；作业列表仍基于目录扫描，后续引入上传与任务 CRUD。
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="panel panel-success">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-list-alt"></span> 进度速览
-        </div>
-        <div class="panel-body p15">
-          <ul class="list-unstyled mb10">
-            <li><span class="label label-success">已完成</span> 角色字段 & 默认 root</li>
-            <li><span class="label label-success">已完成</span> 成员申请/审批</li>
-            <li><span class="label label-warning">进行中</span> 成员管理/审批界面美化</li>
-            <li><span class="label label-warning">进行中</span> 主页概览精简</li>
-            <li><span class="label label-default">待办</span> 任务表 CRUD、作业上传表单</li>
-          </ul>
         </div>
       </div>
     </div>
