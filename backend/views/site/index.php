@@ -84,9 +84,9 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
               <?php endif; ?>
             </div>
             <div class="col-sm-4 text-right">
-              <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">团队管理</a>
-              <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/create']) ?>">申请成员</a>
-              <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">任务分工板</a>
+              <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+              <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/create']) ?>">申请成为团队成员</a>
+              <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
             </div>
           </div>
         </div>

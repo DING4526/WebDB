@@ -59,7 +59,10 @@ class TeamMemberApplyController extends Controller
     {
         $user = Yii::$app->user->getUser();
         if ($user && $user->isRoot()) {
-            throw new \yii\web\ForbiddenHttpException('root 无需申请成员身份');
+            throw new \yii\web\ForbiddenHttpException('root 管理员 无需申请成员身份');
+        }
+        if ($user && $user->isMember()) {
+            throw new \yii\web\ForbiddenHttpException('已是 member，无需申请成员身份');
         }
 
         $model = new TeamMemberApply();
