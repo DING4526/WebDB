@@ -5,7 +5,6 @@
  * 团队表模型
  */
 
-
 namespace common\models;
 
 use Yii;
