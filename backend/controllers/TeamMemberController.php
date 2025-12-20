@@ -33,7 +33,7 @@ class TeamMemberController extends Controller
                     [
                         'allow' => true,
                         'matchCallback' => function () {
-                            $user = Yii::$app->user->identity;
+                            $user = Yii::$app->user->getUser();
                             return $user && $user->isRoot();
                         },
                     ],

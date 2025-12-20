@@ -9,6 +9,7 @@ namespace backend\controllers;
 
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use Yii;
 
 /**
  * 任务分工板（占位）控制器
@@ -28,7 +29,7 @@ class TaskboardController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function () {
-                            $user = Yii::$app->user->identity;
+                            $user = Yii::$app->user->getUser();
                             if (!$user) {
                                 return false;
                             }

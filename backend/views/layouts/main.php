@@ -350,7 +350,7 @@ AppAsset::register($this);
             </a>
           </li>
 
-          <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot()): ?>
+          <?php if (($user = Yii::$app->user->getUser()) && $user->isRoot()): ?>
           <li>
             <a href="<?= Url::to(['team-member-apply/index']) ?>">
               <span class="glyphicon glyphicon-check"></span>
