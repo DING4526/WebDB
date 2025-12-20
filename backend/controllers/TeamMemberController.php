@@ -15,6 +15,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use common\models\User;     
 
 /**
  * TeamMemberController implements the CRUD actions for TeamMember model.
@@ -28,7 +29,7 @@ class TeamMemberController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::class,
+                'class' => AccessControl::class,    
                 'rules' => [
                     [
                         'allow' => true,

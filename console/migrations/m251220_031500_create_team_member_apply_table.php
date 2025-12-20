@@ -7,7 +7,7 @@ use yii\db\Migration;
  */
 class m251220_031500_create_team_member_apply_table extends Migration
 {
-    public function safeUp()
+    public function up()
     {
         $this->createTable('{{%team_member_apply}}', [
             'id' => $this->primaryKey(),
@@ -29,7 +29,7 @@ class m251220_031500_create_team_member_apply_table extends Migration
         $this->addForeignKey('fk-team_member_apply-reviewer', '{{%team_member_apply}}', 'reviewer_id', '{{%user}}', 'id', 'SET NULL', 'CASCADE');
     }
 
-    public function safeDown()
+    public function down()
     {
         $this->dropForeignKey('fk-team_member_apply-reviewer', '{{%team_member_apply}}');
         $this->dropForeignKey('fk-team_member_apply-user', '{{%team_member_apply}}');
