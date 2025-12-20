@@ -7,7 +7,7 @@ use yii\db\Migration;
  */
 class m251220_024300_add_role_to_user extends Migration
 {
-    public function safeUp()
+    public function up()
     {
         $this->addColumn('{{%user}}', 'role', $this->string(20)->notNull()->defaultValue('user')->after('email'));
         $this->createIndex('idx-user-role', '{{%user}}', 'role');
@@ -20,7 +20,7 @@ class m251220_024300_add_role_to_user extends Migration
         }
     }
 
-    public function safeDown()
+    public function down()
     {
         $this->dropIndex('idx-user-role', '{{%user}}');
         $this->dropColumn('{{%user}}', 'role');

@@ -8,7 +8,7 @@ use yii\db\Query;
  */
 class m251220_025600_seed_root_user extends Migration
 {
-    public function safeUp()
+    public function up()
     {
         $exists = (new Query())
             ->from('{{%user}}')
@@ -24,7 +24,7 @@ class m251220_025600_seed_root_user extends Migration
             'username' => 'root',
             'email' => 'root@example.com',
             'auth_key' => Yii::$app->security->generateRandomString(),
-            'password_hash' => Yii::$app->security->generatePasswordHash('root123456'),
+            'password_hash' => Yii::$app->security->generatePasswordHash('123456'),
             'password_reset_token' => null,
             'status' => 10,
             'role' => 'root',
@@ -33,7 +33,7 @@ class m251220_025600_seed_root_user extends Migration
         ]);
     }
 
-    public function safeDown()
+    public function down()
     {
         $this->delete('{{%user}}', ['username' => 'root']);
     }

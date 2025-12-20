@@ -17,9 +17,10 @@ PRESETS = {
         "files": [
             "backend/controllers/*.php",
             "backend/models/*.php",
-            "backend/views/layouts/*.php",
-            "backend/views/site/*.php",
-            # "backend/views/*/*.php",
+            # "backend/views/layouts/*.php",
+            # "backend/views/site/*.php",
+            # "backend/views/taskboard/*.php",
+            "backend/views/*/*.php",
         ],
         "output": "_current_code/backend.txt"
     },
