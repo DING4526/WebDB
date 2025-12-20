@@ -312,9 +312,9 @@ AppAsset::register($this);
             </a>
           </li>
           <li>
-            <a href="<?= Url::to(['team-member/index']) ?>">
+            <a href="<?= Url::to(['team/index']) ?>">
               <span class="glyphicon glyphicon-king"></span>
-              <span class="sidebar-title">成员管理</span>
+              <span class="sidebar-title">团队管理</span>
             </a>
           </li>
 
