@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
           <?php else: ?>
             <?= Html::hiddenInput('student_no', $currentStudentNo) ?>
             <div class="form-group mb10" style="margin-right:8px;">
-              <div class="form-control" disabled><?= Html::encode($currentStudentNo) ?></div>
+              <?= Html::textInput('student_no_display', $currentStudentNo, ['class' => 'form-control', 'disabled' => true]) ?>
             </div>
           <?php endif; ?>
           <div class="form-group mb10" style="margin-right:8px;">

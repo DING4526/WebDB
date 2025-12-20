@@ -99,6 +99,7 @@ class TeamMemberApplyController extends Controller
         $model->reviewed_at = time();
         if ($model->save(false, ['status', 'reviewer_id', 'reviewed_at', 'updated_at'])) {
             // 提升为 member
+            $syncOk = true;
             if ($model->user_id) {
                 User::updateAll(['role' => User::ROLE_MEMBER], ['id' => $model->user_id]);
                 $teamId = $model->team_id ?: (Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null);
@@ -115,19 +116,17 @@ class TeamMemberApplyController extends Controller
                     if (!$tm->name) {
                         $tm->name = $model->name;
                     }
-                    if (!$tm->team_id) {
-                        $tm->team_id = $teamId;
-                    }
-                    if (!$tm->user_id && $model->user_id) {
-                        $tm->user_id = $model->user_id;
-                    }
                     $tm->student_no = $model->student_no;
                     if (!$tm->save()) {
-                        Yii::$app->session->setFlash('error', '成员信息同步失败：' . current($tm->firstErrors));
+                        $error = $tm->firstErrors ? reset($tm->firstErrors) : '未知错误';
+                        Yii::$app->session->setFlash('error', '成员信息同步失败：' . $error);
+                        $syncOk = false;
                     }
                 }
             }
-            Yii::$app->session->setFlash('success', '已通过申请，用户角色已升为 member。');
+            if ($syncOk) {
+                Yii::$app->session->setFlash('success', '已通过申请，用户角色已升为 member。');
+            }
         }
         return $this->redirect(['index']);
     }

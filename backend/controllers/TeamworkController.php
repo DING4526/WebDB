@@ -14,6 +14,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 use yii\helpers\FileHelper;
 use common\models\User;
+use common\helpers\UploadHelper;
 use yii\filters\VerbFilter;
 
 class TeamworkController extends Controller
@@ -99,11 +100,8 @@ class TeamworkController extends Controller
         $basePath = Yii::getAlias('@data/team');
         FileHelper::createDirectory($basePath);
 
-        $safeBase = preg_replace('/[^A-Za-z0-9_\\-\\.]/', '_', $file->baseName);
-        if ($safeBase === '') {
-            $safeBase = 'file';
-        }
-        $safeExt = $file->extension ? preg_replace('/[^A-Za-z0-9]/', '', $file->extension) : '';
+        $safeBase = UploadHelper::sanitizeBaseName($file->baseName);
+        $safeExt = UploadHelper::sanitizeExtension($file->extension);
         $fileName = $safeExt ? $safeBase . '.' . $safeExt : $safeBase;
         $target = $basePath . '/' . $fileName;
         $suffix = 1;
@@ -113,7 +111,7 @@ class TeamworkController extends Controller
             $suffix++;
         }
 
-        if ($file->saveAs($target, false)) {
+        if ($file->saveAs($target)) {
             $meta = $this->loadMeta($basePath);
             $meta[$fileName] = [
                 'uploader_id' => $user->id,
@@ -153,7 +151,9 @@ class TeamworkController extends Controller
             throw new ForbiddenHttpException('只能删除自己上传的文件');
         }
 
-        @unlink($full);
+        if (is_file($full)) {
+            unlink($full);
+        }
         unset($meta[$fileName]);
         $this->saveMeta($basePath, $meta);
         Yii::$app->session->setFlash('success', '文件已删除');

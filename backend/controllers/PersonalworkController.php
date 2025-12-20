@@ -15,6 +15,7 @@ use yii\web\UploadedFile;
 use yii\helpers\FileHelper;
 use common\models\TeamMember;
 use yii\filters\VerbFilter;
+use common\helpers\UploadHelper;
 
 class PersonalworkController extends Controller
 {
@@ -98,8 +99,8 @@ class PersonalworkController extends Controller
             Yii::$app->session->setFlash('error', '未找到学号，请先在主页补充学号。');
             return $this->redirect(['index']);
         }
-        if (strpos($studentNo, '..') !== false || strpos($studentNo, '/') !== false) {
-            Yii::$app->session->setFlash('error', '非法的学号目录。');
+        if (!$this->isValidStudentNo($studentNo)) {
+            Yii::$app->session->setFlash('error', '非法的学号目录，仅允许字母、数字、下划线和短横线。');
             return $this->redirect(['index']);
         }
 
@@ -111,14 +112,17 @@ class PersonalworkController extends Controller
 
         $basePath = Yii::getAlias('@data/personal/' . $studentNo);
         FileHelper::createDirectory($basePath);
-        $safeBase = preg_replace('/[^A-Za-z0-9_\\-\\.]/', '_', $file->baseName);
-        if ($safeBase === '') {
-            $safeBase = 'file';
-        }
-        $safeExt = $file->extension ? preg_replace('/[^A-Za-z0-9]/', '', $file->extension) : '';
+        $safeBase = UploadHelper::sanitizeBaseName($file->baseName);
+        $safeExt = UploadHelper::sanitizeExtension($file->extension);
         $fileName = $safeExt ? $safeBase . '.' . $safeExt : $safeBase;
         $target = $basePath . '/' . $fileName;
-        if ($file->saveAs($target, false)) {
+        $suffix = 1;
+        while (file_exists($target)) {
+            $fileName = $safeBase . '_' . $suffix . ($safeExt ? '.' . $safeExt : '');
+            $target = $basePath . '/' . $fileName;
+            $suffix++;
+        }
+        if ($file->saveAs($target)) {
             Yii::$app->session->setFlash('success', '上传成功：' . $file->name);
         } else {
             Yii::$app->session->setFlash('error', '上传失败，请重试。');
@@ -152,7 +156,9 @@ class PersonalworkController extends Controller
             throw new NotFoundHttpException('文件不存在');
         }
 
-        @unlink($full);
+        if (is_file($full)) {
+            unlink($full);
+        }
         Yii::$app->session->setFlash('success', '文件已删除');
         return $this->redirect(['index']);
     }
@@ -167,5 +173,10 @@ class PersonalworkController extends Controller
             return null;
         }
         return TeamMember::find()->andWhere(['team_id' => $teamId, 'user_id' => $user->id])->one();
+    }
+
+    protected function isValidStudentNo($studentNo): bool
+    {
+        return (bool)preg_match('/^[A-Za-z0-9_-]+$/', (string)$studentNo);
     }
 }
