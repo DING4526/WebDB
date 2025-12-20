@@ -67,7 +67,12 @@ $contentPipelines = [
         参考 Absolute 后台模板的分栏与卡片样式，明确角色边界、成员管理与内容链路，并为作业/任务提供统一入口。
       </p>
       <p class="text-muted" style="margin-bottom: 0;">
-        当前身份：<?= Yii::$app->user->isGuest ? '游客（仅浏览）' : Html::encode(Yii::$app->user->identity->username . ' · 默认 member 权限') ?>
+        当前身份：
+        <?php if (Yii::$app->user->isGuest): ?>
+          游客（仅浏览）
+        <?php else: ?>
+          <?= Html::encode(Yii::$app->user->identity->username) ?> · 角色：<?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
+        <?php endif; ?>
       </p>
       <div style="margin-top: 14px;">
         <a class="btn btn-primary" href="<?= Url::to(['teamwork/index']) ?>">查看团队作业</a>

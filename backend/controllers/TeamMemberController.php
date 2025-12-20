@@ -13,6 +13,7 @@ use common\models\TeamMember;
 use backend\models\TeamMemberSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
 /**
@@ -26,6 +27,18 @@ class TeamMemberController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'matchCallback' => function () {
+                            $user = Yii::$app->user->identity;
+                            return $user && $user->isRoot();
+                        },
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

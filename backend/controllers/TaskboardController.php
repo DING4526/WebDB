@@ -22,6 +22,13 @@ class TaskboardController extends Controller
                     [
                         'allow' => true,
                         'roles' => ['@'],
+                        'matchCallback' => function () {
+                            $user = Yii::$app->user->identity;
+                            if (!$user) {
+                                return false;
+                            }
+                            return $user->isMember();
+                        },
                     ],
                 ],
             ],

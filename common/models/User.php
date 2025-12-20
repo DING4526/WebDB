@@ -16,6 +16,7 @@ use yii\web\IdentityInterface;
  * @property string $password_reset_token
  * @property string $verification_token
  * @property string $email
+ * @property string $role
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
@@ -28,6 +29,18 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
 
+    const ROLE_ROOT = 'root';
+    const ROLE_MEMBER = 'member';
+    const ROLE_USER = 'user';
+
+    public static function getRoleList()
+    {
+        return [
+            self::ROLE_ROOT => 'root',
+            self::ROLE_MEMBER => 'member',
+            self::ROLE_USER => 'user',
+        ];
+    }
 
     /**
      * {@inheritdoc}
@@ -55,6 +68,8 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            ['role', 'default', 'value' => self::ROLE_USER],
+            ['role', 'in', 'range' => array_keys(self::getRoleList())],
         ];
     }
 
@@ -147,6 +162,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getAuthKey()
     {
         return $this->auth_key;
+    }
+
+    public function isRoot()
+    {
+        return $this->role === self::ROLE_ROOT;
+    }
+
+    public function isMember()
+    {
+        return $this->role === self::ROLE_MEMBER || $this->isRoot();
     }
 
     /**

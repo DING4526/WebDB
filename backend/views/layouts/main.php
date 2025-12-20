@@ -218,7 +218,13 @@ AppAsset::register($this);
             <li class="dropdown-header clearfix">
               <div class="pull-left ml10">
                 <div class="text-muted">当前身份</div>
-                <div><strong><?= Yii::$app->user->isGuest ? '游客 (guest)' : '已登录（默认 member）' ?></strong></div>
+                <div><strong>
+                  <?php if (Yii::$app->user->isGuest): ?>
+                    游客 (guest)
+                  <?php else: ?>
+                    <?= Html::encode(Yii::$app->user->identity->role ?? 'member') ?>
+                  <?php endif; ?>
+                </strong></div>
               </div>
 
               <div class="pull-right mr10 text-right">
