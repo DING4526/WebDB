@@ -54,19 +54,27 @@ $contentPipelines = [
 ?>
 
 <div class="site-index">
-  <div class="jumbotron" style="padding: 22px 28px;">
-    <h2 style="margin-top: 0;">团队后台导航与治理说明</h2>
-    <p class="lead" style="margin-bottom: 10px;">
-      明确角色边界、成员管理与内容链路，并为作业/任务提供统一入口。
-    </p>
-    <p class="text-muted" style="margin-bottom: 0;">
-      当前身份：<?= Yii::$app->user->isGuest ? '游客（仅浏览）' : Html::encode(Yii::$app->user->identity->username . ' · 默认 member 权限') ?>
-    </p>
-    <div style="margin-top: 14px;">
-      <a class="btn btn-primary" href="<?= Url::to(['teamwork/index']) ?>">查看团队作业</a>
-      <a class="btn btn-default" href="<?= Url::to(['personalwork/index']) ?>">查看个人作业</a>
-      <a class="btn btn-warning" href="<?= Url::to(['team-member/index']) ?>">成员管理面板</a>
-      <a class="btn btn-success" href="<?= Url::to(['taskboard/index']) ?>">任务分工板</a>
+  <div class="panel panel-info panel-border top">
+    <div class="panel-heading">
+      <span class="panel-title">
+        <i class="glyphicon glyphicon-dashboard"></i>
+        基于 Absolute 模板的后台导航与治理说明
+      </span>
+    </div>
+    <div class="panel-body" style="padding: 18px 22px;">
+      <h3 style="margin-top: 0; font-weight: 600;">团队后台信息架构</h3>
+      <p class="text-muted" style="margin-bottom: 10px;">
+        参考 Absolute 后台模板的分栏与卡片样式，明确角色边界、成员管理与内容链路，并为作业/任务提供统一入口。
+      </p>
+      <p class="text-muted" style="margin-bottom: 0;">
+        当前身份：<?= Yii::$app->user->isGuest ? '游客（仅浏览）' : Html::encode(Yii::$app->user->identity->username . ' · 默认 member 权限') ?>
+      </p>
+      <div style="margin-top: 14px;">
+        <a class="btn btn-primary" href="<?= Url::to(['teamwork/index']) ?>">查看团队作业</a>
+        <a class="btn btn-default" href="<?= Url::to(['personalwork/index']) ?>">查看个人作业</a>
+        <a class="btn btn-warning" href="<?= Url::to(['team-member/index']) ?>">成员管理面板</a>
+        <a class="btn btn-success" href="<?= Url::to(['taskboard/index']) ?>">任务分工板</a>
+      </div>
     </div>
   </div>
 
