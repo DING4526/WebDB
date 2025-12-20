@@ -14,6 +14,7 @@ use yii\db\ActiveRecord;
 /**
  * @property int $id
  * @property int|null $user_id
+ * @property int $team_id
  * @property string $name
  * @property string $student_no
  * @property string|null $email
@@ -26,6 +27,7 @@ use yii\db\ActiveRecord;
  *
  * @property User $user
  * @property User $reviewer
+ * @property Team $team
  */
 class TeamMemberApply extends ActiveRecord
 {
@@ -47,15 +49,17 @@ class TeamMemberApply extends ActiveRecord
     {
         return [
             [['name', 'student_no'], 'required'],
-            [['user_id', 'status', 'reviewer_id', 'reviewed_at', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'team_id', 'status', 'reviewer_id', 'reviewed_at', 'created_at', 'updated_at'], 'integer'],
             [['reason'], 'string'],
             [['name'], 'string', 'max' => 50],
             [['student_no'], 'string', 'max' => 30],
             [['email'], 'string', 'max' => 120],
             [['student_no'], 'unique'],
+            [['team_id'], 'required'],
             ['status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED]],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['reviewer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['reviewer_id' => 'id']],
+            [['team_id'], 'exist', 'skipOnError' => true, 'targetClass' => Team::class, 'targetAttribute' => ['team_id' => 'id']],
         ];
     }
 
@@ -64,6 +68,7 @@ class TeamMemberApply extends ActiveRecord
         return [
             'id' => 'ID',
             'user_id' => '申请人',
+            'team_id' => '目标团队',
             'name' => '姓名',
             'student_no' => '学号',
             'email' => '邮箱',
@@ -98,5 +103,10 @@ class TeamMemberApply extends ActiveRecord
     public function getReviewer()
     {
         return $this->hasOne(User::class, ['id' => 'reviewer_id']);
+    }
+
+    public function getTeam()
+    {
+        return $this->hasOne(Team::class, ['id' => 'team_id']);
     }
 }

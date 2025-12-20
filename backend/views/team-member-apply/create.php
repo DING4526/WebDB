@@ -19,9 +19,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <?php $form = ActiveForm::begin(); ?>
 
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'student_no')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'team_id')->dropDownList($teamOptions, ['prompt' => '请选择目标团队']) ?>
+            <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => true]) ?>
+            <?= $form->field($model, 'student_no')->textInput(['maxlength' => true, 'readonly' => true]) ?>
+            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true]) ?>
             <?= $form->field($model, 'reason')->textarea(['rows' => 4]) ?>
 
             <div class="form-group">

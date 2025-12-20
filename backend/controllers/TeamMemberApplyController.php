@@ -11,6 +11,7 @@ use Yii;
 use common\models\TeamMemberApply;
 use backend\models\TeamMemberApplySearch;
 use common\models\User;
+use common\models\Team;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -57,13 +58,20 @@ class TeamMemberApplyController extends Controller
 
     public function actionCreate()
     {
-        $model = new TeamMemberApply();
         $user = Yii::$app->user->getUser();
+        if ($user && $user->isRoot()) {
+            throw new \yii\web\ForbiddenHttpException('root 无需申请成员身份');
+        }
+
+        $model = new TeamMemberApply();
         if ($user) {
             $model->user_id = $user->id;
             $model->name = $user->username;
+            $model->student_no = $user->username;
             $model->email = $user->email;
         }
+
+        $teamOptions = Team::find()->select(['name', 'id'])->indexBy('id')->column();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', '申请已提交，请等待审核。');
@@ -72,6 +80,7 @@ class TeamMemberApplyController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'teamOptions' => $teamOptions,
         ]);
     }
 
@@ -80,7 +89,8 @@ class TeamMemberApplyController extends Controller
         $this->requireRoot();
         $model = $this->findModel($id);
         $model->status = TeamMemberApply::STATUS_APPROVED;
-        $model->reviewer_id = Yii::$app->user->id;
+        $reviewer = Yii::$app->user->getUser();
+        $model->reviewer_id = $reviewer ? $reviewer->id : Yii::$app->user->id;
         $model->reviewed_at = time();
         if ($model->save(false, ['status', 'reviewer_id', 'reviewed_at', 'updated_at'])) {
             // 提升为 member
@@ -97,7 +107,8 @@ class TeamMemberApplyController extends Controller
         $this->requireRoot();
         $model = $this->findModel($id);
         $model->status = TeamMemberApply::STATUS_REJECTED;
-        $model->reviewer_id = Yii::$app->user->id;
+        $reviewer = Yii::$app->user->getUser();
+        $model->reviewer_id = $reviewer ? $reviewer->id : Yii::$app->user->id;
         $model->reviewed_at = time();
         $model->save(false, ['status', 'reviewer_id', 'reviewed_at', 'updated_at']);
         Yii::$app->session->setFlash('info', '已拒绝该申请。');

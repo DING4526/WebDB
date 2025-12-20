@@ -28,6 +28,13 @@ $this->params['breadcrumbs'][] = $this->title;
           'tableOptions' => ['class' => 'table table-striped table-condensed'],
           'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
+              [
+                  'attribute' => 'team_id',
+                  'value' => function ($model) {
+                      return $model->team->name ?? '';
+                  },
+                  'filter' => \common\models\Team::find()->select(['name','id'])->indexBy('id')->column(),
+              ],
               'name',
               'student_no',
               'email:email',

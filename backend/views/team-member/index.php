@@ -16,7 +16,8 @@ use common\models\User;
 $this->title = '成员管理';
 $this->params['breadcrumbs'][] = $this->title;
 
-$isRoot = !Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot();
+$user = Yii::$app->user->getUser();
+$isRoot = $user && $user->isRoot();
 
 $teamFilter = ArrayHelper::map(Team::find()->all(), 'id', 'name');
 
@@ -58,7 +59,9 @@ $userList = ArrayHelper::map(
               ],
               [
                   'attribute' => 'user_id',
-                  'value' => fn($m) => $m->user ? $m->user->username : '',
+                  'value' => function ($m) {
+                      return $m->user ? $m->user->username : '';
+                  },
                   'filter' => $userList,
               ],
               'name',

@@ -14,7 +14,7 @@ class TeamMemberApplySearch extends TeamMemberApply
     public function rules()
     {
         return [
-            [['id', 'user_id', 'status', 'reviewer_id'], 'integer'],
+            [['id', 'user_id', 'team_id', 'status', 'reviewer_id'], 'integer'],
             [['name', 'student_no', 'email'], 'safe'],
         ];
     }
@@ -44,6 +44,7 @@ class TeamMemberApplySearch extends TeamMemberApply
         $query->andFilterWhere([
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'team_id' => $this->team_id,
             'status' => $this->status,
             'reviewer_id' => $this->reviewer_id,
         ]);
