@@ -10,6 +10,7 @@ namespace backend\controllers;
 use Yii;
 use common\models\TeamMemberApply;
 use backend\models\TeamMemberApplySearch;
+use common\models\TeamMember;
 use common\models\User;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -101,6 +102,22 @@ class TeamMemberApplyController extends Controller
             // 提升为 member
             if ($model->user_id) {
                 User::updateAll(['role' => User::ROLE_MEMBER], ['id' => $model->user_id]);
+                $teamId = $model->team_id ?: (Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null);
+                if ($teamId) {
+                    $exists = TeamMember::find()
+                        ->andWhere(['team_id' => $teamId, 'user_id' => $model->user_id])
+                        ->exists();
+                    if (!$exists) {
+                        $user = User::findOne($model->user_id);
+                        $tm = new TeamMember();
+                        $tm->team_id = $teamId;
+                        $tm->user_id = $model->user_id;
+                        $tm->name = $user ? $user->username : $model->name;
+                        $tm->student_no = $user ? $user->username : $model->student_no;
+                        $tm->status = TeamMember::STATUS_ACTIVE;
+                        $tm->save(false);
+                    }
+                }
             }
             Yii::$app->session->setFlash('success', '已通过申请，用户角色已升为 member。');
         }

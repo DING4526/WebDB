@@ -19,8 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 $user = Yii::$app->user->getUser();
 $isRoot = $user && $user->isRoot();
 
-$teamFilter = ArrayHelper::map(Team::find()->all(), 'id', 'name');
-
 $userList = ArrayHelper::map(
     User::find()->orderBy(['id' => SORT_DESC])->all(),
     'id',
@@ -50,18 +48,13 @@ $userList = ArrayHelper::map(
           'dataProvider' => $dataProvider,
           'filterModel' => $searchModel,
           'tableOptions' => ['class' => 'table table-striped table-condensed'],
-          'columns' => [
-              ['class' => 'yii\grid\SerialColumn'],
-              [
-                  'attribute' => 'team_id',
-                  'value' => fn($m) => $m->team ? $m->team->name : '',
-                  'filter' => $teamFilter,
-              ],
-              [
-                  'attribute' => 'user_id',
-                  'value' => function ($m) {
-                      return $m->user ? $m->user->username : '';
-                  },
+           'columns' => [
+               ['class' => 'yii\grid\SerialColumn'],
+               [
+                   'attribute' => 'user_id',
+                   'value' => function ($m) {
+                       return $m->user ? $m->user->username : '';
+                   },
                   'filter' => $userList,
               ],
               'name',
