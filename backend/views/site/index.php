@@ -8,26 +8,30 @@ use yii\helpers\Url;
 $this->title = '团队后台主页';
 $this->params['breadcrumbs'][] = $this->title;
 
+$currentUser = Yii::$app->user->getUser();
+$isRoot = $currentUser && $currentUser->isRoot();
+$isMember = $currentUser && $currentUser->isMember();
+
 $roleMatrix = [
     [
         'name' => 'root 管理员',
         'color' => 'danger',
-        'abilities' => ['系统配置', '成员审批/禁用', '敏感数据清理'],
+        'abilities' => ['系统配置', '成员审批/维护'],
     ],
     [
-        'name' => '普通管理员（member）',
+        'name' => '团队成员（member）',
         'color' => 'primary',
-        'abilities' => ['成员维护', '作业/任务内容管理', '公告与导航编辑'],
+        'abilities' => ['查看任务版', '提交作业文件', '参与团队协作'],
     ],
     [
         'name' => '普通用户（user）',
         'color' => 'info',
-        'abilities' => ['查看作业与任务', '提交作业文件（待开放上传）', '参与任务分工'],
+        'abilities' => ['仅浏览公共信息', '无法操作数据', '可申请成为团队成员'],
     ],
     [
         'name' => '游客（guest）',
         'color' => 'default',
-        'abilities' => ['仅浏览公共信息', '无法操作数据'],
+        'abilities' => ['仅浏览首页', '无法访问后台'],
     ],
 ];
 
@@ -84,9 +88,18 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
               <?php endif; ?>
             </div>
             <div class="col-sm-4 text-right">
-              <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
-              <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/create']) ?>">申请成为团队成员</a>
-              <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
+              <?php if ($isRoot): ?>
+                <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+                <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/index']) ?>">审批成员申请</a>
+                <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
+              <?php elseif($isMember): ?>
+                <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+                <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
+              <?php else: ?>
+                <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+                <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/create']) ?>">申请成为团队成员</a>
+                <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
+              <?php endif; ?>                
             </div>
           </div>
         </div>
@@ -123,9 +136,9 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
               </tbody>
             </table>
           </div>
-          <div class="alert alert-warning" style="margin-bottom: 0;">
+          <!-- <div class="alert alert-warning" style="margin-bottom: 0;">
             当前系统仅基于“是否登录”区分身份，以上为规划基线，后续逐步接入。
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

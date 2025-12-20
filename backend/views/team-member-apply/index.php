@@ -18,9 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
       成员申请审批
     </div>
     <div class="panel-body">
-      <p>
-        <?= Html::a('提交申请', ['create'], ['class' => 'btn btn-success']) ?>
-      </p>
 
       <?= GridView::widget([
           'dataProvider' => $dataProvider,

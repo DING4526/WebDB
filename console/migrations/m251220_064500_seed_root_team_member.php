@@ -1,6 +1,5 @@
 <?php
 
-use Yii;
 use yii\db\Migration;
 use yii\db\Query;
 
@@ -11,7 +10,7 @@ class m251220_064500_seed_root_team_member extends Migration
 {
     public function up()
     {
-        $teamId = Yii::$app->has('teamProvider') ? Yii::$app->teamProvider->getId() : null;
+        $teamId = \Yii::$app->has('teamProvider') ? \Yii::$app->teamProvider->getId() : null;
         if (!$teamId) {
             return;
         }
@@ -51,7 +50,7 @@ class m251220_064500_seed_root_team_member extends Migration
 
     public function down()
     {
-        $teamId = Yii::$app->has('teamProvider') ? Yii::$app->teamProvider->getId() : null;
+        $teamId = \Yii::$app->has('teamProvider') ? \Yii::$app->teamProvider->getId() : null;
         $rootId = (new Query())
             ->from('{{%user}}')
             ->where(['username' => 'root'])

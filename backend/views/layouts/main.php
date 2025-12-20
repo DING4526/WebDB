@@ -18,7 +18,12 @@ use common\widgets\Alert;
 use common\models\User;
 
 AppAsset::register($this);
+
+$currentUser = Yii::$app->user->getUser();
+$isRoot = $currentUser && $currentUser->isRoot();
+$isMember = $currentUser && $currentUser->isMember();
 ?>
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
@@ -233,10 +238,10 @@ AppAsset::register($this);
                 </strong></div>
               </div>
 
-              <div class="pull-right mr10 text-right">
+              <!-- <div class="pull-right mr10 text-right">
                 <div class="text-muted">可访问范围</div>
                 <div class="label label-primary">作业/任务</div>
-              </div>
+              </div> -->
             </li>
    
           </ul>
@@ -314,7 +319,11 @@ AppAsset::register($this);
           <li>
             <a href="<?= Url::to(['team/index']) ?>">
               <span class="glyphicon glyphicon-king"></span>
+                <?php if ($isRoot): ?>
               <span class="sidebar-title">团队管理</span>
+              <?php else: ?>
+                <span class="sidebar-title">团队信息</span>
+              <?php endif; ?>
             </a>
           </li>
 
@@ -335,29 +344,33 @@ AppAsset::register($this);
 
           <!-- 任务分工 -->
           <li class="sidebar-label pt20">任务与协作</li>
-          <li>
-            <a href="<?= Url::to(['taskboard/index']) ?>">
-              <span class="glyphicon glyphicon-check"></span>
-              <span class="sidebar-title">任务分工板</span>
-              <span class="label label-sm label-success ml10">NEW</span>
-            </a>
-          </li>
-
+          <?php if ($isRoot || $isMember): ?>
+            <li>
+              <a href="<?= Url::to(['taskboard/index']) ?>">
+                <span class="glyphicon glyphicon-check"></span>
+                <span class="sidebar-title">任务分工板</span>
+                <span class="label label-sm label-success ml10">NEW</span>
+              </a>
+            </li>
+          <?php endif; ?>
+          
+          <?php if (!$isRoot && !$isMember): ?>
           <li>
             <a href="<?= Url::to(['team-member-apply/create']) ?>">
               <span class="glyphicon glyphicon-send"></span>
               <span class="sidebar-title">申请成为成员</span>
             </a>
           </li>
+          <?php endif; ?>
 
-          <?php if (($user = Yii::$app->user->getUser()) && $user->isRoot()): ?>
-          <li>
-            <a href="<?= Url::to(['team-member-apply/index']) ?>">
-              <span class="glyphicon glyphicon-check"></span>
-              <span class="sidebar-title">成员申请审批</span>
-              <span class="label label-sm label-primary ml10">root</span>
-            </a>
-          </li>
+          <?php if ($isRoot): ?>
+            <li>
+              <a href="<?= Url::to(['team-member-apply/index']) ?>">
+                <span class="glyphicon glyphicon-check"></span>
+                <span class="sidebar-title">成员申请审批</span>
+                <span class="label label-sm label-primary ml10">root</span>
+              </a>
+            </li>
           <?php endif; ?>
 
           <!-- 项目管理（占位） -->
