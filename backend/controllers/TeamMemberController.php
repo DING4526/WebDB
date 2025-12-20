@@ -39,7 +39,7 @@ class TeamMemberController extends Controller
                         'allow' => true,
                         'actions' => ['create', 'update', 'delete'],
                         'matchCallback' => function () {
-                            $user = Yii::$app->user->identity;
+                            $user = Yii::$app->user->getUser();
                             return $user && $user->isRoot();
                         },
                     ],
@@ -139,7 +139,7 @@ class TeamMemberController extends Controller
 
     protected function requireRoot()
     {
-        $user = Yii::$app->user->identity;
+        $user = Yii::$app->user->getUser();
         if (!$user || !$user->isRoot()) {
             throw new \yii\web\ForbiddenHttpException('仅 root 可执行此操作');
         }

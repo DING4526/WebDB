@@ -10,7 +10,7 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => '团队管理', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
-$isRoot = !Yii::$app->user->isGuest && Yii::$app->user->identity->isRoot();
+$isRoot = ($user = Yii::$app->user->getUser()) && $user->isRoot();
 ?>
 <div class="team-view">
 

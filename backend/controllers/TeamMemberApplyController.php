@@ -58,7 +58,7 @@ class TeamMemberApplyController extends Controller
     public function actionCreate()
     {
         $model = new TeamMemberApply();
-        $user = Yii::$app->user->identity;
+        $user = Yii::$app->user->getUser();
         if ($user) {
             $model->user_id = $user->id;
             $model->name = $user->username;
