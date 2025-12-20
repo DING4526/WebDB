@@ -12,6 +12,7 @@ use yii\web\IdentityInterface;
  *
  * @property integer $id
  * @property string $username
+ * @property string $role
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $verification_token
@@ -159,19 +160,25 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * {@inheritdoc}
      */
-    public function getAuthKey()
-    {
-        return $this->auth_key;
-    }
-
-    public function isRoot()
+    /**
+     * 是否为 root（超管）
+     */
+    public function isRoot(): bool
     {
         return $this->role === self::ROLE_ROOT;
     }
 
-    public function isMember()
+    /**
+     * 是否具备 member 权限（含 root）
+     */
+    public function isMember(): bool
     {
         return $this->role === self::ROLE_MEMBER || $this->isRoot();
+    }
+
+    public function getAuthKey()
+    {
+        return $this->auth_key;
     }
 
     /**
