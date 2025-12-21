@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ding 2310724
+ * 苏奕扬 2311330
  * 前台人物列表与详情
  */
 
@@ -14,16 +14,25 @@ use yii\web\NotFoundHttpException;
 
 class PersonController extends Controller
 {
-    public function actionIndex()
+    public function actionIndex($role_type = null)
     {
+        $query = WarPerson::find()->where(['status' => 1]);
+
+        if ($role_type) {
+            $query->andWhere(['role_type' => $role_type]);
+        }
+
         $dataProvider = new ActiveDataProvider([
-            'query' => WarPerson::find()->where(['status' => 1])->orderBy(['id' => SORT_ASC]),
+            'query' => $query->orderBy(['id' => SORT_ASC]),
             'pagination' => ['pageSize' => 12],
         ]);
 
-        return $this->render('index', [
+        // 共享侧边栏数据
+        $sidebarData = $this->getSidebarData($role_type);
+
+        return $this->render('index', array_merge([
             'dataProvider' => $dataProvider,
-        ]);
+        ], $sidebarData));
     }
 
     public function actionView($id)
@@ -37,8 +46,28 @@ class PersonController extends Controller
             throw new NotFoundHttpException('未找到人物信息');
         }
 
-        return $this->render('view', [
+        // 共享侧边栏数据
+        $sidebarData = $this->getSidebarData(null);
+
+        return $this->render('view', array_merge([
             'model' => $model,
-        ]);
+        ], $sidebarData));
+    }
+
+    /**
+     * 获取侧边栏所需数据
+     */
+    protected function getSidebarData($currentRole)
+    {
+        $roles = WarPerson::find()
+            ->select('role_type')
+            ->where(['status' => 1])
+            ->distinct()
+            ->column();
+        
+        return [
+            'roles' => $roles,
+            'currentRole' => $currentRole,
+        ];
     }
 }
