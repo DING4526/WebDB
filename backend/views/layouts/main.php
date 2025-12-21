@@ -24,6 +24,14 @@ $isRoot = $currentUser && $currentUser->isRoot();
 $isMember = $currentUser && $currentUser->isMember();
 ?>
 
+<?php
+// 只要同一个 controller 就高亮（更符合侧边栏习惯）
+$cur = Yii::$app->controller->id . '/' . Yii::$app->controller->action->id;
+$activeCtl = function($controllerId) {
+  return Yii::$app->controller->id === $controllerId ? 'active' : '';
+};
+?>
+
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
@@ -48,7 +56,7 @@ $isMember = $currentUser && $currentUser->isMember();
 <?php $this->beginBody() ?>
 
 
-<!-- Start: Theme Preview Pane -->
+  <!-- Start: Theme Preview Pane -->
   <div id="skin-toolbox">
     <div class="panel">
       <div class="panel-heading">
@@ -310,13 +318,13 @@ $isMember = $currentUser && $currentUser->isMember();
 
           <!-- 首页与权限 -->
           <li class="sidebar-label pt15">主页与权限</li>
-          <li>
+          <li class="<?= $activeCtl('site') ?>">
             <a href="<?= Url::to(['site/index']) ?>">
               <span class="glyphicon glyphicon-home"></span>
               <span class="sidebar-title">后台主页概览</span>
             </a>
           </li>
-          <li>
+          <li class="<?= $activeCtl('team') ?>">
             <a href="<?= Url::to(['team/index']) ?>">
               <span class="glyphicon glyphicon-king"></span>
                 <?php if ($isRoot): ?>
@@ -329,13 +337,13 @@ $isMember = $currentUser && $currentUser->isMember();
 
           <!-- 作业展示 -->
           <li class="sidebar-label pt20">作业与内容</li>
-          <li>
+          <li class="<?= $activeCtl('teamwork') ?>">
             <a href="<?= Url::to(['teamwork/index']) ?>">
               <span class="glyphicon glyphicon-folder-open"></span>
               <span class="sidebar-title">团队作业</span>
             </a>
           </li>
-          <li>
+          <li class="<?= $activeCtl('personalwork') ?>">
             <a href="<?= Url::to(['personalwork/index']) ?>">
               <span class="glyphicon glyphicon-user"></span>
               <span class="sidebar-title">个人作业</span>
@@ -345,7 +353,7 @@ $isMember = $currentUser && $currentUser->isMember();
           <!-- 任务分工 -->
           <li class="sidebar-label pt20">任务与协作</li>
           <?php if ($isRoot || $isMember): ?>
-            <li>
+            <li class="<?= $activeCtl('taskboard') ?>">
               <a href="<?= Url::to(['taskboard/index']) ?>">
                 <span class="glyphicon glyphicon-check"></span>
                 <span class="sidebar-title">任务分工板</span>
@@ -355,7 +363,7 @@ $isMember = $currentUser && $currentUser->isMember();
           <?php endif; ?>
           
           <?php if (!$isRoot && !$isMember): ?>
-          <li>
+          <li class="<?= $activeCtl('team-member-apply') ?>">
             <a href="<?= Url::to(['team-member-apply/create']) ?>">
               <span class="glyphicon glyphicon-send"></span>
               <span class="sidebar-title">申请成为成员</span>
@@ -364,7 +372,7 @@ $isMember = $currentUser && $currentUser->isMember();
           <?php endif; ?>
 
           <?php if ($isRoot): ?>
-            <li>
+            <li class="<?= $activeCtl('team-member-apply') ?>">
               <a href="<?= Url::to(['team-member-apply/index']) ?>">
                 <span class="glyphicon glyphicon-check"></span>
                 <span class="sidebar-title">成员申请审批</span>
@@ -375,7 +383,7 @@ $isMember = $currentUser && $currentUser->isMember();
 
           <!-- 项目管理（占位） -->
           <li class="sidebar-label pt20">项目管理</li>
-          <li>
+          <li class="<?= $activeCtl('project') ?>">
             <a href="<?= Url::to(['project/index']) ?>">
               <span class="glyphicon glyphicon-wrench"></span>
               <span class="sidebar-title">团队项目网站管理</span>
@@ -668,5 +676,27 @@ $isMember = $currentUser && $currentUser->isMember();
   <!-- END: PAGE SCRIPTS -->
 <?php $this->endBody() ?>
 </body>
+
+<style>
+/* 侧边栏选中项：背景色 + 左侧高亮条 */
+#sidebar_left .sidebar-menu > li.active > a {
+  background: rgba(255,255,255,0.10) !important; /* 深色侧边栏上更明显 */
+  color: #fff !important;
+  border-left: 4px solid #4aa3ff;  /* 你可以换成主题色 */
+  padding-left: 5px;             /* 配合左边border */
+}
+
+/* 选中项图标也亮一点 */
+#sidebar_left .sidebar-menu > li.active > a .glyphicon,
+#sidebar_left .sidebar-menu > li.active > a .fa {
+  color: #fff !important;
+}
+
+/* hover 也顺滑些（可选） */
+#sidebar_left .sidebar-menu > li > a:hover {
+  background: rgba(255,255,255,0.06);
+}
+</style>
+
 </html>
 <?php $this->endPage() ?>
