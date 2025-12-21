@@ -174,8 +174,6 @@ class WarPersonController extends Controller
 
     public function actionUploadMedia($id)
     {
-        $type = Yii::$app->request->post('type', 'image');
-        $title = Yii::$app->request->post('title');
         $file = UploadedFile::getInstanceByName('file');
 
         if (!$file) {
@@ -183,6 +181,7 @@ class WarPersonController extends Controller
             return $this->redirect(['view', 'id' => $id]);
         }
 
+        $type = $this->detectType($file);
         if (!$this->validateFile($file, $type)) {
             Yii::$app->session->setFlash('error', '文件类型或大小不符合要求');
             return $this->redirect(['view', 'id' => $id]);
@@ -195,18 +194,14 @@ class WarPersonController extends Controller
             return $this->redirect(['view', 'id' => $id]);
         }
 
-        $media = new WarMedia();
-        $media->person_id = $id;
-        $media->type = $type;
-        $media->path = $relativePath;
-        $media->title = $title ?: $file->baseName;
-        $media->uploaded_at = time();
-        if ($media->save()) {
-            Yii::$app->session->setFlash('success', '文件已上传并保存');
-        } else {
-            Yii::$app->session->setFlash('error', '媒资保存失败');
-        }
-        return $this->redirect(['view', 'id' => $id]);
+        Yii::$app->session->setFlash('success', '文件已上传，表单已填充，可修改标题后保存');
+        return $this->redirect([
+            'view',
+            'id' => $id,
+            'm_title' => $file->baseName,
+            'm_type' => $type,
+            'm_path' => $relativePath,
+        ]);
     }
 
     public function actionDelete($id)
@@ -246,7 +241,9 @@ class WarPersonController extends Controller
     {
         $form = new WarMedia();
         $form->person_id = $personId;
-        $form->type = 'image';
+        $form->type = Yii::$app->request->get('m_type', 'image');
+        $form->path = Yii::$app->request->get('m_path');
+        $form->title = Yii::$app->request->get('m_title');
         return $form;
     }
 
@@ -256,6 +253,13 @@ class WarPersonController extends Controller
             ->where(['person_id' => $personId])
             ->orderBy(['id' => SORT_DESC])
             ->all();
+    }
+
+    protected function detectType(UploadedFile $file): string
+    {
+        $ext = strtolower($file->extension);
+        $images = ['jpg', 'jpeg', 'png', 'webp'];
+        return in_array($ext, $images, true) ? 'image' : 'document';
     }
 
     protected function validateFile(UploadedFile $file, string $type): bool
@@ -275,7 +279,7 @@ class WarPersonController extends Controller
 
     protected function storeFile(UploadedFile $file, string $subDir): ?string
     {
-        $basePath = Yii::getAlias('@frontend/web/uploads/war');
+        $basePath = Yii::getAlias('@uploadsWarRoot');
         $targetDir = $basePath . '/' . $subDir;
         FileHelper::createDirectory($targetDir, 0775, true);
 

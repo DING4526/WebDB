@@ -133,7 +133,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]); ?>
                     <?= $mediaFormWidget->field($mediaForm, 'title')->textInput(['maxlength' => true]) ?>
                     <?= $mediaFormWidget->field($mediaForm, 'type')->dropDownList(['image' => '图片', 'document' => '文档']) ?>
-                    <?= $mediaFormWidget->field($mediaForm, 'path')->textInput(['maxlength' => true]) ?>
+                    <?= $mediaFormWidget->field($mediaForm, 'path')->textInput(['maxlength' => true, 'readonly' => true, 'placeholder' => '通过上传自动填充']) ?>
+                    <p class="help-block">上传成功后自动带入路径与类型，可在此调整标题再保存。</p>
                     <?= Html::submitButton('添加媒资', ['class' => 'btn btn-primary']) ?>
                     <?php ActiveForm::end(); ?>
                 </div>
@@ -152,17 +153,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="modal-body">
                     <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', ['enctype' => 'multipart/form-data']) ?>
                     <div class="form-group">
-                        <label>标题（可选）</label>
-                        <?= Html::textInput('title', null, ['class' => 'form-control']) ?>
-                    </div>
-                    <div class="form-group">
-                        <label>类型</label>
-                        <?= Html::dropDownList('type', 'image', ['image' => '图片', 'document' => '文档'], ['class' => 'form-control']) ?>
-                    </div>
-                    <div class="form-group">
                         <label>选择文件</label>
                         <?= Html::fileInput('file', null, ['class' => 'form-control']) ?>
-                        <p class="help-block">支持图片(jpg/png/webp)或文档(pdf/doc/docx)，大小 ≤ 10MB。</p>
+                        <p class="help-block">支持图片(jpg/png/webp)或文档(pdf/doc/docx)，大小 ≤ 10MB。上传后自动识别类型并生成路径（基于 uploads/war/people/ 或 uploads/war/docs/）。</p>
                     </div>
                     <?= Html::submitButton('上传', ['class' => 'btn btn-primary']) ?>
                     <?= Html::endForm() ?>
