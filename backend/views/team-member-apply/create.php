@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
               </div>
             <?php endif; ?>
             <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => true]) ?>
-            <?= $form->field($model, 'student_no')->textInput(['maxlength' => true, 'readonly' => true]) ?>
+            <?= $form->field($model, 'student_no')->textInput(['maxlength' => true, 'placeholder' => '请输入本人学号']) ?>
             <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'readonly' => true]) ?>
             <?= $form->field($model, 'reason')->textarea(['rows' => 4]) ?>
 

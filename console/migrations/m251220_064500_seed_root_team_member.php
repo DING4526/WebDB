@@ -25,12 +25,14 @@ class m251220_064500_seed_root_team_member extends Migration
             return;
         }
 
-        $exists = (new Query())
+        $existingId = (new Query())
             ->from('{{%team_member}}')
             ->where(['team_id' => $teamId, 'user_id' => $rootId])
-            ->exists();
+            ->select('id')
+            ->scalar();
 
-        if ($exists) {
+        if ($existingId) {
+            $this->update('{{%team_member}}', ['student_no' => '000000'], ['id' => $existingId]);
             return;
         }
 
@@ -39,7 +41,7 @@ class m251220_064500_seed_root_team_member extends Migration
             'team_id' => $teamId,
             'user_id' => $rootId,
             'name' => 'root',
-            'student_no' => 'root',
+            'student_no' => '000000',
             'role' => 'root',
             'work_scope' => 'system',
             'status' => 1,

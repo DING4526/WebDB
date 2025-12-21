@@ -41,6 +41,10 @@ class DownloadController extends Controller
         $path = str_replace(['..', '\\'], ['', '/'], $path);
         $full = $base . '/' . $path;
 
+        $baseName = basename($full);
+        if ($baseName === '' || $baseName[0] === '.') {
+            throw new NotFoundHttpException('File not found');
+        }
         if (!is_file($full)) {
             throw new NotFoundHttpException('File not found');
         }
