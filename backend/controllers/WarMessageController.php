@@ -38,6 +38,7 @@ class WarMessageController extends Controller
                     'reject' => ['POST'],
                     'approve-all' => ['POST'],
                     'reject-all' => ['POST'],
+                    'revert' => ['POST'],
                 ],
             ],
         ];
@@ -92,6 +93,16 @@ class WarMessageController extends Controller
     {
         WarMessage::updateAll(['status' => WarMessage::STATUS_REJECTED], ['status' => WarMessage::STATUS_PENDING]);
         Yii::$app->session->setFlash('success', '所有待审留言已拒绝');
+        return $this->redirect(['index']);
+    }
+
+    public function actionRevert($id)
+    {
+        if (($model = WarMessage::findOne($id)) !== null) {
+            $model->status = WarMessage::STATUS_PENDING;
+            $model->save(false);
+            Yii::$app->session->setFlash('success', '已撤销至待审核');
+        }
         return $this->redirect(['index']);
     }
 

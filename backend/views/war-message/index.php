@@ -8,6 +8,8 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use common\models\WarMessage;
+use common\models\WarPerson;
+use common\models\WarEvent;
 
 /* @var $this yii\web\View */
 /* @var $pendingSearch backend\models\WarMessageSearch */
@@ -19,6 +21,34 @@ use common\models\WarMessage;
 
 $this->title = '留言审核';
 $this->params['breadcrumbs'][] = $this->title;
+
+// 简易缓存，避免重复查询
+$personCache = [];
+$eventCache = [];
+
+$getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
+    if ($model->target_type === 'person') {
+        if (!isset($personCache[$model->target_id])) {
+            $personCache[$model->target_id] = WarPerson::findOne($model->target_id);
+        }
+        $person = $personCache[$model->target_id];
+        return [
+            'label' => $person ? '人物：' . $person->name : '人物(ID:' . $model->target_id . ')',
+            'link' => "/advanced/frontend/web/index.php?r=person%2Fview&id={$model->target_id}",
+            'name' => $person->name ?? ('ID:' . $model->target_id),
+        ];
+    }
+
+    if (!isset($eventCache[$model->target_id])) {
+        $eventCache[$model->target_id] = WarEvent::findOne($model->target_id);
+    }
+    $event = $eventCache[$model->target_id];
+    return [
+        'label' => $event ? '事件：' . $event->title : '事件(ID:' . $model->target_id . ')',
+        'link' => "/advanced/frontend/web/index.php?r=timeline%2Findex&event_id={$model->target_id}",
+        'name' => $event->title ?? ('ID:' . $model->target_id),
+    ];
+};
 ?>
 
 <div class="war-message-index">
@@ -39,10 +69,14 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="panel panel-warning">
-                <div class="panel-heading">待审核</div>
+    <div class="panel-group" id="msg-accordion">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#pending-panel" aria-expanded="true">待审核</a>
+                </h4>
+            </div>
+            <div id="pending-panel" class="panel-collapse collapse in">
                 <div class="panel-body">
                     <?= GridView::widget([
                         'dataProvider' => $pendingProvider,
@@ -57,10 +91,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'label' => '目标',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return $model->target_type === 'person'
-                                        ? Html::a('人物', ['/person/view', 'id' => $model->target_id], ['target' => '_blank'])
-                                        : Html::a('事件', ['/timeline/index'], ['target' => '_blank']);
+                                'value' => function ($model) use ($getTargetInfo) {
+                                    $info = $getTargetInfo($model);
+                                    return Html::a($info['label'], $info['link'], ['target' => '_blank']);
                                 },
                             ],
                             'created_at:datetime',
@@ -80,12 +113,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'class' => 'btn btn-xs btn-danger',
                                         ]);
                                     },
-                                    'view' => function ($url, $model) {
+                                    'view' => function ($url, $model) use ($getTargetInfo) {
+                                        $info = $getTargetInfo($model);
                                         return Html::button('查看', [
                                             'class' => 'btn btn-xs btn-info js-view-message',
                                             'data-nickname' => $model->nickname,
                                             'data-content' => $model->content,
-                                            'data-target' => $model->target_type . ':' . $model->target_id,
+                                            'data-target' => $info['label'],
+                                            'data-target-link' => $info['link'],
                                             'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
                                         ]);
                                     },
@@ -97,9 +132,13 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="panel panel-success">
-                <div class="panel-heading">已通过</div>
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#approved-panel" aria-expanded="false">已通过</a>
+                </h4>
+            </div>
+            <div id="approved-panel" class="panel-collapse collapse">
                 <div class="panel-body">
                     <?= GridView::widget([
                         'dataProvider' => $approvedProvider,
@@ -114,24 +153,31 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'label' => '目标',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return $model->target_type === 'person'
-                                        ? Html::a('人物', ['/person/view', 'id' => $model->target_id], ['target' => '_blank'])
-                                        : Html::a('事件', ['/timeline/index'], ['target' => '_blank']);
+                                'value' => function ($model) use ($getTargetInfo) {
+                                    $info = $getTargetInfo($model);
+                                    return Html::a($info['label'], $info['link'], ['target' => '_blank']);
                                 },
                             ],
                             'created_at:datetime',
                             [
                                 'class' => 'yii\grid\ActionColumn',
-                                'template' => '{view}',
+                                'template' => '{view} {revert}',
                                 'buttons' => [
-                                    'view' => function ($url, $model) {
+                                    'view' => function ($url, $model) use ($getTargetInfo) {
+                                        $info = $getTargetInfo($model);
                                         return Html::button('查看', [
                                             'class' => 'btn btn-xs btn-info js-view-message',
                                             'data-nickname' => $model->nickname,
                                             'data-content' => $model->content,
-                                            'data-target' => $model->target_type . ':' . $model->target_id,
+                                            'data-target' => $info['label'],
+                                            'data-target-link' => $info['link'],
                                             'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
+                                        ]);
+                                    },
+                                    'revert' => function ($url, $model) {
+                                        return Html::a('撤销', ['revert', 'id' => $model->id], [
+                                            'data-method' => 'post',
+                                            'class' => 'btn btn-xs btn-warning',
                                         ]);
                                     },
                                 ],
@@ -142,9 +188,13 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">已拒绝</div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#rejected-panel" aria-expanded="false">已拒绝</a>
+                </h4>
+            </div>
+            <div id="rejected-panel" class="panel-collapse collapse">
                 <div class="panel-body">
                     <?= GridView::widget([
                         'dataProvider' => $rejectedProvider,
@@ -159,24 +209,31 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'label' => '目标',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return $model->target_type === 'person'
-                                        ? Html::a('人物', ['/person/view', 'id' => $model->target_id], ['target' => '_blank'])
-                                        : Html::a('事件', ['/timeline/index'], ['target' => '_blank']);
+                                'value' => function ($model) use ($getTargetInfo) {
+                                    $info = $getTargetInfo($model);
+                                    return Html::a($info['label'], $info['link'], ['target' => '_blank']);
                                 },
                             ],
                             'created_at:datetime',
                             [
                                 'class' => 'yii\grid\ActionColumn',
-                                'template' => '{view}',
+                                'template' => '{view} {revert}',
                                 'buttons' => [
-                                    'view' => function ($url, $model) {
+                                    'view' => function ($url, $model) use ($getTargetInfo) {
+                                        $info = $getTargetInfo($model);
                                         return Html::button('查看', [
                                             'class' => 'btn btn-xs btn-info js-view-message',
                                             'data-nickname' => $model->nickname,
                                             'data-content' => $model->content,
-                                            'data-target' => $model->target_type . ':' . $model->target_id,
+                                            'data-target' => $info['label'],
+                                            'data-target-link' => $info['link'],
                                             'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
+                                        ]);
+                                    },
+                                    'revert' => function ($url, $model) {
+                                        return Html::a('撤销', ['revert', 'id' => $model->id], [
+                                            'data-method' => 'post',
+                                            'class' => 'btn btn-xs btn-warning',
                                         ]);
                                     },
                                 ],
@@ -198,7 +255,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 <div class="modal-body">
                     <p><strong>昵称：</strong><span id="md-nickname"></span></p>
-                    <p><strong>目标：</strong><span id="md-target"></span></p>
+                    <p><strong>目标：</strong><a id="md-target" href="#" target="_blank"></a></p>
                     <p><strong>时间：</strong><span id="md-time"></span></p>
                     <p><strong>内容：</strong></p>
                     <div id="md-content" style="white-space: pre-wrap;"></div>
@@ -215,7 +272,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $js = <<<JS
 $(document).on('click', '.js-view-message', function () {
     $('#md-nickname').text($(this).data('nickname'));
-    $('#md-target').text($(this).data('target'));
+    $('#md-target').text($(this).data('target')).attr('href', $(this).data('target-link'));
     $('#md-time').text($(this).data('time'));
     $('#md-content').text($(this).data('content'));
     $('#messageDetailModal').modal('show');
