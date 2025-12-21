@@ -93,7 +93,9 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
         <div class="panel panel-warning">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#pending-panel" aria-expanded="true">待审核</a>
+                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#pending-panel" aria-expanded="true">
+                        待审核 (<?= $pendingProvider->getTotalCount() ?>)
+                    </a>
                 </h4>
             </div>
             <div id="pending-panel" class="panel-collapse collapse in">
@@ -137,12 +139,12 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
                                         $info = $getTargetInfo($model);
                                         return Html::button('查看', [
                                             'class' => 'btn btn-xs btn-info js-view-message',
-                                            'data-nickname' => $model->nickname,
-                                            'data-content' => $model->content,
-                                            'data-target-type' => $info['type'],
-                                            'data-target-name' => $info['name'],
-                                            'data-target-info' => json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE),
-                                            'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
+                                            'data-nickname' => Html::encode($model->nickname),
+                                            'data-content' => Html::encode($model->content),
+                                            'data-target-type' => Html::encode($info['type']),
+                                            'data-target-name' => Html::encode($info['name']),
+                                            'data-target-info' => Html::encode(json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE)),
+                                            'data-time' => Html::encode(Yii::$app->formatter->asDatetime($model->created_at)),
                                         ]);
                                     },
                                 ],
@@ -156,7 +158,9 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
         <div class="panel panel-success">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#approved-panel" aria-expanded="false">已通过</a>
+                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#approved-panel" aria-expanded="false">
+                        已通过 (<?= $approvedProvider->getTotalCount() ?>)
+                    </a>
                 </h4>
             </div>
             <div id="approved-panel" class="panel-collapse collapse">
@@ -188,12 +192,12 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
                                         $info = $getTargetInfo($model);
                                         return Html::button('查看', [
                                             'class' => 'btn btn-xs btn-info js-view-message',
-                                            'data-nickname' => $model->nickname,
-                                            'data-content' => $model->content,
-                                            'data-target-type' => $info['type'],
-                                            'data-target-name' => $info['name'],
-                                            'data-target-info' => json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE),
-                                            'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
+                                            'data-nickname' => Html::encode($model->nickname),
+                                            'data-content' => Html::encode($model->content),
+                                            'data-target-type' => Html::encode($info['type']),
+                                            'data-target-name' => Html::encode($info['name']),
+                                            'data-target-info' => Html::encode(json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE)),
+                                            'data-time' => Html::encode(Yii::$app->formatter->asDatetime($model->created_at)),
                                         ]);
                                     },
                                     'revert' => function ($url, $model) {
@@ -213,7 +217,9 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#rejected-panel" aria-expanded="false">已拒绝</a>
+                    <a data-toggle="collapse" data-parent="#msg-accordion" href="#rejected-panel" aria-expanded="false">
+                        已拒绝 (<?= $rejectedProvider->getTotalCount() ?>)
+                    </a>
                 </h4>
             </div>
             <div id="rejected-panel" class="panel-collapse collapse">
@@ -245,12 +251,12 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
                                         $info = $getTargetInfo($model);
                                         return Html::button('查看', [
                                             'class' => 'btn btn-xs btn-info js-view-message',
-                                            'data-nickname' => $model->nickname,
-                                            'data-content' => $model->content,
-                                            'data-target-type' => $info['type'],
-                                            'data-target-name' => $info['name'],
-                                            'data-target-info' => json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE),
-                                            'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
+                                            'data-nickname' => Html::encode($model->nickname),
+                                            'data-content' => Html::encode($model->content),
+                                            'data-target-type' => Html::encode($info['type']),
+                                            'data-target-name' => Html::encode($info['name']),
+                                            'data-target-info' => Html::encode(json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE)),
+                                            'data-time' => Html::encode(Yii::$app->formatter->asDatetime($model->created_at)),
                                         ]);
                                     },
                                     'revert' => function ($url, $model) {
@@ -270,40 +276,24 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
 
     <!-- 查看留言 Modal -->
     <div class="modal fade" id="messageDetailModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg"> <!-- 改为大模态框 -->
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">留言详情</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">留言信息</h3>
-                                </div>
-                                <div class="panel-body">
-                                    <p><strong>昵称：</strong><span id="md-nickname"></span></p>
-                                    <p><strong>时间：</strong><span id="md-time"></span></p>
-                                    <p><strong>内容：</strong></p>
-                                    <div id="md-content" style="white-space: pre-wrap; border: 1px solid #eee; padding: 10px; border-radius: 4px; background-color: #f9f9f9;"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="panel panel-success">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title" id="md-target-title"></h3>
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table table-bordered table-striped" id="md-target-info">
-                                        <!-- 目标信息将通过JavaScript动态填充 -->
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <p><strong>昵称：</strong><span id="md-nickname"></span></p>
+                    <p><strong>时间：</strong><span id="md-time"></span></p>
+                    <p><strong>内容：</strong></p>
+                    <div id="md-content" style="white-space: pre-wrap; border: 1px solid #eee; padding: 10px; border-radius: 4px; background-color: #f9f9f9; margin-bottom:10px;"></div>
+
+                    <h4>关联信息</h4>
+                    <p><strong>类型：</strong><span id="md-target-type"></span></p>
+                    <p><strong>名称：</strong><span id="md-target-name"></span></p>
+                    <table class="table table-bordered table-striped" id="md-target-info">
+                        <!-- 目标信息将通过JavaScript动态填充 -->
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -318,31 +308,23 @@ $(document).on('click', '.js-view-message', function () {
     $('#md-nickname').text($(this).data('nickname'));
     $('#md-time').text($(this).data('time'));
     $('#md-content').text($(this).data('content'));
-    
-    // 设置目标标题
-    var targetType = $(this).data('target-type');
-    var targetName = $(this).data('target-name');
-    $('#md-target-title').text(targetType + '信息：' + targetName);
-    
-    // 解析并显示目标信息
-    var targetInfo = JSON.parse($(this).data('target-info'));
+    $('#md-target-type').text($(this).data('target-type'));
+    $('#md-target-name').text($(this).data('target-name'));
+
+    var raw = $(this).data('target-info');
+    var targetInfo = {};
+    try { targetInfo = JSON.parse(raw); } catch (e) { targetInfo = {}; }
     var html = '';
-    
-    if (targetInfo) {
-        $.each(targetInfo, function(key, value) {
-            if (value && value !== '未知' && value !== '暂无简介') {
-                // 对简介字段特殊处理，换行显示
-                if (key === '简介' || key === 'description') {
-                    html += '<tr><th style="width: 100px;">' + key + '</th><td style="white-space: pre-wrap;">' + value + '</td></tr>';
-                } else {
-                    html += '<tr><th style="width: 100px;">' + key + '</th><td>' + value + '</td></tr>';
-                }
-            }
-        });
-    } else {
+
+    $.each(targetInfo || {}, function(key, value) {
+        if (value && value !== '未知' && value !== '暂无简介') {
+            var safeVal = $('<div/>').text(value).html();
+            html += '<tr><th style="width: 120px;">' + key + '</th><td style="white-space: pre-wrap;">' + safeVal + '</td></tr>';
+        }
+    });
+    if (!html) {
         html = '<tr><td colspan="2" class="text-muted">未能获取到目标信息</td></tr>';
     }
-    
     $('#md-target-info').html(html);
     $('#messageDetailModal').modal('show');
 });
