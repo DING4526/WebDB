@@ -381,15 +381,28 @@ $activeCtl = function($controllerId) {
             </li>
           <?php endif; ?>
 
-          <!-- 项目管理（占位） -->
+          <!-- 项目管理 -->
           <li class="sidebar-label pt20">项目管理</li>
           <li class="<?= $activeCtl('project') ?>">
             <a href="<?= Url::to(['project/index']) ?>">
               <span class="glyphicon glyphicon-wrench"></span>
               <span class="sidebar-title">团队项目网站管理</span>
-              <span class="label label-sm label-warning ml10">未实现</span>
             </a>
           </li>
+          <?php if ($isRoot || $isMember): ?>
+          <li class="<?= $activeCtl('war-event') ?>">
+            <a href="<?= Url::to(['war-event/index']) ?>">
+              <span class="glyphicon glyphicon-time"></span>
+              <span class="sidebar-title">抗战事件</span>
+            </a>
+          </li>
+          <li class="<?= $activeCtl('war-person') ?>">
+            <a href="<?= Url::to(['war-person/index']) ?>">
+              <span class="glyphicon glyphicon-education"></span>
+              <span class="sidebar-title">抗战人物</span>
+            </a>
+          </li>
+          <?php endif; ?>
 
           <!-- 状态（可留可删） -->
           <li class="sidebar-label pt25 pb10">治理进度</li>
