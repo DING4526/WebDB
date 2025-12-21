@@ -23,7 +23,7 @@ class WarMessageController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'approve', 'reject', 'approve-all', 'reject-all'],
+                        'actions' => ['index', 'approve', 'reject', 'approve-all', 'reject-all', 'revert'],
                         'matchCallback' => function () {
                             $user = Yii::$app->user->getUser();
                             return $user && $user->isMember();

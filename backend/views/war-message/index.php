@@ -32,10 +32,20 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
             $personCache[$model->target_id] = WarPerson::findOne($model->target_id);
         }
         $person = $personCache[$model->target_id];
+        
         return [
+            'type' => '人物',
             'label' => $person ? '人物：' . $person->name : '人物(ID:' . $model->target_id . ')',
-            'link' => "/advanced/frontend/web/index.php?r=person%2Fview&id={$model->target_id}",
             'name' => $person->name ?? ('ID:' . $model->target_id),
+            'basic_info' => $person ? [
+                'id' => $person->id,
+                '姓名' => $person->name,
+                '性别' => $person->gender ?? '未知',
+                '出生日期' => $person->birth_date ?? '未知',
+                '逝世日期' => $person->death_date ?? '未知',
+                '简介' => $person->summary ?? '暂无简介',
+            ] : null,
+            'link' => "/advanced/frontend/web/index.php?r=person%2Fview&id={$model->target_id}",
         ];
     }
 
@@ -43,10 +53,20 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
         $eventCache[$model->target_id] = WarEvent::findOne($model->target_id);
     }
     $event = $eventCache[$model->target_id];
+    
     return [
+        'type' => '事件',
         'label' => $event ? '事件：' . $event->title : '事件(ID:' . $model->target_id . ')',
-        'link' => "/advanced/frontend/web/index.php?r=timeline%2Findex&event_id={$model->target_id}",
         'name' => $event->title ?? ('ID:' . $model->target_id),
+        'basic_info' => $event ? [
+            'id' => $event->id,
+            '事件标题' => $event->title,
+            '发生时间' => $event->happened_at ?? '未知',
+            '发生地点' => $event->location ?? '未知',
+            '事件类型' => $event->type ?? '未知',
+            '简介' => $event->description ?? '暂无简介',
+        ] : null,
+        'link' => "/advanced/frontend/web/index.php?r=timeline%2Findex&event_id={$model->target_id}",
     ];
 };
 ?>
@@ -119,8 +139,9 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
                                             'class' => 'btn btn-xs btn-info js-view-message',
                                             'data-nickname' => $model->nickname,
                                             'data-content' => $model->content,
-                                            'data-target' => $info['label'],
-                                            'data-target-link' => $info['link'],
+                                            'data-target-type' => $info['type'],
+                                            'data-target-name' => $info['name'],
+                                            'data-target-info' => json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE),
                                             'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
                                         ]);
                                     },
@@ -169,8 +190,9 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
                                             'class' => 'btn btn-xs btn-info js-view-message',
                                             'data-nickname' => $model->nickname,
                                             'data-content' => $model->content,
-                                            'data-target' => $info['label'],
-                                            'data-target-link' => $info['link'],
+                                            'data-target-type' => $info['type'],
+                                            'data-target-name' => $info['name'],
+                                            'data-target-info' => json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE),
                                             'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
                                         ]);
                                     },
@@ -225,8 +247,9 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
                                             'class' => 'btn btn-xs btn-info js-view-message',
                                             'data-nickname' => $model->nickname,
                                             'data-content' => $model->content,
-                                            'data-target' => $info['label'],
-                                            'data-target-link' => $info['link'],
+                                            'data-target-type' => $info['type'],
+                                            'data-target-name' => $info['name'],
+                                            'data-target-info' => json_encode($info['basic_info'], JSON_UNESCAPED_UNICODE),
                                             'data-time' => Yii::$app->formatter->asDatetime($model->created_at),
                                         ]);
                                     },
@@ -247,18 +270,40 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
 
     <!-- 查看留言 Modal -->
     <div class="modal fade" id="messageDetailModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg"> <!-- 改为大模态框 -->
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">留言详情</h4>
                 </div>
                 <div class="modal-body">
-                    <p><strong>昵称：</strong><span id="md-nickname"></span></p>
-                    <p><strong>目标：</strong><a id="md-target" href="#" target="_blank"></a></p>
-                    <p><strong>时间：</strong><span id="md-time"></span></p>
-                    <p><strong>内容：</strong></p>
-                    <div id="md-content" style="white-space: pre-wrap;"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">留言信息</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <p><strong>昵称：</strong><span id="md-nickname"></span></p>
+                                    <p><strong>时间：</strong><span id="md-time"></span></p>
+                                    <p><strong>内容：</strong></p>
+                                    <div id="md-content" style="white-space: pre-wrap; border: 1px solid #eee; padding: 10px; border-radius: 4px; background-color: #f9f9f9;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel panel-success">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title" id="md-target-title"></h3>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table table-bordered table-striped" id="md-target-info">
+                                        <!-- 目标信息将通过JavaScript动态填充 -->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
@@ -266,15 +311,39 @@ $getTargetInfo = function ($model) use (&$personCache, &$eventCache) {
             </div>
         </div>
     </div>
-</div>
 
 <?php
 $js = <<<JS
 $(document).on('click', '.js-view-message', function () {
     $('#md-nickname').text($(this).data('nickname'));
-    $('#md-target').text($(this).data('target')).attr('href', $(this).data('target-link'));
     $('#md-time').text($(this).data('time'));
     $('#md-content').text($(this).data('content'));
+    
+    // 设置目标标题
+    var targetType = $(this).data('target-type');
+    var targetName = $(this).data('target-name');
+    $('#md-target-title').text(targetType + '信息：' + targetName);
+    
+    // 解析并显示目标信息
+    var targetInfo = JSON.parse($(this).data('target-info'));
+    var html = '';
+    
+    if (targetInfo) {
+        $.each(targetInfo, function(key, value) {
+            if (value && value !== '未知' && value !== '暂无简介') {
+                // 对简介字段特殊处理，换行显示
+                if (key === '简介' || key === 'description') {
+                    html += '<tr><th style="width: 100px;">' + key + '</th><td style="white-space: pre-wrap;">' + value + '</td></tr>';
+                } else {
+                    html += '<tr><th style="width: 100px;">' + key + '</th><td>' + value + '</td></tr>';
+                }
+            }
+        });
+    } else {
+        html = '<tr><td colspan="2" class="text-muted">未能获取到目标信息</td></tr>';
+    }
+    
+    $('#md-target-info').html(html);
     $('#messageDetailModal').modal('show');
 });
 JS;
