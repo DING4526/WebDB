@@ -45,12 +45,27 @@ class WarMessageController extends Controller
 
     public function actionIndex()
     {
-        $searchModel = new WarMessageSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $params = Yii::$app->request->queryParams;
+
+        $pendingSearch = new WarMessageSearch();
+        $pendingParams = array_replace_recursive($params, ['WarMessageSearch' => ['status' => WarMessage::STATUS_PENDING]]);
+        $pendingProvider = $pendingSearch->search($pendingParams);
+
+        $approvedSearch = new WarMessageSearch();
+        $approvedParams = array_replace_recursive($params, ['WarMessageSearch' => ['status' => WarMessage::STATUS_APPROVED]]);
+        $approvedProvider = $approvedSearch->search($approvedParams);
+
+        $rejectedSearch = new WarMessageSearch();
+        $rejectedParams = array_replace_recursive($params, ['WarMessageSearch' => ['status' => WarMessage::STATUS_REJECTED]]);
+        $rejectedProvider = $rejectedSearch->search($rejectedParams);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'pendingSearch' => $pendingSearch,
+            'approvedSearch' => $approvedSearch,
+            'rejectedSearch' => $rejectedSearch,
+            'pendingProvider' => $pendingProvider,
+            'approvedProvider' => $approvedProvider,
+            'rejectedProvider' => $rejectedProvider,
         ]);
     }
 
