@@ -171,8 +171,13 @@ class WarEventController extends Controller
     public function actionDeleteMedia($id)
     {
         $mediaId = (int)Yii::$app->request->post('media_id');
-        WarMedia::deleteAll(['id' => $mediaId, 'event_id' => $id]);
-        Yii::$app->session->setFlash('success', '媒资已删除');
+        if ($media = WarMedia::findOne(['id' => $mediaId, 'event_id' => $id])) {
+            $this->removePhysicalFile($media->path);
+            $media->delete();
+            Yii::$app->session->setFlash('success', '媒资已删除');
+        } else {
+            Yii::$app->session->setFlash('error', '媒资不存在');
+        }
         return $this->redirect(['view', 'id' => $id]);
     }
 
@@ -304,5 +309,14 @@ class WarEventController extends Controller
         }
 
         return 'uploads/war/' . $subDir . '/' . $filename;
+    }
+
+    protected function removePhysicalFile(string $relativePath): void
+    {
+        $suffix = ltrim(str_replace('uploads/war/', '', $relativePath), '/');
+        $fullPath = Yii::getAlias('@uploadsWarRoot') . '/' . $suffix;
+        if (is_file($fullPath)) {
+            @unlink($fullPath);
+        }
     }
 }

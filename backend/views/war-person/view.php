@@ -111,7 +111,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             <tr>
                                 <td><?= Html::encode($media->title) ?></td>
                                 <td><?= Html::encode($media->type) ?></td>
-                                <td><?= Html::a(Html::encode($media->path), $media->path, ['target' => '_blank']) ?></td>
+                                <?php $url = '/' . ltrim($media->path, '/'); ?>
+                                <td><?= Html::a(Html::encode($media->path), $url, ['target' => '_blank']) ?></td>
                                 <td>
                                     <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post') .
                                         Html::hiddenInput('media_id', $media->id) .
