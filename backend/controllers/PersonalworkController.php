@@ -163,6 +163,18 @@ class PersonalworkController extends Controller
         if (is_file($full)) {
             unlink($full);
         }
+        // 如果目录空了，顺手删目录
+        $dirPath = $basePath . '/' . $folder;
+        $dirReal = realpath($dirPath);
+
+        // 再做一次安全校验：目录必须在 baseRoot 下
+        if ($dirReal && strpos($dirReal, $baseRoot) === 0 && is_dir($dirReal)) {
+            $items = array_diff(scandir($dirReal), ['.', '..']);
+            // 只要没有剩余文件/子目录，就删除该目录
+            if (count($items) === 0) {
+                @rmdir($dirReal);
+            }
+        }
         Yii::$app->session->setFlash('success', '文件已删除');
         return $this->redirect(['index']);
     }
