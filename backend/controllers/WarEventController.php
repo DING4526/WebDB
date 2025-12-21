@@ -12,6 +12,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
+use yii\helpers\FileHelper;
 use common\models\WarEvent;
 use common\models\WarStage;
 use common\models\WarPerson;
@@ -33,7 +35,7 @@ class WarEventController extends Controller
                             'index', 'view', 'create', 'update', 'delete',
                             'publish', 'offline',
                             'attach-person', 'detach-person',
-                            'add-media', 'delete-media',
+                            'add-media', 'delete-media', 'upload-media',
                         ],
                         'matchCallback' => function () {
                             $user = Yii::$app->user->getUser();
@@ -52,6 +54,7 @@ class WarEventController extends Controller
                     'detach-person' => ['POST'],
                     'add-media' => ['POST'],
                     'delete-media' => ['POST'],
+                    'upload-media' => ['POST'],
                 ],
             ],
         ];
@@ -173,6 +176,43 @@ class WarEventController extends Controller
         return $this->redirect(['view', 'id' => $id]);
     }
 
+    public function actionUploadMedia($id)
+    {
+        $type = Yii::$app->request->post('type', 'image');
+        $title = Yii::$app->request->post('title');
+        $file = UploadedFile::getInstanceByName('file');
+
+        if (!$file) {
+            Yii::$app->session->setFlash('error', '请选择要上传的文件');
+            return $this->redirect(['view', 'id' => $id]);
+        }
+
+        if (!$this->validateFile($file, $type)) {
+            Yii::$app->session->setFlash('error', '文件类型或大小不符合要求');
+            return $this->redirect(['view', 'id' => $id]);
+        }
+
+        $subDir = $type === 'document' ? 'docs' : "events/{$id}";
+        $relativePath = $this->storeFile($file, $subDir);
+        if ($relativePath === null) {
+            Yii::$app->session->setFlash('error', '文件保存失败');
+            return $this->redirect(['view', 'id' => $id]);
+        }
+
+        $media = new WarMedia();
+        $media->event_id = $id;
+        $media->type = $type;
+        $media->path = $relativePath;
+        $media->title = $title ?: $file->baseName;
+        $media->uploaded_at = time();
+        if ($media->save()) {
+            Yii::$app->session->setFlash('success', '文件已上传并保存');
+        } else {
+            Yii::$app->session->setFlash('error', '媒资保存失败');
+        }
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
@@ -230,5 +270,35 @@ class WarEventController extends Controller
             ->where(['event_id' => $eventId])
             ->orderBy(['id' => SORT_DESC])
             ->all();
+    }
+
+    protected function validateFile(UploadedFile $file, string $type): bool
+    {
+        $allowedImages = ['jpg', 'jpeg', 'png', 'webp'];
+        $allowedDocs = ['pdf', 'doc', 'docx'];
+        $ext = strtolower($file->extension);
+
+        $allowed = $type === 'document' ? $allowedDocs : $allowedImages;
+        if (!in_array($ext, $allowed, true)) {
+            return false;
+        }
+
+        // 10MB
+        return $file->size <= 10 * 1024 * 1024;
+    }
+
+    protected function storeFile(UploadedFile $file, string $subDir): ?string
+    {
+        $basePath = Yii::getAlias('@frontend/web/uploads/war');
+        $targetDir = $basePath . '/' . $subDir;
+        FileHelper::createDirectory($targetDir, 0775, true);
+
+        $filename = date('Ymd_His') . '_' . Yii::$app->security->generateRandomString(6) . '.' . $file->extension;
+        $fullPath = $targetDir . '/' . $filename;
+        if (!$file->saveAs($fullPath)) {
+            return null;
+        }
+
+        return 'uploads/war/' . $subDir . '/' . $filename;
     }
 }

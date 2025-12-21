@@ -91,7 +91,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="col-md-6">
             <div class="panel panel-default">
-                <div class="panel-heading">媒资管理</div>
+                <div class="panel-heading d-flex justify-content-between">
+                    <span>媒资管理</span>
+                    <?= Html::button('上传文件', [
+                        'class' => 'btn btn-xs btn-primary pull-right',
+                        'data-toggle' => 'modal',
+                        'data-target' => '#uploadMediaModalPerson',
+                    ]) ?>
+                </div>
                 <div class="panel-body">
                     <table class="table table-condensed">
                         <thead>
@@ -129,6 +136,36 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $mediaFormWidget->field($mediaForm, 'path')->textInput(['maxlength' => true]) ?>
                     <?= Html::submitButton('添加媒资', ['class' => 'btn btn-primary']) ?>
                     <?php ActiveForm::end(); ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal fade" id="uploadMediaModalPerson" tabindex="-1" role="dialog" aria-labelledby="uploadMediaModalPersonLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="uploadMediaModalPersonLabel">上传文件</h4>
+                </div>
+                <div class="modal-body">
+                    <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', ['enctype' => 'multipart/form-data']) ?>
+                    <div class="form-group">
+                        <label>标题（可选）</label>
+                        <?= Html::textInput('title', null, ['class' => 'form-control']) ?>
+                    </div>
+                    <div class="form-group">
+                        <label>类型</label>
+                        <?= Html::dropDownList('type', 'image', ['image' => '图片', 'document' => '文档'], ['class' => 'form-control']) ?>
+                    </div>
+                    <div class="form-group">
+                        <label>选择文件</label>
+                        <?= Html::fileInput('file', null, ['class' => 'form-control']) ?>
+                        <p class="help-block">支持图片(jpg/png/webp)或文档(pdf/doc/docx)，大小 ≤ 10MB。</p>
+                    </div>
+                    <?= Html::submitButton('上传', ['class' => 'btn btn-primary']) ?>
+                    <?= Html::endForm() ?>
                 </div>
             </div>
         </div>
