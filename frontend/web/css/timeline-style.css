@@ -1,0 +1,155 @@
+/* frontend/web/css/timeline-style.css */
+
+/* 
+    liyu 2311581
+    时间轴样式
+*/
+
+.timeline-section {
+    padding: 30px 0;
+    background-color: #f9f9f9;
+}
+
+/* 时间轴主干 */
+.timeline {
+    position: relative;
+    padding: 0;
+    list-style: none;
+}
+
+/* 垂直线*/
+.timeline:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 40px;
+    width: 2px;
+    background-color: #d1d1d1;
+    z-index: 1; /* 设为底层 */
+    pointer-events: none; 
+}
+
+/* 每一个列表项：增加清除浮动，防止卡片堆叠重叠 */
+.timeline > li {
+    position: relative;
+    margin-bottom: 50px;
+    min-height: 50px;
+    clear: both; 
+}
+
+/* 清除浮动伪元素 */
+.timeline > li:after {
+    content: " ";
+    display: table;
+    clear: both;
+}
+
+/* 时间轴上的小圆点 */
+.timeline > li .timeline-badge {
+    position: absolute;
+    top: 16px;
+    left: 29px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 1.4em;
+    text-align: center;
+    color: #fff;
+    background-color: #c9302c; /* 抗战红 */
+    border-radius: 50%;
+    z-index: 2; /* 高于线条 */
+    pointer-events: none; /* 关键：防止圆点挡住背后的点击 */
+}
+
+/* 内容卡片 */
+.timeline > li .timeline-panel {
+    position: relative;
+    width: calc(100% - 90px);
+    float: right;
+    padding: 20px;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 10; /* 提升层级，确保在最顶层 */
+}
+
+/* 悬停效果 */
+.timeline > li .timeline-panel:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-color: #c9302c;
+}
+
+/* 卡片左侧的小箭头 */
+.timeline > li .timeline-panel:before {
+    content: " ";
+    display: inline-block;
+    position: absolute;
+    top: 21px;
+    left: -15px;
+    border-top: 15px solid transparent;
+    border-right: 15px solid #ccc;
+    border-left: 0 solid #ccc;
+    border-bottom: 15px solid transparent;
+}
+
+.timeline > li .timeline-panel:after {
+    content: " ";
+    display: inline-block;
+    position: absolute;
+    top: 22px;
+    left: -14px;
+    border-top: 14px solid transparent;
+    border-right: 14px solid #fff;
+    border-left: 0 solid #fff;
+    border-bottom: 14px solid transparent;
+}
+
+.timeline-title {
+    margin-top: 0;
+    color: #333;
+    font-weight: 700;
+}
+
+.timeline-date {
+    color: #c9302c;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.timeline-summary {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 阶段标题样式 */
+.timeline-stage-header {
+    list-style: none;
+    text-align: center;
+    position: relative;
+    padding: 40px 0 20px 0;
+    clear: both; /* 确保标题行不受上方浮动影响 */
+}
+
+.stage-title {
+    display: inline-block;
+    padding: 10px 25px;
+    background-color: #8b0000; /* 深红 */
+    color: #fff;
+    border-radius: 50px;
+    font-size: 1.4em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 101; 
+}
+
+@media (max-width: 767px) {
+    .timeline:before { left: 20px; }
+    .timeline > li .timeline-badge { left: 9px; }
+    .timeline > li .timeline-panel { width: calc(100% - 50px); }
+    .stage-title { font-size: 1.1em; padding: 8px 15px; }
+}
