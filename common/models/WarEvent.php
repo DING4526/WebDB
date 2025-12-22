@@ -69,4 +69,9 @@ class WarEvent extends ActiveRecord
         return $this->hasMany(WarPerson::class, ['id' => 'person_id'])
             ->via('eventPeople');
     }
+
+    public function getMedias()
+    {
+        return $this->hasMany(WarMedia::class, ['event_id' => 'id']);
+    }
 }
