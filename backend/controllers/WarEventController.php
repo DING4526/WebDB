@@ -33,7 +33,7 @@ class WarEventController extends Controller
                         'allow' => true,
                         'actions' => [
                             'index', 'view', 'create', 'update', 'delete',
-                            'publish', 'offline',
+                            'publish', 'offline', 'toggle-status',
                             'attach-person', 'detach-person',
                             'add-media', 'delete-media', 'upload-media',
                         ],
@@ -50,6 +50,7 @@ class WarEventController extends Controller
                     'delete' => ['POST'],
                     'publish' => ['POST'],
                     'offline' => ['POST'],
+                    'toggle-status' => ['POST'],
                     'attach-person' => ['POST'],
                     'detach-person' => ['POST'],
                     'add-media' => ['POST'],
@@ -79,6 +80,7 @@ class WarEventController extends Controller
             'relationForm' => $this->buildRelationForm($id),
             'mediaForm' => $this->buildMediaForm($id),
             'mediaList' => $this->getMediaList($id),
+            'relationMap' => $this->getRelationMap($id),
         ]);
     }
 
@@ -86,8 +88,8 @@ class WarEventController extends Controller
     {
         $model = new WarEvent();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', '事件已创建');
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', '事件已创建，已进入编辑页，可继续维护关联与媒资');
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -102,13 +104,27 @@ class WarEventController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', '事件已更新');
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         return $this->render('update', [
             'model' => $model,
             'stageList' => $this->getStageList(),
+            'personOptions' => $this->getPersonList(),
+            'relationForm' => $this->buildRelationForm($id),
+            'mediaForm' => $this->buildMediaForm($id),
+            'mediaList' => $this->getMediaList($id),
+            'relationMap' => $this->getRelationMap($id),
         ]);
+    }
+
+    public function actionToggleStatus($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = ($model->status === 1) ? 0 : 1;
+        $model->save(false);
+        Yii::$app->session->setFlash('success', $model->status ? '事件已发布' : '事件已下线');
+        return $this->redirect(Yii::$app->request->referrer ?: ['index']);
     }
 
     public function actionPublish($id)
@@ -272,6 +288,15 @@ class WarEventController extends Controller
             ->where(['event_id' => $eventId])
             ->orderBy(['id' => SORT_DESC])
             ->all();
+    }
+
+    protected function getRelationMap(int $eventId): array
+    {
+        $map = [];
+        foreach (WarEventPerson::find()->where(['event_id' => $eventId])->all() as $relation) {
+            $map[$relation->person_id] = $relation->relation_type;
+        }
+        return $map;
     }
 
     protected function detectType(UploadedFile $file): string
