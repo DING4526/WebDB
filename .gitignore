@@ -47,3 +47,5 @@ phpunit.phar
 
 # ignore data files
 data/
+
+**/*-local.php
