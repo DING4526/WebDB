@@ -221,11 +221,12 @@ class WarEventController extends Controller
 
         Yii::$app->session->setFlash('success', '文件已上传，表单已填充，可修改标题后保存');
         return $this->redirect([
-            'view',
+            'update',
             'id' => $id,
             'm_title' => $file->baseName,
             'm_type' => $type,
             'm_path' => $relativePath,
+            '#' => 'tab-relations',
         ]);
     }
 
