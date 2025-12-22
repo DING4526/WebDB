@@ -39,4 +39,47 @@ $this->title = $model->name;
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
+
+    <hr>
+    
+    <div class="comments-section">
+        <h3>留言互动</h3>
+        
+        <!-- 留言列表 -->
+        <div class="comments-list">
+            <?php if (empty($comments)): ?>
+                <p class="text-muted">暂无留言，快来抢沙发吧！</p>
+            <?php else: ?>
+                <?php foreach ($comments as $comment): ?>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong><?= Html::encode($comment->nickname) ?></strong>
+                            <span class="text-muted pull-right">
+                                <?= Yii::$app->formatter->asDatetime($comment->created_at) ?>
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <?= nl2br(Html::encode($comment->content)) ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- 留言表单 -->
+        <div class="comment-form">
+            <h4>发表留言</h4>
+            <?php $form = \yii\widgets\ActiveForm::begin(); ?>
+            
+            <?= $form->field($newMessage, 'nickname')->textInput(['maxlength' => true, 'placeholder' => '请输入您的昵称']) ?>
+            
+            <?= $form->field($newMessage, 'content')->textarea(['rows' => 4, 'placeholder' => '请输入留言内容']) ?>
+            
+            <div class="form-group">
+                <?= Html::submitButton('提交留言', ['class' => 'btn btn-primary']) ?>
+            </div>
+            
+            <?php \yii\widgets\ActiveForm::end(); ?>
+        </div>
+    </div>
 </div>
