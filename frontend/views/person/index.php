@@ -17,23 +17,23 @@ $this->title = '抗战人物';
     min-height: 100vh;
     border-radius: 4px;
     height: 100%;
-    border: 1px solid #ddd;
+    border: 1px solid #ebccd1;
 }
 .sidebar-dark .nav-link {
     display: block;
     padding: 15px 25px;
-    color: #333;
+    color: #a94442;
     text-decoration: none;
     font-size: 16px;
     transition: all 0.3s;
 }
 .sidebar-dark .nav-link:hover {
-    color: #000;
-    background-color: #f5f5f5;
+    color: #843534;
+    background-color: #f2dede;
 }
 .sidebar-dark .nav-link.active {
-    color: #000;
-    background-color: #e0e0e0;
+    color: #843534;
+    background-color: #ebccd1;
     font-weight: bold;
 }
 </style>
@@ -72,13 +72,13 @@ $this->title = '抗战人物';
                             'style' => 'width:100%; height:200px; object-fit:contain; margin-bottom:10px;'
                         ]);
                     }
-                    return '<div class="panel panel-default">'
+                    return '<div class="panel panel-danger">'
                         . '<div class="panel-heading"><strong>' . Html::encode($model->name) . '</strong> '
-                        . '<span class="text-muted">' . Html::encode($model->role_type) . '</span></div>'
+                        . '<span class="text-muted" style="color: #a94442;">' . Html::encode($model->role_type) . '</span></div>'
                         . '<div class="panel-body">'
                         . $img
-                        . '<p>' . Html::encode($model->intro) . '</p>'
-                        . Html::a('查看详情', ['view', 'id' => $model->id], ['class' => 'btn btn-primary btn-xs'])
+                        . '<p style="color: #a94442;">' . Html::encode($model->intro) . '</p>'
+                        . Html::a('查看详情', ['view', 'id' => $model->id], ['class' => 'btn btn-danger btn-xs'])
                         . '</div></div>';
                 },
                 'summary' => '',
