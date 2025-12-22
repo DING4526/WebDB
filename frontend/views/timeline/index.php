@@ -30,9 +30,7 @@ $this->registerCssFile('@web/css/timeline-style.css');
                     <div class="stage-title">
                         <?= Html::encode($stage->name) ?>
                         <?php if ($stage->start_year || $stage->end_year): ?>
-                            <br><small style="color: #ffd700; font-size: 0.6em;">
-                                (<?= Html::encode($stage->start_year ?: '?') ?> - <?= Html::encode($stage->end_year ?: '?') ?>)
-                            </small>
+                            <small>(<?= Html::encode($stage->start_year ?: '?') ?> - <?= Html::encode($stage->end_year ?: '?') ?>)</small>
                         <?php endif; ?>
                     </div>
                 </li>
