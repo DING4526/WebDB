@@ -32,7 +32,7 @@ class WarPersonController extends Controller
                         'allow' => true,
                         'actions' => [
                             'index', 'view', 'create', 'update', 'delete',
-                            'publish', 'offline',
+                            'publish', 'offline', 'toggle-status',
                             'attach-event', 'detach-event',
                             'add-media', 'delete-media', 'upload-media',
                         ],
@@ -49,6 +49,7 @@ class WarPersonController extends Controller
                     'delete' => ['POST'],
                     'publish' => ['POST'],
                     'offline' => ['POST'],
+                    'toggle-status' => ['POST'],
                     'attach-event' => ['POST'],
                     'detach-event' => ['POST'],
                     'add-media' => ['POST'],
@@ -85,8 +86,8 @@ class WarPersonController extends Controller
     {
         $model = new WarPerson();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', '人物已创建');
-            return $this->redirect(['view', 'id' => $model->id]);
+            Yii::$app->session->setFlash('success', '人物已创建，已进入编辑页，可继续维护关联与媒资');
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -99,12 +100,25 @@ class WarPersonController extends Controller
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', '人物已更新');
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         return $this->render('update', [
             'model' => $model,
+            'eventOptions' => $this->getEventList(),
+            'relationForm' => $this->buildRelationForm($id),
+            'mediaForm' => $this->buildMediaForm($id),
+            'mediaList' => $this->getMediaList($id),
         ]);
+    }
+
+    public function actionToggleStatus($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = ($model->status === 1) ? 0 : 1;
+        $model->save(false);
+        Yii::$app->session->setFlash('success', $model->status ? '人物已发布' : '人物已下线');
+        return $this->redirect(Yii::$app->request->referrer ?: ['index']);
     }
 
     public function actionPublish($id)

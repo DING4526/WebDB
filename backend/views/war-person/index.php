@@ -41,7 +41,35 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'filter' => [1 => '展示', 0 => '隐藏'],
             ],
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'header' => '快捷操作',
+                'template' => '{update} {toggle-status} {delete}',
+                'buttons' => [
+                    'update' => function ($url, $model) {
+                        return Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-xs btn-primary']);
+                    },
+                    'toggle-status' => function ($url, $model) {
+                        $isPublished = (bool)$model->status;
+                        return Html::a($isPublished ? '下线' : '发布', ['toggle-status', 'id' => $model->id], [
+                            'class' => 'btn btn-xs ' . ($isPublished ? 'btn-warning' : 'btn-success'),
+                            'data-method' => 'post',
+                            'data-pjax' => 0,
+                        ]);
+                    },
+                    'delete' => function ($url, $model) {
+                        return Html::a('删除', ['delete', 'id' => $model->id], [
+                            'class' => 'btn btn-xs btn-danger',
+                            'data' => [
+                                'confirm' => '确认删除该人物？',
+                                'method' => 'post',
+                            ],
+                            'data-pjax' => 0,
+                        ]);
+                    },
+                ],
+                'contentOptions' => ['style' => 'min-width:220px;'],
+            ],
         ],
     ]); ?>
 
