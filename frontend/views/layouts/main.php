@@ -92,8 +92,8 @@ echo Nav::widget([
 NavBar::end();
 ?>
 
-<div class="container">
-  <!-- 顶部专题横幅（可留可删） -->
+<!-- <div class="container">
+         顶部专题横幅（可留可删） 
   <div class="hero">
     <h3>抗战史实时间轴 · 人物群像数据库</h3>
     <div class="text-muted" style="margin-bottom:10px;">
@@ -105,7 +105,7 @@ NavBar::end();
     <a class="btn btn-default btn-sm" href="<?= Url::to(['/person/index']) ?>">
       <span class="glyphicon glyphicon-user"></span> 浏览人物库
     </a>
-  </div>
+  </div> --> 
 
   <div class="content-wrap">
     <?= Breadcrumbs::widget([
