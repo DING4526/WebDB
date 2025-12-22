@@ -74,15 +74,10 @@ class WarEventController extends Controller
 
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-            'personOptions' => $this->getPersonList(),
-            'relationForm' => $this->buildRelationForm($id),
-            'mediaForm' => $this->buildMediaForm($id),
-            'mediaList' => $this->getMediaList($id),
-            'relationMap' => $this->getRelationMap($id),
-        ]);
+        // 统一详情入口：view 路由只负责跳转到 workspace
+        return $this->redirect(['update', 'id' => $id, 'mode' => 'view']);
     }
+
 
     public function actionCreate()
     {
@@ -102,12 +97,17 @@ class WarEventController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $mode = Yii::$app->request->get('mode', 'edit');
+        $mode = in_array($mode, ['view', 'edit'], true) ? $mode : 'edit';
+
+        if ($mode === 'edit' && $model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', '事件已更新');
-            return $this->redirect(['update', 'id' => $model->id]);
+            // 保存后回到查看态（更符合“详情页”习惯；不想就改成 edit）
+            return $this->redirect(['update', 'id' => $model->id, 'mode' => 'view']);
         }
 
         return $this->render('update', [
+            'mode' => $mode,
             'model' => $model,
             'stageList' => $this->getStageList(),
             'personOptions' => $this->getPersonList(),
@@ -117,6 +117,7 @@ class WarEventController extends Controller
             'relationMap' => $this->getRelationMap($id),
         ]);
     }
+
 
     public function actionToggleStatus($id)
     {
@@ -158,7 +159,7 @@ class WarEventController extends Controller
             }
             Yii::$app->session->setFlash($saved ? 'success' : 'error', $saved ? '人物已绑定' : '绑定失败，请检查选择');
         }
-        return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+        return $this->redirect(['update', 'id' => $id]);
     }
 
     public function actionDetachPerson($id)
@@ -166,7 +167,7 @@ class WarEventController extends Controller
         $personId = (int)Yii::$app->request->post('person_id');
         WarEventPerson::deleteAll(['event_id' => $id, 'person_id' => $personId]);
         Yii::$app->session->setFlash('success', '已移除绑定');
-        return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+        return $this->redirect(['update', 'id' => $id]);
     }
 
     public function actionAddMedia($id)
@@ -181,7 +182,7 @@ class WarEventController extends Controller
                 Yii::$app->session->setFlash('error', '媒资保存失败');
             }
         }
-        return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+        return $this->redirect(['update', 'id' => $id]);
     }
 
     public function actionDeleteMedia($id)
@@ -194,7 +195,7 @@ class WarEventController extends Controller
         } else {
             Yii::$app->session->setFlash('error', '媒资不存在');
         }
-        return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+        return $this->redirect(['update', 'id' => $id]);
     }
 
     public function actionUploadMedia($id)
@@ -203,20 +204,20 @@ class WarEventController extends Controller
 
         if (!$file) {
             Yii::$app->session->setFlash('error', '请选择要上传的文件');
-            return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+            return $this->redirect(['update', 'id' => $id]);
         }
 
         $type = $this->detectType($file);
         if (!$this->validateFile($file, $type)) {
             Yii::$app->session->setFlash('error', '文件类型或大小不符合要求');
-            return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+            return $this->redirect(['update', 'id' => $id]);
         }
 
         $subDir = $type === 'document' ? 'docs' : "events/{$id}";
         $relativePath = $this->storeFile($file, $subDir);
         if ($relativePath === null) {
             Yii::$app->session->setFlash('error', '文件保存失败');
-            return $this->redirect(['update', 'id' => $id, '#' => 'tab-relations']);
+            return $this->redirect(['update', 'id' => $id]);
         }
 
         Yii::$app->session->setFlash('success', '文件已上传，表单已填充，可修改标题后保存');
@@ -226,7 +227,6 @@ class WarEventController extends Controller
             'm_title' => $file->baseName,
             'm_type' => $type,
             'm_path' => $relativePath,
-            '#' => 'tab-relations',
         ]);
     }
 
