@@ -65,11 +65,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
-    <?= $this->render('_relations_media', [
+    <?= $this->render('_relations_media_view', [
         'model' => $model,
-        'personOptions' => $personOptions,
-        'relationForm' => $relationForm,
-        'mediaForm' => $mediaForm,
         'mediaList' => $mediaList,
         'relationMap' => $relationMap,
     ]) ?>

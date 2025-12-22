@@ -49,8 +49,11 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'class' => 'yii\grid\ActionColumn',
                 'header' => '快捷操作',
-                'template' => '{update} {toggle-status} {delete}',
+                'template' => '{view} {update} {toggle-status} {delete}',
                 'buttons' => [
+                    'view' => function ($url, $model) {
+                        return Html::a('查看', ['view', 'id' => $model->id], ['class' => 'btn btn-xs btn-default']);
+                    },
                     'update' => function ($url, $model) {
                         return Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-xs btn-primary']);
                     },

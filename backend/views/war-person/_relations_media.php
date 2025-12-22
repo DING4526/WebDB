@@ -47,10 +47,10 @@ $docList = array_filter($mediaList, fn($m) => $m->type === 'document');
 
                 <?php $form = ActiveForm::begin([
                     'action' => ['attach-event', 'id' => $model->id],
-                    'options' => ['class' => 'form-inline'],
+                    'options' => ['class' => 'form-vertical'],
                 ]); ?>
-                <?= $form->field($relationForm, 'event_id')->dropDownList($eventOptions, ['prompt' => '选择事件'])->label(false) ?>
-                <?= $form->field($relationForm, 'relation_type')->textInput(['placeholder' => '关系(可选)'])->label(false) ?>
+                <?= $form->field($relationForm, 'event_id')->dropDownList($eventOptions, ['prompt' => '选择事件']) ?>
+                <?= $form->field($relationForm, 'relation_type')->textInput(['placeholder' => '关系(可选)']) ?>
                 <?= Html::submitButton('绑定事件', ['class' => 'btn btn-success']) ?>
                 <?php ActiveForm::end(); ?>
             </div>
