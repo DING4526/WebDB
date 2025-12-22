@@ -9,7 +9,7 @@ namespace backend\controllers;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 
-class ProjectController extends Controller
+class ProjectShowController extends Controller
 {
     public function behaviors()
     {

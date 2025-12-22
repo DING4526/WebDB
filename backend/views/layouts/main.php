@@ -381,26 +381,67 @@ $activeCtl = function($controllerId) {
             </li>
           <?php endif; ?>
 
-          <!-- 项目管理 -->
-          <li class="sidebar-label pt20">项目管理</li>
-          <li class="<?= $activeCtl('project') ?>">
-            <a href="<?= Url::to(['project/index']) ?>">
-              <span class="glyphicon glyphicon-wrench"></span>
-              <span class="sidebar-title">团队项目网站管理</span>
+          <?php // —— 抗战专题：用于自动展开 ——
+            // 当前 controller id
+            $curCtl = Yii::$app->controller->id;
+            // 展示模块 controller
+            $warShowCtls = ['project-show']; 
+            // 管理模块 controller（随时可加）
+            $warManageCtls = [
+              'war-event',
+              'war-person',
+              'war-message',
+            ];
+
+            // 当前是否命中“展示/管理”
+            $isWarShowActive = in_array($curCtl, $warShowCtls, true);
+            $isWarManageActive = in_array($curCtl, $warManageCtls, true);
+          ?>
+
+          <!-- 抗战专题 -->
+          <li class="sidebar-label pt20">团队项目-抗战专题</li>
+
+          <!-- 1) 项目数据展示：单独入口 -->
+          <li class="<?= $isWarShowActive ? 'active' : '' ?>">
+            <a href="<?= Url::to(['project-show/index']) ?>">
+              <span class="glyphicon glyphicon-stats"></span>
+              <span class="sidebar-title">项目数据展示</span>
             </a>
           </li>
+
+          <!-- 2) 项目数据管理：点击展开 -->
           <?php if ($isRoot || $isMember): ?>
-          <li class="<?= $activeCtl('war-event') ?>">
-            <a href="<?= Url::to(['war-event/index']) ?>">
-              <span class="glyphicon glyphicon-time"></span>
-              <span class="sidebar-title">抗战事件</span>
+          <li class="<?= $isWarManageActive ? 'active' : '' ?>">
+            <a class="accordion-toggle <?= $isWarManageActive ? '' : 'collapsed' ?>"
+              data-toggle="collapse"
+              href="#menu-war-manage"
+              aria-expanded="<?= $isWarManageActive ? 'true' : 'false' ?>">
+              <span class="glyphicon glyphicon-folder-open"></span>
+              <span class="sidebar-title">项目数据管理</span>
+              <span class="caret"></span>
             </a>
-          </li>
-          <li class="<?= $activeCtl('war-person') ?>">
-            <a href="<?= Url::to(['war-person/index']) ?>">
-              <span class="glyphicon glyphicon-education"></span>
-              <span class="sidebar-title">抗战人物</span>
-            </a>
+
+            <ul id="menu-war-manage" class="nav sub-nav collapse <?= $isWarManageActive ? 'in' : '' ?>">
+              <!-- 核心 CRUD -->
+              <li class="<?= $activeCtl('war-event') ?>">
+                <a href="<?= Url::to(['war-event/index']) ?>">
+                  <span class="glyphicon glyphicon-time"></span>
+                  抗战事件
+                </a>
+              </li>
+              <li class="<?= $activeCtl('war-person') ?>">
+                <a href="<?= Url::to(['war-person/index']) ?>">
+                  <span class="glyphicon glyphicon-education"></span>
+                  抗战人物
+                </a>
+              </li>
+              <li class="<?= $activeCtl('war-message') ?>">
+                <a href="<?= Url::to(['war-message/index']) ?>">
+                  <span class="glyphicon glyphicon-comment"></span>
+                  留言审核
+                </a>
+              </li>
+            </ul>
           </li>
           <?php endif; ?>
 
