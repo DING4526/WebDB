@@ -15,6 +15,7 @@ use yii\widgets\ActiveForm;
 /* @var $relationForm common\models\WarEventPerson */
 /* @var $mediaForm common\models\WarMedia */
 /* @var $mediaList common\models\WarMedia[] */
+/* @var $relationMap array */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => '抗战人物管理', 'url' => ['index']];
@@ -37,24 +38,29 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'role_type',
-            'birth_year',
-            'death_year',
-            'intro:ntext',
-            'biography:ntext',
-            [
-                'attribute' => 'status',
-                'value' => $model->status ? '展示' : '隐藏',
-            ],
-            'created_at:datetime',
-            'updated_at:datetime',
-        ],
-    ]) ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">基本信息</div>
+        <div class="panel-body">
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'id',
+                    'name',
+                    'role_type',
+                    'birth_year',
+                    'death_year',
+                    'intro:ntext',
+                    'biography:ntext',
+                    [
+                        'attribute' => 'status',
+                        'value' => $model->status ? '展示' : '隐藏',
+                    ],
+                    'created_at:datetime',
+                    'updated_at:datetime',
+                ],
+            ]) ?>
+        </div>
+    </div>
 
     <?= $this->render('_relations_media', [
         'model' => $model,
@@ -62,5 +68,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'relationForm' => $relationForm,
         'mediaForm' => $mediaForm,
         'mediaList' => $mediaList,
+        'relationMap' => $relationMap,
     ]) ?>
 </div>

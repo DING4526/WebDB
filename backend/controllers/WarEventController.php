@@ -80,6 +80,7 @@ class WarEventController extends Controller
             'relationForm' => $this->buildRelationForm($id),
             'mediaForm' => $this->buildMediaForm($id),
             'mediaList' => $this->getMediaList($id),
+            'relationMap' => $this->getRelationMap($id),
         ]);
     }
 
@@ -113,6 +114,7 @@ class WarEventController extends Controller
             'relationForm' => $this->buildRelationForm($id),
             'mediaForm' => $this->buildMediaForm($id),
             'mediaList' => $this->getMediaList($id),
+            'relationMap' => $this->getRelationMap($id),
         ]);
     }
 
@@ -286,6 +288,15 @@ class WarEventController extends Controller
             ->where(['event_id' => $eventId])
             ->orderBy(['id' => SORT_DESC])
             ->all();
+    }
+
+    protected function getRelationMap(int $eventId): array
+    {
+        $map = [];
+        foreach (WarEventPerson::find()->where(['event_id' => $eventId])->all() as $relation) {
+            $map[$relation->person_id] = $relation->relation_type;
+        }
+        return $map;
     }
 
     protected function detectType(UploadedFile $file): string

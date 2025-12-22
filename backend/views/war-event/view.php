@@ -15,6 +15,7 @@ use yii\widgets\ActiveForm;
 /* @var $relationForm common\models\WarEventPerson */
 /* @var $mediaForm common\models\WarMedia */
 /* @var $mediaList common\models\WarMedia[] */
+/* @var $relationMap array */
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => '抗战事件管理', 'url' => ['index']];
@@ -37,27 +38,32 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'title',
-            'event_date',
-            [
-                'label' => '阶段',
-                'value' => $model->stage->name ?? '',
-            ],
-            'location',
-            'summary:ntext',
-            'content:ntext',
-            [
-                'attribute' => 'status',
-                'value' => $model->status ? '发布' : '草稿',
-            ],
-            'created_at:datetime',
-            'updated_at:datetime',
-        ],
-    ]) ?>
+    <div class="panel panel-default">
+        <div class="panel-heading">基本信息</div>
+        <div class="panel-body">
+            <?= DetailView::widget([
+                'model' => $model,
+                'attributes' => [
+                    'id',
+                    'title',
+                    'event_date',
+                    [
+                        'label' => '阶段',
+                        'value' => $model->stage->name ?? '',
+                    ],
+                    'location',
+                    'summary:ntext',
+                    'content:ntext',
+                    [
+                        'attribute' => 'status',
+                        'value' => $model->status ? '发布' : '草稿',
+                    ],
+                    'created_at:datetime',
+                    'updated_at:datetime',
+                ],
+            ]) ?>
+        </div>
+    </div>
 
     <?= $this->render('_relations_media', [
         'model' => $model,
@@ -65,5 +71,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'relationForm' => $relationForm,
         'mediaForm' => $mediaForm,
         'mediaList' => $mediaList,
+        'relationMap' => $relationMap,
     ]) ?>
 </div>
