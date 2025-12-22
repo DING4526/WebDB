@@ -151,3 +151,34 @@ $docList = array_filter($mediaList, fn($m) => $m->type === 'document');
         </div>
     </div>
 </div>
+
+<?php
+$js = <<<JS
+(function(){
+  function activateByHash(){
+    var hash = window.location.hash || '';
+    if(!hash) return;
+
+    // 找到对应的tab按钮并激活
+    var \$a = $('a[data-toggle="tab"][href="' + hash + '"]');
+    if(\$a.length){
+      \$a.tab('show');
+
+      // 可选：滚动到tab区域，避免回到页首
+      var \$panel = \$a.closest('.panel');
+      if(\$panel.length){
+        $('html,body').scrollTop(\$panel.offset().top - 80);
+      }
+    }
+  }
+
+  // 页面加载后执行一次
+  activateByHash();
+
+  // 如果你页面里有别的脚本会影响tab，延迟再执行一次更稳
+  setTimeout(activateByHash, 80);
+})();
+JS;
+$this->registerJs($js);
+?>
+
