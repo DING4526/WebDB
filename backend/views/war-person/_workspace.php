@@ -498,11 +498,14 @@ $js = <<<JS
   }
   if(cancelBtn){
     cancelBtn.addEventListener('click', function(){
+      dirty = false;
+      submitting = false;
       setEdit(false);
     });
   }
 
   var dirty = false;
+  var submitting = false; 
   function markDirty(){ dirty = true; }
   if(form){
     form.addEventListener('input', function(e){
@@ -513,6 +516,7 @@ $js = <<<JS
     }, true);
   }
   window.addEventListener('beforeunload', function(e){
+    if (submitting) return;
     if(!dirty) return;
     e.preventDefault();
     e.returnValue = '';
@@ -581,7 +585,20 @@ $js = <<<JS
     }
   }, true);
 
-  document.addEventListener('submit', function(){ saveState(); }, true);
+  document.addEventListener('submit', function(e){
+    // 只处理主表单提交（保存更新/创建）
+    if (form && e.target === form) {
+      // 先保存 state（你原本就想做）
+      if (typeof saveState === 'function') saveState();
+
+      // ✅关键：提交时关闭脏标记，并标记正在提交
+      submitting = true;
+      dirty = false;
+    } else {
+      // drawer 内的小表单（绑定/删除/上传）照旧保存 state
+      if (typeof saveState === 'function') saveState();
+    }
+  }, true);
 
   restoreState();
 
