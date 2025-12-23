@@ -33,6 +33,7 @@ $relationMap = $relationMap ?? [];
 
 $imageList = array_filter($mediaList, fn($m) => $m->type === 'image');
 $docList   = array_filter($mediaList, fn($m) => $m->type === 'document');
+$uploadsBase = '/advanced/frontend/web';
 
 $titleText = $isCreate ? '新增事件' : $model->title;
 $subText = $isCreate
@@ -231,7 +232,22 @@ $subText = $isCreate
               $rel = $relationMap[$person->id] ?? '未填写';
             ?>
             <div class="we3-person-card">
-              <div class="we3-person-ava"><?= Html::encode($initial) ?></div>
+              <?php
+                $cover = $person->coverImage ?? null;
+                $avatarPath = $cover && !empty($cover->path) ? ltrim($cover->path, '/') : null;
+                $avatarUrl = $avatarPath ? $uploadsBase . '/' . $avatarPath : null;
+              ?>
+              <div class="we3-person-ava">
+                <?php if ($avatarUrl): ?>
+                  <?= Html::img($avatarUrl, [
+                    'alt' => $name,
+                    'class' => 'we3-person-ava-img',
+                    'loading' => 'lazy',
+                  ]) ?>
+                <?php else: ?>
+                  <?= Html::encode($initial) ?>
+                <?php endif; ?>
+              </div>
               <div class="we3-person-main">
                 <div class="we3-person-name"><?= Html::encode($name) ?></div>
                 <div class="we3-person-rel">关系：<?= Html::encode($rel) ?></div>
@@ -299,30 +315,30 @@ $subText = $isCreate
       <div class="we3-panel-bd">
 
         <!-- Upload: make button obvious -->
-        <div class="we3-uploadbar">
-          <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', [
-            'enctype' => 'multipart/form-data',
-            'id' => 'we3-upload-form',
-          ]) ?>
-            <div class="we3-upload-modern">
-              <div class="we3-upload-hint">
-                <span class="we3-upload-icon">🔗</span>
-                <div>
-                  <div class="we3-upload-hint-title">上传媒资文件</div>
-                  <div class="we3-upload-hint-desc">上传后自动识别类型，支持图片 / PDF / DOC 等</div>
+          <div class="we3-editable-inline">
+            <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', [
+              'enctype' => 'multipart/form-data',
+              'id' => 'we3-upload-form',
+            ]) ?>
+              <div class="we3-upload-modern">
+                <div class="we3-upload-hint">
+                  <span class="we3-upload-icon">🔗</span>
+                  <div>
+                    <div class="we3-upload-hint-title">上传媒资文件</div>
+                    <div class="we3-upload-hint-desc">上传后自动识别类型，支持图片 / PDF / DOC 等</div>
+                  </div>
+                </div>
+                
+                <div class="we3-upload-action">
+                  <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx" style="display:none;">
+                  <button type="button" class="btn-we3-upload" id="we3-upload-btn">
+                    <span class="glyphicon glyphicon-cloud-upload"></span>
+                    <span id="we3-upload-filename">选择文件并上传</span>
+                  </button>
                 </div>
               </div>
-              
-              <div class="we3-upload-action">
-                <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx" style="display:none;">
-                <button type="button" class="btn-we3-upload" id="we3-upload-btn">
-                  <span class="glyphicon glyphicon-cloud-upload"></span>
-                  <span id="we3-upload-filename">选择文件并上传</span>
-                </button>
-              </div>
-            </div>
-          <?= Html::endForm() ?> 
-        </div> 
+            <?= Html::endForm() ?> 
+          </div> 
 
 
         <!-- Add media form: type readonly, path hidden -->
@@ -367,7 +383,9 @@ $subText = $isCreate
           <?php endif; ?>
         </div>
 
-        <div class="we3-split"></div>
+        <div class="we3-editable-inline">
+          <div class="we3-split"></div>
+        </div>
 
         <!-- Media lists: thumbnails + short display -->
         <div class="we3-media-sections">
@@ -379,7 +397,7 @@ $subText = $isCreate
 
             <div class="we3-media-grid">
               <?php foreach ($imageList as $m): ?>
-                <?php $url = '/' . ltrim($m->path, '/'); ?>
+                <?php $url = $uploadsBase . '/' . ltrim($m->path, '/'); ?>
                 <div class="we3-media-card">
                   <a class="we3-media-thumb" href="<?= Html::encode($url) ?>" target="_blank" title="打开原图">
                     <img src="<?= Html::encode($url) ?>" alt="<?= Html::encode($m->title ?: '图片') ?>">
@@ -412,7 +430,7 @@ $subText = $isCreate
 
             <div class="we3-media-grid">
               <?php foreach ($docList as $m): ?>
-                <?php $url = '/' . ltrim($m->path, '/'); ?>
+                <?php $url = $uploadsBase . '/' . ltrim($m->path, '/'); ?>
                 <div class="we3-media-card we3-media-card-doc">
                   <div class="we3-docicon">PDF</div>
                   <div class="we3-media-main">

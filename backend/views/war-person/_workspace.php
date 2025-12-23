@@ -31,6 +31,7 @@ $mediaForm    = $mediaForm ?? null;
 $imageList = array_filter($mediaList, function ($m) { return $m->type === 'image'; });
 $docList   = array_filter($mediaList, function ($m) { return $m->type === 'document'; });
 $eventCount = count($model->events ?? []);
+$uploadsBase = '/advanced/frontend/web';
 
 $titleText = $isCreate ? '新增人物' : $model->name;
 $subText = $isCreate
@@ -240,7 +241,18 @@ $subText = $isCreate
                   $time = $event->event_date ?: '-';
                 ?>
                 <div class="we3-person-card">
-                  <div class="we3-person-ava"><?= Html::encode($initial) ?></div>
+                  <?php
+                    $cover = $event->coverImage ?? null;
+                    $avatarPath = $cover && !empty($cover->path) ? ltrim($cover->path, '/') : null;
+                    $avatarUrl = $avatarPath ? $uploadsBase . '/' . $avatarPath : null;
+                  ?>
+                  <div class="we3-person-ava" style="border-radius:10px">
+                    <?php if ($avatarUrl): ?>
+                      <img src="<?= Html::encode($avatarUrl) ?>" alt="<?= Html::encode($title) ?>">
+                    <?php else: ?>
+                      <?= Html::encode($initial) ?>
+                    <?php endif; ?>
+                  </div>
                   <div class="we3-person-main">
                     <div class="we3-person-name"><?= Html::encode($title) ?></div>
                     <div class="we3-person-rel">关系：<?= Html::encode($rel) ?> · 日期：<?= Html::encode($time) ?></div>
@@ -305,7 +317,7 @@ $subText = $isCreate
           </div>
 
           <div class="we3-panel-bd">
-
+            <div class="we3-editable-inline">
               <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', [
                 'enctype' => 'multipart/form-data',
                 'id' => 'we3-upload-form',
@@ -328,7 +340,8 @@ $subText = $isCreate
                   </div>
                 </div>
               <?= Html::endForm() ?>
-
+            </div>
+            
             <div class="we3-editable-inline">
               <?php if ($mediaForm): ?>
                 <?php
@@ -369,7 +382,9 @@ $subText = $isCreate
               <?php endif; ?>
             </div>
 
-            <div class="we3-split"></div>
+            <div class="we3-editable-inline">
+              <div class="we3-split"></div>
+            </div>
 
             <div class="we3-media-sections">
               <div class="we3-media-sec">
@@ -379,7 +394,7 @@ $subText = $isCreate
 
                 <div class="we3-media-grid">
                   <?php foreach ($imageList as $m): ?>
-                    <?php $url = '/' . ltrim($m->path, '/'); ?>
+                    <?php $url = $uploadsBase . '/' . ltrim($m->path, '/'); ?>
                     <div class="we3-media-card">
                       <a class="we3-media-thumb" href="<?= Html::encode($url) ?>" target="_blank" title="打开原图">
                         <img src="<?= Html::encode($url) ?>" alt="<?= Html::encode($m->title ?: '图片') ?>">
@@ -412,7 +427,7 @@ $subText = $isCreate
                 <div class="we3-media-grid">
                   <?php foreach ($docList as $m): ?>
                     <?php
-                      $url = '/' . ltrim($m->path, '/');
+                      $url = $uploadsBase . '/' . ltrim($m->path, '/');
                       $docExt = strtoupper(pathinfo($m->path, PATHINFO_EXTENSION) ?: 'DOC');
                     ?>
                     <div class="we3-media-card we3-media-card-doc">
