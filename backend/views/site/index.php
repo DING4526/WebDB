@@ -113,7 +113,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
           </div>
         </div>
         <div class="col-sm-4">
-          <div class="adm-section">
+          <!-- <div class="adm-section">
             <div class="adm-section-title">快速操作</div>
             <?php if ($isRoot): ?>
               <a class="btn btn-xs btn-soft-warning" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
@@ -126,7 +126,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
               <a class="btn btn-xs btn-soft-warning" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
               <a class="btn btn-xs btn-soft-primary" href="<?= Url::to(['team-member-apply/create']) ?>">申请成为团队成员</a>
             <?php endif; ?>                
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -185,9 +185,15 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
             <?php endforeach; ?>
           </ol>
           <div class="adm-section" style="margin-bottom:0;">
-            管理员入口：
-            <a href="<?= Url::to(['team-member-apply/index']) ?>">成员申请审批</a>
-            <span class="adm-muted">（root 可审批并授予 member）</span>
+            <?php if ($isRoot): ?>
+              管理员入口：
+              <a href="<?= Url::to(['team-member-apply/index']) ?>">成员申请审批</a>
+              <span class="adm-muted">（root 可审批并授予 member）</span>
+            <?php elseif (!$isMember): ?>
+              申请入口：
+              <a href="<?= Url::to(['team-member-apply/create']) ?>">提交成员申请</a>
+              <span class="adm-muted">（申请后等待管理员审批）</span>
+            <?php endif; ?>
           </div>
         </div>
       </div>
