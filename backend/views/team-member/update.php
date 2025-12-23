@@ -5,17 +5,23 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\TeamMember */
 
-$this->title = 'Update Team Member: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Team Members', 'url' => ['index']];
+$this->title = '编辑成员：' . $model->name;
+$this->params['breadcrumbs'][] = ['label' => '成员管理', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = '编辑';
+$this->registerCssFile('@web/css/admin-common.css');
 ?>
 <div class="team-member-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+  <div class="adm-card">
+    <div class="adm-card-head">
+      <h3 class="adm-card-title"><?= Html::encode($this->title) ?></h3>
+    </div>
+    <div class="adm-card-body adm-form">
+      <?= $this->render('_form', [
+          'model' => $model,
+      ]) ?>
+    </div>
+  </div>
 
 </div>

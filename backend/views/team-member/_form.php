@@ -55,7 +55,8 @@ $userList = ArrayHelper::map(
     <?php // created_at / updated_at 不要手填，TimestampBehavior 会自动写入 ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('保存', ['class' => 'btn btn-success']) ?>
+        <?= Html::a('取消', ['index'], ['class' => 'btn btn-default']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
