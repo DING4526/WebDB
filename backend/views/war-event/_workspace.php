@@ -18,6 +18,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+$this->registerCssFile('@web/css/admin-common.css');
+$this->registerCssFile('@web/css/upload-modern.css');
+$this->registerJsFile('@web/js/upload-modern.js');
 
 $mode = $mode ?? 'view';
 $isCreate = ($mode === 'create');
@@ -60,10 +63,10 @@ $subText = $isCreate
     </div>
 
     <div class="we3-head-right">
-      <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-ghost we3-btn']) ?>
+      <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-soft-ghost we3-btn']) ?>
 
       <?php if (!$isCreate): ?>
-        <?= Html::button('人物关联与媒资', ['class' => 'btn btn-soft-primary we3-btn', 'id' => 'we3-open-drawer']) ?>
+        <?= Html::button('人物关联与媒资', ['class' => 'btn btn-soft-danger we3-btn', 'id' => 'we3-open-drawer']) ?>
 
         <?= Html::button($initialEdit ? '退出编辑' : '进入编辑', [
           'class' => 'btn ' . ($initialEdit ? 'btn-soft-warning' : 'btn-soft-success') . ' we3-btn',
@@ -184,9 +187,9 @@ $subText = $isCreate
         ]) ?>
 
         <?php if (!$isCreate): ?>
-          <?= Html::button('取消编辑', ['class' => 'btn btn-ghost we3-btn', 'id' => 'we3-cancel-edit']) ?>
+          <?= Html::button('取消编辑', ['class' => 'btn btn-soft-ghost we3-btn', 'id' => 'we3-cancel-edit']) ?>
         <?php else: ?>
-          <?= Html::a('取消', ['index'], ['class' => 'btn btn-ghost we3-btn']) ?>
+          <?= Html::a('取消', ['index'], ['class' => 'btn btn-soft-ghost we3-btn']) ?>
         <?php endif; ?>
       </div>
     </div>
@@ -272,7 +275,7 @@ $subText = $isCreate
 
               <div class="we3-miniCol we3-miniColBtn">
                 <?= Html::submitButton('绑定人物', [
-                  'class' => 'btn btn-soft-success we3-btn we3-btn-block',
+                  'class' => 'btn btn-soft-danger we3-btn we3-btn-block',
                 ]) ?>
               </div>
             </div>
@@ -297,27 +300,30 @@ $subText = $isCreate
 
         <!-- Upload: make button obvious -->
         <div class="we3-uploadbar">
-          <div class="we3-uploadrow">
-            <button type="button"
-                    class="btn btn-soft-primary we3-btn we3-btn-upload we3-editable-inline"
-                    id="we3-upload-btn">
-              上传文件
-            </button>
-
-            <div class="we3-uploadhint">
-              <div class="we3-uploadhint-title">上传后自动识别类型</div>
-              <div class="we3-uploadhint-sub">自动回填“标题/类型”，你只需要点“添加媒资”。</div>
-            </div>
-          </div>
-
           <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', [
             'enctype' => 'multipart/form-data',
             'id' => 'we3-upload-form',
-            'style' => 'display:none;',
           ]) ?>
-            <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx">
-          <?= Html::endForm() ?>
-        </div>
+            <div class="we3-upload-modern">
+              <div class="we3-upload-hint">
+                <span class="we3-upload-icon">🔗</span>
+                <div>
+                  <div class="we3-upload-hint-title">上传媒资文件</div>
+                  <div class="we3-upload-hint-desc">上传后自动识别类型，支持图片 / PDF / DOC 等</div>
+                </div>
+              </div>
+              
+              <div class="we3-upload-action">
+                <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx" style="display:none;">
+                <button type="button" class="btn-we3-upload" id="we3-upload-btn">
+                  <span class="glyphicon glyphicon-cloud-upload"></span>
+                  <span id="we3-upload-filename">选择文件并上传</span>
+                </button>
+              </div>
+            </div>
+          <?= Html::endForm() ?> 
+        </div> 
+
 
         <!-- Add media form: type readonly, path hidden -->
         <div class="we3-editable-inline">
@@ -350,7 +356,7 @@ $subText = $isCreate
 
                 <div class="we3-miniCol we3-miniColBtn">
                   <?= Html::submitButton('添加媒资', [
-                    'class' => 'btn btn-soft-success we3-btn we3-btn-block',
+                    'class' => 'btn btn-soft-danger we3-btn we3-btn-block',
                   ]) ?>
                 </div>
               </div>
@@ -604,24 +610,6 @@ $js = <<<JS
   }, true);
 
   restoreState();
-
-  // One-click upload
-  var uploadBtn = document.getElementById('we3-upload-btn');
-  var uploadInput = document.getElementById('we3-upload-input');
-  var uploadForm = document.getElementById('we3-upload-form');
-
-  if(uploadBtn && uploadInput){
-    uploadBtn.addEventListener('click', function(){
-      if(typeof saveState === 'function') saveState();
-      uploadInput.click();
-    });
-  }
-  if(uploadInput && uploadForm){
-    uploadInput.addEventListener('change', function(){
-      if(!uploadInput.files || !uploadInput.files.length) return;
-      uploadForm.submit();
-    });
-  }
 
 })();
 JS;
