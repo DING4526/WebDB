@@ -41,7 +41,7 @@ $roleMatrix = [
     ],
     [
         'name' => '游客（guest）',
-        'color' => 'default',
+        'color' => 'ghost',
         'abilities' => ['仅浏览首页', '无法访问后台'],
     ],
 ];
@@ -153,7 +153,10 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <?php foreach ($roleMatrix as $role): ?>
                   <tr>
                     <td>
-                      <span class="adm-badge adm-badge-<?= $role['color'] === 'danger' ? 'inactive' : ($role['color'] === 'primary' ? 'active' : 'info') ?>">
+                      <span class="adm-badge adm-badge-<?= 
+                         $role['color'] === 'danger' ? 'pending' : 
+                        ($role['color'] === 'primary' ? 'active' : 
+                        ($role['color'] === 'info' ? 'info' : 'inactive')) ?>">
                         <?= Html::encode($role['name']) ?>
                       </span>
                     </td>
