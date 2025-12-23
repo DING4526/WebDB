@@ -65,20 +65,8 @@ $subText = $isCreate
       <?php if (!$isCreate): ?>
         <?= Html::button('人物关联与媒资', ['class' => 'btn btn-soft-primary we3-btn', 'id' => 'we3-open-drawer']) ?>
 
-        <?= Html::a($model->status ? '下线' : '发布', ['toggle-status', 'id' => $model->id], [
-          'class' => 'btn ' . ($model->status ? 'btn-soft-warning' : 'btn-soft-success') . ' we3-btn',
-          'data-method' => 'post',
-          'data-pjax' => 0,
-        ]) ?>
-
-        <?= Html::a('删除', ['delete', 'id' => $model->id], [
-          'class' => 'btn btn-soft-danger we3-btn',
-          'data' => ['confirm' => '确认删除该事件？', 'method' => 'post'],
-          'data-pjax' => 0,
-        ]) ?>
-
-        <?= Html::button($initialEdit ? '退出编辑' : '编辑', [
-          'class' => 'btn ' . ($initialEdit ? 'btn-ghost' : 'btn-soft-primary') . ' we3-btn',
+        <?= Html::button($initialEdit ? '退出编辑' : '进入编辑', [
+          'class' => 'btn ' . ($initialEdit ? 'btn-soft-warning' : 'btn-soft-success') . ' we3-btn',
           'id' => 'we3-toggle-edit',
         ]) ?>
       <?php endif; ?>
@@ -172,23 +160,10 @@ $subText = $isCreate
               <div class="we3-lab">详情</div>
               <div class="we3-ctl we3-editable">
                 <?= $form->field($model, 'content', ['options' => ['class' => 'we3-field-inner']])
-                  ->textarea(['rows' => 12, 'placeholder' => '可分段，支持较长文本'])
+                  ->textarea(['rows' => 8, 'placeholder' => '可分段，支持较长文本'])
                   ->label(false) ?>
               </div>
               <div class="we3-ctl we3-readonly we3-pre"><?= Html::encode($model->content) ?></div>
-            </div>
-
-            <!-- 状态 -->
-            <div class="we3-fieldline">
-              <div class="we3-lab">状态</div>
-              <div class="we3-ctl we3-editable">
-                <?= $form->field($model, 'status', ['options' => ['class' => 'we3-field-inner']])
-                  ->dropDownList([1 => '发布', 0 => '草稿'], ['prompt' => '请选择'])
-                  ->label(false) ?>
-              </div>
-              <div class="we3-ctl we3-readonly">
-                <?= $model->status ? '<span class="we3-chip we3-chip-green">发布</span>' : '<span class="we3-chip we3-chip-gray">草稿</span>' ?>
-              </div>
             </div>
 
           </div>
@@ -445,10 +420,9 @@ $js = <<<JS
       saveBar.style.display = on ? 'flex' : 'none';
     }
     if(toggleBtn){
-      toggleBtn.textContent = on ? '退出编辑' : '编辑';
-      // 保持按钮风格：编辑态 -> ghost，查看态 -> soft-primary
-      toggleBtn.classList.toggle('btn-ghost', on);
-      toggleBtn.classList.toggle('btn-soft-primary', !on);
+      toggleBtn.textContent = on ? '退出编辑' : '进入编辑';
+      toggleBtn.classList.toggle('btn-soft-warning', on);
+      toggleBtn.classList.toggle('btn-soft-success', !on);
     }
   }
 
