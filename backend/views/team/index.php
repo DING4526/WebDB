@@ -42,7 +42,7 @@ $userList = ArrayHelper::map(
       </div>
       <div class="adm-actions">
         <?php if ($isRoot): ?>
-          <?= Html::a('新增成员', ['team-member/create'], ['class' => 'btn btn-soft-success']) ?>
+          <?= Html::a('新增成员', ['team-member/create'], ['class' => 'btn btn-success']) ?>
         <?php endif; ?>
         <?= Html::a('刷新', ['index'], ['class' => 'btn btn-default']) ?>
       </div>
