@@ -194,453 +194,12 @@
 
 
 /* ==========================================================================
-   we3 - Single page canvas + drawer (best coherence)
+   we3 Workspace（单一来源样式）
    ========================================================================== */
 
-.we3{ padding:14px 0 28px; }
-
-/* Sticky action bar (inside content area) */
-.we3-bar{
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: rgba(255,255,255,.92);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.06);
-  padding: 12px 14px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom: 12px;
-}
-.we3-h1{ font-size:18px; font-weight:900; color:#111827; line-height:1.15; }
-.we3-sub{ margin-top:6px; color:#64748b; font-weight:700; }
-.we3-bar-right{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-.we3-btn{ border-radius: 12px; font-weight:900; padding:8px 12px; }
-.we3-btn-strong{ padding:9px 14px; }
-
-/* Canvas */
-.we3-canvas{
-  border: 1px solid rgba(0,0,0,.06);
-  background:#fff;
-  border-radius: 18px;
-  box-shadow: 0 18px 45px rgba(0,0,0,.06);
-  overflow:hidden;
-}
-.we3-strip{
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  align-items:center;
-  background: linear-gradient(180deg, rgba(248,250,252,.9), #fff);
-}
-.we3-chip{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  border: 1px solid rgba(0,0,0,.08);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight:900;
-  color:#0f172a;
-  background: rgba(17,24,39,.04);
-}
-.we3-chip-green{ background: rgba(34,197,94,.14); color:#14532d; }
-.we3-chip-gray{ background: rgba(107,114,128,.14); color:#374151; }
-.we3-chip-light{ background:#fff; }
-.we3-chip-muted{ color:#475569; background: rgba(148,163,184,.12); }
-
-/* Main section */
-.we3-section{ padding: 12px 14px 14px; }
-.we3-sec-hd{ margin-bottom: 12px; }
-.we3-sec-title{ font-weight:900; color:#111827; font-size:14px; }
-.we3-sec-desc{ margin-top:6px; color:#64748b; font-weight:700; }
-
-.we3-grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 10px 12px;
-}
-@media (max-width: 640px){
-  .we3-grid{ grid-template-columns: 1fr; }
-}
-.we3-span-2{ grid-column: 1 / -1; }
-
-.we3-label{
-  font-size:12px;
-  font-weight:900;
-  color:#64748b;
-  letter-spacing:.3px;
-  text-transform: uppercase;
-}
-.we3-field{ position:relative; }
-.we3-field-inner{ margin-top:6px; }
-
-.we3-form .form-control{
-  border-radius: 14px;
-  border: 1px solid rgba(0,0,0,.10);
-  box-shadow:none;
-}
-.we3-form input.form-control,
-.we3-form select.form-control{
-  max-width: 520px;
-}
-.we3-form textarea.form-control{ line-height:1.7; }
-.we3-form .help-block{ color:#64748b; font-weight:700; }
-
-.we3-readonly{
-  margin-top: 8px;
-  padding: 10px 11px;
-  border-radius: 14px;
-  border: 1px solid rgba(0,0,0,.06);
-  background:#f8fafc;
-  font-weight:800;
-  color:#0f172a;
-}
-.we3-pre{ white-space:pre-wrap; word-break:break-word; }
-
-/* View/Edit switch */
-.we3-canvas.is-view .we3-editable{ display:none; }
-.we3-canvas.is-view .we3-readonly{ display:block; }
-.we3-canvas.is-edit .we3-editable{ display:block; }
-.we3-canvas.is-edit .we3-readonly{ display:none; }
-
-/* Save bar */
-.we3-save{
-  border-top: 1px solid rgba(0,0,0,.06);
-  background: rgba(248,250,252,.9);
-  padding: 12px 14px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.we3-hint{ color:#64748b; font-weight:700; }
-.we3-save-right{ display:flex; gap:10px; flex-wrap:wrap; }
-
-/* Drawer */
-.we3-overlay{
-  position: fixed;
-  inset: 0;
-  background: rgba(15,23,42,.45);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .18s ease;
-  z-index: 98;
-}
-.we3-overlay.is-open{ opacity:1; pointer-events:auto; }
-
-.we3-drawer{
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  width: 520px;
-  max-width: calc(100vw - 16px);
-  background:#fff;
-  border-left: 1px solid rgba(0,0,0,.10);
-  box-shadow: -20px 0 60px rgba(0,0,0,.18);
-  transform: translateX(102%);
-  transition: transform .22s ease;
-  z-index: 99;
-  display:flex;
-  flex-direction:column;
-}
-.we3-drawer.is-open{ transform: translateX(0); }
-
-.we3-drawer-hd{
-  padding: 14px 14px 12px;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-  background: linear-gradient(180deg, rgba(248,250,252,.9), #fff);
-}
-.we3-drawer-title{ font-weight:900; color:#111827; }
-.we3-drawer-sub{ margin-top:6px; color:#64748b; font-weight:700; }
-.we3-iconbtn{
-  border:none;
-  background:#f1f5f9;
-  color:#0f172a;
-  border-radius: 12px;
-  width: 36px;
-  height: 36px;
-  font-size: 20px;
-  font-weight:900;
-  line-height: 36px;
-  text-align:center;
-  cursor:pointer;
-}
-.we3-drawer-bd{
-  padding: 12px 14px 18px;
-  overflow:auto;
-}
-
-/* Panels in drawer */
-.we3-panel{
-  border: 1px solid rgba(0,0,0,.06);
-  background:#fff;
-  border-radius: 16px;
-  overflow:hidden;
-  margin-bottom: 12px;
-}
-.we3-panel-hd{
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-.we3-panel-title{ font-weight:900; color:#111827; }
-.we3-panel-meta{ color:#64748b; font-weight:800; font-size:12px; }
-.we3-panel-bd{ padding: 10px 12px 12px; }
-
-.we3-list{ display:flex; flex-direction:column; gap:8px; }
-.we3-item{
-  border: 1px solid rgba(0,0,0,.06);
-  background:#f8fafc;
-  border-radius: 14px;
-  padding: 10px 12px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:flex-start;
-}
-.we3-item-title{ font-weight:900; color:#111827; }
-.we3-item-sub{ margin-top:4px; color:#64748b; font-weight:700; font-size:12px; }
-.we3-empty{ padding: 6px 2px; color:#64748b; font-weight:700; }
-
-.we3-minihead{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin: 6px 0 10px; }
-.we3-mini{ font-weight:900; color:#0f172a; }
-
-.we3-file{
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 14px;
-  padding: 10px 12px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:flex-start;
-  margin-bottom:8px;
-  background:#fff;
-}
-.we3-file-title{ font-weight:900; color:#111827; }
-.we3-file-sub{ margin-top:4px; font-weight:700; font-size:12px; color:#64748b; overflow:hidden; text-overflow:ellipsis; }
-
-.we3-split{
-  height:1px;
-  background: rgba(0,0,0,.06);
-  margin: 12px 0;
-}
-
-.we3-modal{ border-radius: 18px; overflow:hidden; }
-
-/* drawer edit-only areas */
-.we3-canvas.is-view .we3-editable-inline{ display:none; }
-
-/* ======================================================================
-   we3 compact + align to index look
-   追加到 war-event.css 末尾（覆盖现有 we3 样式）
-   ====================================================================== */
-
-/* 统一一些尺度（更紧凑） */
-.we3{
-  padding: 10px 0 18px;
-}
-
-/* 顶部 sticky bar：更像 index 的 card 头，减少“磨砂感”，间距更紧 */
-.we3-bar{
-  padding: 10px 12px;
-  border-radius: 18px;
-  background: #fff;
-  backdrop-filter: none;
-  box-shadow: 0 18px 45px rgba(0,0,0,.06);
-}
-.we3-h1{ font-size: 17px; }
-.we3-sub{ margin-top: 4px; font-weight: 700; }
-.we3-bar-right{ gap: 8px; }
-
-/* 主画布：整体更紧凑 */
-.we3-strip{
-  padding: 10px 12px;
-}
-.we3-section{
-  padding: 10px 12px 12px;
-}
-.we3-sec-hd{ margin-bottom: 10px; }
-.we3-sec-title{ font-size: 13px; }
-.we3-sec-desc{ margin-top: 4px; }
-
-/* 表单布局更紧凑：gap 变小 + label 更协调 */
-.we3-grid{
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 8px 10px;
-}
-.we3-label{
-  font-size: 12px;
-  letter-spacing: 0;
-  text-transform: none; /* 中文更自然 */
-  color: #64748b;
-}
-
-/* 输入框“收窄”：短字段更像表单而不是铺满整列 */
-.we3-form input.form-control,
-.we3-form select.form-control{
-  max-width: 420px;   /* 关键：从 520 收窄 */
-  height: 34px;       /* 更紧凑 */
-  padding: 6px 10px;
-  border-radius: 12px;
-}
-.we3-form textarea.form-control{
-  padding: 8px 10px;
-  border-radius: 12px;
-  line-height: 1.55;
-}
-/* summary/content 这种跨两列字段允许更宽一点，但仍别太铺满 */
-.we3-span-2 .form-control{
-  max-width: 920px;
-}
-
-/* readonly 也一起变紧凑 */
-.we3-readonly{
-  margin-top: 6px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  font-weight: 800;
-}
-
-/* Save bar 更紧凑 */
-.we3-save{
-  padding: 10px 12px;
-  gap: 10px;
-}
-
-/* ================= Drawer：减少“又长又窄”的观感 ================= */
-
-/* 让 drawer 更像侧边面板而不是窄栏 */
-.we3-drawer{
-  width: 500px; 
-}
-.we3-drawer-hd{
-  padding: 12px 12px 10px;
-}
-.we3-drawer-bd{
-  padding: 10px 12px 14px;
-}
-
-/* 面板/列表项更紧凑 */
-.we3-panel{ border-radius: 18px; }
-.we3-panel-hd{ padding: 9px 10px; }
-.we3-panel-bd{ padding: 9px 10px 10px; }
-
-.we3-list{ gap: 6px; }
-.we3-item{
-  padding: 8px 10px;
-  border-radius: 12px;
-}
-.we3-item-sub{ margin-top: 3px; }
-
-.we3-minihead{ margin: 4px 0 8px; }
-.we3-file{
-  padding: 8px 10px;
-  border-radius: 12px;
-  margin-bottom: 6px;
-}
-.we3-file-sub{
-  margin-top: 3px;
-  max-width: 420px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.we3-split{ margin: 10px 0; }
-
-/* Drawer 里的 ActiveForm 默认 form-group 太松，压紧一点 */
-.we3-drawer .form-group{ margin-bottom: 10px; }
-.we3-drawer label.control-label{
-  font-size: 12px;
-  font-weight: 900;
-  color:#64748b;
-  margin-bottom: 4px;
-}
-
-/* ================= Workspace 按钮风格贴近 index（仅在 .we3 范围内生效） ================= */
-.we3 .btn{
-  border-radius: 12px;
-  font-weight: 900;
-  border: 0;
-}
-.we3 .btn-default{
-  background: rgba(17,24,39,.06);
-  color: #111827;
-}
-.we3 .btn-default:hover{ background: rgba(17,24,39,.10); }
-
-.we3 .btn-primary{
-  background: rgba(59,130,246,.14);
-  color: #1e3a8a;
-}
-.we3 .btn-primary:hover{
-  background: rgba(59,130,246,.22);
-  color: #1e3a8a;
-}
-
-.we3 .btn-success{
-  background:#22c55e;
-  color:#fff;
-}
-.we3 .btn-success:hover{ background:#16a34a; }
-
-.we3 .btn-warning{
-  background: rgba(245,158,11,.18);
-  color:#78350f;
-}
-.we3 .btn-warning:hover{ background: rgba(245,158,11,.26); }
-
-.we3 .btn-danger{
-  background: rgba(239,68,68,.14);
-  color:#7f1d1d;
-}
-.we3 .btn-danger:hover{ background: rgba(239,68,68,.22); }
-
-/* 小按钮更紧凑 */
-.we3 .btn-xs{ padding: 5px 8px; border-radius: 10px; }
-
-/* ======================================================================
-   we3 v4 (Best UI): aligned with index, no "tight ends", better form
-   追加到 war-event.css 末尾（覆盖旧 we3）
-   ====================================================================== */
-
-/* ---- Soft buttons (reuse index style semantics) ---- */
-.btn-ghost{ background:rgba(17,24,39,.06);color:#111827;border:0; }
-.btn-ghost:hover{ background:rgba(17,24,39,.10); }
-
-.btn-soft-primary{ background:rgba(59,130,246,.14);color:#1e3a8a;border:0; }
-.btn-soft-primary:hover{ background:rgba(59,130,246,.22);color:#1e3a8a; }
-
-.btn-soft-success{ background:rgba(34,197,94,.14);color:#14532d;border:0; }
-.btn-soft-success:hover{ background:rgba(34,197,94,.22); }
-
-.btn-soft-warning{ background:rgba(245,158,11,.18);color:#78350f;border:0; }
-.btn-soft-warning:hover{ background:rgba(245,158,11,.26); }
-
-.btn-soft-danger{ background:rgba(239,68,68,.14);color:#7f1d1d;border:0; }
-.btn-soft-danger:hover{ background:rgba(239,68,68,.22); }
-
-/* ---- Wrapper: fix "tight ends" by limiting width ---- */
-.we3.we3-wrap{
-  padding: 12px 0 22px;
-}
+/* Wrapper & width */
+.we3{ padding: 12px 0 22px; }
+.we3.we3-wrap{ padding: 12px 0 22px; }
 .we3-headcard,
 .we3-canvas{
   max-width: 1120px;
@@ -655,7 +214,7 @@
   }
 }
 
-/* ---- Header card (index-like) ---- */
+/* Header card */
 .we3-headcard{
   background:#fff;
   border:1px solid rgba(0,0,0,.08);
@@ -675,7 +234,7 @@
 .we3-btn{ border-radius:12px; font-weight:900; padding:8px 12px; }
 .we3-btn-strong{ padding:9px 14px; }
 
-/* ---- Chips / badges ---- */
+/* Chips / badges */
 .we3-chip{
   display:inline-flex;align-items:center;gap:6px;
   border: 1px solid rgba(0,0,0,.08);
@@ -703,7 +262,7 @@
   color:#111827;
 }
 
-/* ---- Canvas / body ---- */
+/* Canvas */
 .we3-canvas{
   background:#fff;
   border:1px solid rgba(0,0,0,.08);
@@ -713,7 +272,7 @@
 }
 .we3-body{ padding: 14px 16px 4px; }
 
-/* ---- Card in canvas ---- */
+/* Card */
 .we3-card{
   border:1px solid rgba(0,0,0,.06);
   border-radius:18px;
@@ -733,7 +292,15 @@
 .we3-card-desc{ margin-top:6px; color:#64748b; font-weight:700; }
 .we3-card-bd{ padding: 14px; }
 
-/* ---- Two-col grid with aligned label-control ---- */
+/* Grid */
+.we3-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 10px;
+}
+@media (max-width: 640px){
+  .we3-grid{ grid-template-columns: 1fr; }
+}
 .we3-grid2{
   display:grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -742,9 +309,18 @@
 @media (max-width: 900px){
   .we3-grid2{ grid-template-columns: 1fr; }
 }
+.we3-twoCols{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+}
+@media (max-width: 860px){
+  .we3-twoCols{ grid-template-columns: 1fr; }
+}
+.we3-span-2,
 .we3-spanfull{ grid-column: 1 / -1; }
 
-/* field line: label left fixed width, control right */
+/* Field / form */
 .we3-fieldline{
   display:flex;
   gap: 10px;
@@ -758,16 +334,9 @@
   font-weight: 900;
   color: #64748b;
 }
-.we3-ctl{
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* make yii field wrapper not add extra margin */
+.we3-ctl{ flex: 1 1 auto; min-width: 0; }
 .we3-field-inner{ margin:0; }
 .we3-form .form-group{ margin:0; }
-
-/* controls look */
 .we3-form .form-control{
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,.12);
@@ -777,15 +346,16 @@
 .we3-form select.form-control{
   height: 36px;
   padding: 7px 10px;
+  max-width: 420px;
 }
 .we3-form textarea.form-control{
   padding: 9px 10px;
   line-height: 1.6;
 }
-.we3-form .help-block{ display:none; } /* 更干净，如需保留可删 */
-
-/* readonly box */
+.we3-form .help-block{ display:none; }
+.we3-span-2 .form-control{ max-width: 920px; }
 .we3-readonly{
+  margin-top: 6px;
   padding: 9px 10px;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,.06);
@@ -800,6 +370,7 @@
 .we3-canvas.is-view .we3-readonly{ display:block; }
 .we3-canvas.is-edit .we3-editable{ display:block; }
 .we3-canvas.is-edit .we3-readonly{ display:none; }
+.we3-canvas.is-view .we3-editable-inline{ display:none; }
 
 /* Save bar */
 .we3-save{
@@ -815,7 +386,43 @@
 .we3-hint{ color:#64748b; font-weight:700; }
 .we3-save-right{ display:flex; gap:10px; flex-wrap:wrap; }
 
-/* ---- Drawer ---- */
+/* Buttons inside workspace */
+.we3 .btn{
+  border-radius: 12px;
+  font-weight: 900;
+  border: 0;
+}
+.we3 .btn-default{
+  background: rgba(17,24,39,.06);
+  color: #111827;
+}
+.we3 .btn-default:hover{ background: rgba(17,24,39,.10); }
+.we3 .btn-primary{
+  background: rgba(59,130,246,.14);
+  color: #1e3a8a;
+}
+.we3 .btn-primary:hover{
+  background: rgba(59,130,246,.22);
+  color: #1e3a8a;
+}
+.we3 .btn-success{
+  background:#22c55e;
+  color:#fff;
+}
+.we3 .btn-success:hover{ background:#16a34a; }
+.we3 .btn-warning{
+  background: rgba(245,158,11,.18);
+  color:#78350f;
+}
+.we3 .btn-warning:hover{ background: rgba(245,158,11,.26); }
+.we3 .btn-danger{
+  background: rgba(239,68,68,.14);
+  color:#7f1d1d;
+}
+.we3 .btn-danger:hover{ background: rgba(239,68,68,.22); }
+.we3 .btn-xs{ padding: 5px 8px; border-radius: 10px; }
+
+/* Drawer */
 .we3-overlay{
   position: fixed;
   inset: 0;
@@ -826,13 +433,12 @@
   z-index: 98;
 }
 .we3-overlay.is-open{ opacity:1; pointer-events:auto; }
-
 .we3-drawer{
   position: fixed;
   top: 0;
   right: 0;
   height: 100vh;
-  width: 680px; /* 更舒展 */
+  width: 680px;
   max-width: calc(100vw - 16px);
   background:#fff;
   border-left: 1px solid rgba(0,0,0,.10);
@@ -844,7 +450,6 @@
   flex-direction:column;
 }
 .we3-drawer.is-open{ transform: translateX(0); }
-
 .we3-drawer-hd{
   padding: 14px 14px 12px;
   border-bottom: 1px solid rgba(0,0,0,.06);
@@ -874,7 +479,7 @@
   overflow:auto;
 }
 
-/* Panels */
+/* Panels / list / file */
 .we3-panel{
   border: 1px solid rgba(0,0,0,.06);
   background:#fff;
@@ -893,8 +498,6 @@
 .we3-panel-title{ font-weight:900; color:#111827; }
 .we3-panel-meta{ color:#64748b; font-weight:800; font-size:12px; }
 .we3-panel-bd{ padding: 10px 12px 12px; }
-
-/* list/file items */
 .we3-list{ display:flex; flex-direction:column; gap:8px; }
 .we3-item{
   border: 1px solid rgba(0,0,0,.06);
@@ -909,7 +512,6 @@
 .we3-item-title{ font-weight:900; color:#111827; }
 .we3-item-sub{ margin-top:4px; color:#64748b; font-weight:700; font-size:12px; }
 .we3-empty{ padding: 6px 2px; color:#64748b; font-weight:700; }
-
 .we3-minihead{
   display:flex; justify-content:space-between; align-items:center; gap:10px;
   margin: 6px 0 10px;
@@ -921,7 +523,6 @@
   font-weight:700;
   font-size:12px;
 }
-
 .we3-file{
   border: 1px solid rgba(0,0,0,.06);
   border-radius: 14px;
@@ -950,7 +551,7 @@
   margin: 12px 0;
 }
 
-/* mini form grid in drawer */
+/* Drawer forms */
 .we3-miniGrid{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -961,7 +562,6 @@
   .we3-miniGrid{ grid-template-columns: 1fr; }
 }
 .we3-miniColBtn .btn{ height: 36px; padding: 8px 12px; }
-
 .we3-miniForm .form-group{ margin:0; }
 .we3-miniForm label.control-label{
   font-size:12px;
@@ -971,20 +571,4 @@
 }
 .we3-miniForm .help-block{ display:none; }
 .we3-miniForm .form-control{ border-radius: 12px; }
-
-/* show images/docs in two columns in drawer */
-.we3-twoCols{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 14px;
-}
-@media (max-width: 860px){
-  .we3-twoCols{ grid-template-columns: 1fr; }
-}
-
-/* small ops form */
 .we3-miniop{ margin:0; }
-
-/* drawer edit-only areas */
-.we3-canvas.is-view .we3-editable-inline{ display:none; }
-
