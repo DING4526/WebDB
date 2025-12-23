@@ -18,7 +18,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+$this->registerCssFile('@web/css/admin-common.css');
 $this->registerCssFile('@web/css/upload-modern.css');
 $this->registerJsFile('@web/js/upload-modern.js');
 
@@ -63,10 +63,10 @@ $subText = $isCreate
     </div>
 
     <div class="we3-head-right">
-      <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-ghost we3-btn']) ?>
+      <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-soft-ghost we3-btn']) ?>
 
       <?php if (!$isCreate): ?>
-        <?= Html::button('人物关联与媒资', ['class' => 'btn btn-soft-primary we3-btn', 'id' => 'we3-open-drawer']) ?>
+        <?= Html::button('人物关联与媒资', ['class' => 'btn btn-soft-danger we3-btn', 'id' => 'we3-open-drawer']) ?>
 
         <?= Html::button($initialEdit ? '退出编辑' : '进入编辑', [
           'class' => 'btn ' . ($initialEdit ? 'btn-soft-warning' : 'btn-soft-success') . ' we3-btn',
@@ -187,9 +187,9 @@ $subText = $isCreate
         ]) ?>
 
         <?php if (!$isCreate): ?>
-          <?= Html::button('取消编辑', ['class' => 'btn btn-ghost we3-btn', 'id' => 'we3-cancel-edit']) ?>
+          <?= Html::button('取消编辑', ['class' => 'btn btn-soft-ghost we3-btn', 'id' => 'we3-cancel-edit']) ?>
         <?php else: ?>
-          <?= Html::a('取消', ['index'], ['class' => 'btn btn-ghost we3-btn']) ?>
+          <?= Html::a('取消', ['index'], ['class' => 'btn btn-soft-ghost we3-btn']) ?>
         <?php endif; ?>
       </div>
     </div>
@@ -275,7 +275,7 @@ $subText = $isCreate
 
               <div class="we3-miniCol we3-miniColBtn">
                 <?= Html::submitButton('绑定人物', [
-                  'class' => 'btn btn-soft-success we3-btn we3-btn-block',
+                  'class' => 'btn btn-soft-danger we3-btn we3-btn-block',
                 ]) ?>
               </div>
             </div>
@@ -356,7 +356,7 @@ $subText = $isCreate
 
                 <div class="we3-miniCol we3-miniColBtn">
                   <?= Html::submitButton('添加媒资', [
-                    'class' => 'btn btn-soft-success we3-btn we3-btn-block',
+                    'class' => 'btn btn-soft-danger we3-btn we3-btn-block',
                   ]) ?>
                 </div>
               </div>

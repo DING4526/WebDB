@@ -4,6 +4,10 @@
    Consistent with war-event.css style
    ========================================================================== */
 
+#content.table-layout > div {
+  padding: 15px !important;
+}
+
 /* ===== Hero (Index pages) ===== */
 .adm-hero {
   border-radius: 18px;
@@ -205,30 +209,37 @@
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 900;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-weight: 800;
+  border: 1px solid rgba(15,23,42,0.10);
 }
 
+/* Active：深酒红（当前启用/生效） */
 .adm-badge-active {
-  background: rgba(165, 42, 42, 0.14);
+  background: rgba(127, 29, 29, 0.16);
   color: #7f1d1d;
+  border-color: rgba(127, 29, 29, 0.22);
 }
 
+/* Inactive：铁灰（禁用/隐藏） */
 .adm-badge-inactive {
-  background: rgba(107, 107, 107, 0.14);
-  color: #4A5568;
+  background: rgba(30, 41, 59, 0.10);
+  color: #334155;
+  border-color: rgba(30, 41, 59, 0.16);
 }
 
+/* Pending：哑铜/土金（待处理/待发布） */
 .adm-badge-pending {
-  background: rgba(184, 134, 11, 0.18);
-  color: #6B4423;
+  background: rgba(146, 101, 29, 0.18);
+  color: #6b3f12;
+  border-color: rgba(146, 101, 29, 0.24);
 }
 
+/* Info：军绿灰（信息/提示，不抢主视觉） */
 .adm-badge-info {
-  background: rgba(107, 107, 107, 0.14);
-  color: #4A5568;
+  background: rgba(71, 93, 51, 0.207);
+  color: #2b3b1e;
+  border-color: rgba(74, 94, 55, 0.20);
 }
-
 /* ===== Action Buttons (table) ===== */
 .adm-actions-col {
   white-space: nowrap;
@@ -244,59 +255,60 @@
   margin-left: 6px;
 }
 
-.btn-ghost {
-  background: rgba(17, 24, 39, 0.06);
-  color: #111827;
-  border: 0;
+/* 基础：中性幽灵按钮（铁灰系） */
+.btn-soft-ghost{
+  background: rgba(30, 41, 59, 0.08);   /* slate */
+  color:#0f172a;
+  border:0;
+}
+.btn-soft-ghost:hover{
+  background: rgba(30, 41, 59, 0.14);
 }
 
-.btn-ghost:hover {
-  background: rgba(17, 24, 39, 0.10);
+/* Primary：哑铜（用于“主要操作/入口”，符合纪念章质感） */
+.btn-soft-primary{
+  background: rgba(146, 101, 29, 0.16); /* muted bronze */
+  color:#6b3f12;
+  border:0;
+}
+.btn-soft-primary:hover{
+  background: rgba(146, 101, 29, 0.24);
+  color:#5a320e;
 }
 
-.btn-soft-primary {
-  background: rgba(184, 134, 11, 0.14);
-  color: #6B4423;
-  border: 0;
+/* Success：军绿偏橄榄（比亮绿克制，更“历史”） */
+.btn-soft-success{
+  background: rgba(74, 94, 55, 0.18);   /* olive */
+  color:#2f3f22;
+  border:0;
+}
+.btn-soft-success:hover{
+  background: rgba(74, 94, 55, 0.26);
+  color:#253219;
 }
 
-.btn-soft-primary:hover {
-  background: rgba(184, 134, 11, 0.22);
-  color: #6B4423;
+/* Danger：暗酒红（与你整体深红调一致，用于删除/危险） */
+.btn-soft-danger{
+  background: rgba(127, 29, 29, 0.16);  /* deep wine red */
+  color:#7f1d1d;
+  border:0;
+}
+.btn-soft-danger:hover{
+  background: rgba(127, 29, 29, 0.24);
+  color:#6b1616;
 }
 
-.btn-soft-success {
-  background: rgba(165, 42, 42, 0.14);
-  color: #7f1d1d;
-  border: 0;
+/* Warning：赭黄/土金（提示/下线/谨慎，比亮橙更稳） */
+.btn-soft-warning{
+  background: rgba(152, 98, 24, 0.16);  /* ochre */
+  color:#7a3f10;
+  border:0;
+}
+.btn-soft-warning:hover{
+  background: rgba(152, 98, 24, 0.24);
+  color:#63320c;
 }
 
-.btn-soft-success:hover {
-  background: rgba(165, 42, 42, 0.22);
-  color: #7f1d1d;
-}
-
-.btn-soft-warning {
-  background: rgba(205, 133, 63, 0.18);
-  color: #6B4423;
-  border: 0;
-}
-
-.btn-soft-warning:hover {
-  background: rgba(205, 133, 63, 0.26);
-  color: #6B4423;
-}
-
-.btn-soft-danger {
-  background: rgba(139, 37, 0, 0.14);
-  color: #7f1d1d;
-  border: 0;
-}
-
-.btn-soft-danger:hover {
-  background: rgba(139, 37, 0, 0.22);
-  color: #7f1d1d;
-}
 
 /* ===== Form styles ===== */
 .adm-form .form-control {
@@ -437,15 +449,15 @@
 }
 
 /* ===== Links (Military History Theme) ===== */
-a {
-  color: #B8860B;
-  transition: color 0.2s ease, text-decoration 0.2s ease;
+th>a {
+  color: #B8860B !important;
+  transition: color 0.2s ease, text-decoration 0.2s ease !important;
 }
 
-a:hover,
-a:focus {
-  color: #CD853F;
-  text-decoration: underline;
+th>a:hover,
+th>a:focus {
+  color: #CD853F !important;
+  text-decoration: underline !important;
 }
 
 /* ===== pwFolderList (Personal Work Folder List) ===== */

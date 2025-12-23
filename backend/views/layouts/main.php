@@ -189,7 +189,6 @@ $this->registerCssFile('@web/css/admin-common.css');
             <a href="<?= Url::to(['team-member-apply/create']) ?>">
               <span class="glyphicon glyphicon-send"></span>
               <span class="sidebar-title">申请成为成员</span>
-                <span class="label label-sm label-primary ml10">USER</span>
             </a>
           </li>
           <?php endif; ?>
@@ -199,7 +198,6 @@ $this->registerCssFile('@web/css/admin-common.css');
               <a href="<?= Url::to(['team-member-apply/index']) ?>">
                 <span class="glyphicon glyphicon-check"></span>
                 <span class="sidebar-title">成员申请审批</span>
-                <span class="label label-sm label-primary ml10">ROOT</span>
               </a>
             </li>
           <?php endif; ?>
@@ -237,13 +235,13 @@ $this->registerCssFile('@web/css/admin-common.css');
           <li class="<?= $activeCtl('war-event') ?>">
             <a href="<?= Url::to(['war-event/index']) ?>">
               <span class="glyphicon glyphicon-time"></span>
-              <span class="sidebar-title">抗战事件</span>
+              <span class="sidebar-title">抗战事件管理</span>
             </a>
           </li>
           <li class="<?= $activeCtl('war-person') ?>">
             <a href="<?= Url::to(['war-person/index']) ?>">
               <span class="glyphicon glyphicon-education"></span>
-              <span class="sidebar-title">抗战人物</span>
+              <span class="sidebar-title">抗战人物管理</span>
             </a>
           </li>
           <li class="<?= $activeCtl('war-message') ?>">
@@ -253,21 +251,6 @@ $this->registerCssFile('@web/css/admin-common.css');
             </a>
           </li>
           <?php endif; ?>
-
-          <!-- 状态（可留可删） -->
-          <li class="sidebar-label pt25 pb10">治理进度</li>
-          <li class="sidebar-stat">
-            <a href="#" class="fs11">
-              <span class="fa fa-inbox text-info"></span>
-              <span class="sidebar-title text-muted">后台信息梳理</span>
-              <span class="pull-right mr20 text-muted">70%</span>
-              <div class="progress progress-bar-xs mh20 mb10">
-                <div class="progress-bar progress-bar-info" role="progressbar" style="width: 70%">
-                  <span class="sr-only">70% Complete</span>
-                </div>
-              </div>
-            </a>
-          </li>
 
         </ul>
         <!-- End: Sidebar Menu -->
@@ -549,20 +532,6 @@ $this->registerCssFile('@web/css/admin-common.css');
   padding: 20px !important;
 }
 
-/* footer 优化 */
-.footer {
-  background: #fff;
-  border-top: 1px solid rgba(0,0,0,0.06);
-  margin-top: 0;
-  padding: 20px 0;
-}
-
-.footer p {
-  margin: 0;
-  color: #64748b;
-  font-weight: 700;
-  font-size: 13px;
-}
 </style>
 
 </html>

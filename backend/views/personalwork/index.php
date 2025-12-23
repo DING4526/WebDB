@@ -182,7 +182,7 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
                         <?= date('Y-m-d H:i', $f['mtime']) ?>
                       </td>
                       <td class="text-right adm-actions-col">
-                        <a class="btn btn-xs btn-ghost"
+                        <a class="btn btn-xs btn-soft-ghost"
                            href="<?= Url::to(['download/file', 'type' => 'personal', 'path' => $selectedFolder.'/'.$f['name']]) ?>">
                           下载
                         </a>

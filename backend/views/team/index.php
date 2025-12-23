@@ -111,26 +111,29 @@ $userList = ArrayHelper::map(
                     </div>
                   </div>
                   <div class="team-ws-member-actions">
-                    <span class="adm-badge <?= $isActive ? 'adm-badge-active' : 'adm-badge-inactive' ?>">
-                      <?= $isActive ? '正常' : '禁用' ?>
-                    </span>
-                    <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
-                      'class' => 'btn btn-xs btn-soft-primary',
-                      'style' => 'margin-left:6px; border-radius:8px;'
-                    ]) ?>
+                    <div class="adm-actions-col">
+                      <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
+                        'class' => 'btn btn-xs btn-soft-primary',
+                        'style' => 'margin-left:6px; border-radius:8px;'
+                      ]) ?>
+                    </div>
                     <?php if ($isRoot): ?>
-                      <?= Html::a('编辑', ['team-member/update', 'id' => $m->id], [
-                        'class' => 'btn btn-xs btn-soft-success',
-                        'style' => 'margin-left:4px; border-radius:8px;'
-                      ]) ?>
-                      <?= Html::a('删除', ['team-member/delete', 'id' => $m->id], [
-                        'class' => 'btn btn-xs btn-soft-danger',
-                        'style' => 'margin-left:4px; border-radius:8px;',
-                        'data' => [
-                          'confirm' => '确认删除该成员？',
-                          'method' => 'post',
-                        ],
-                      ]) ?>
+                      <div class="adm-actions-col">
+                        <?= Html::a('编辑', ['team-member/update', 'id' => $m->id], [
+                          'class' => 'btn btn-xs btn-soft-success',
+                          'style' => 'margin-left:4px; border-radius:8px;'
+                        ]) ?>
+                      </div>
+                      <div class="adm-actions-col">
+                        <?= Html::a('删除', ['team-member/delete', 'id' => $m->id], [
+                          'class' => 'btn btn-xs btn-soft-danger',
+                          'style' => 'margin-left:4px; border-radius:8px;',
+                          'data' => [
+                            'confirm' => '确认删除该成员？',
+                            'method' => 'post',
+                          ],
+                        ]) ?>
+                      </div>
                     <?php endif; ?>
                   </div>
                 </div>
@@ -201,9 +204,11 @@ $userList = ArrayHelper::map(
                 <span>保存后立即生效</span>
               </div>
               <div class="team-ws-footer-actions">
-                <?= Html::submitButton('保存团队信息', [
-                  'class' => 'btn btn-success team-ws-btn-save'
-                ]) ?>
+                <div class="adm-actions-col">
+                  <?= Html::submitButton('保存团队信息', [
+                    'class' => 'btn btn-soft-success team-ws-btn-save'
+                  ]) ?>
+                </div>
               </div>
             </div>
 

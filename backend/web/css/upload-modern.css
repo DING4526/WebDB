@@ -15,8 +15,8 @@
   justify-content:space-between;
   gap:16px;
   padding:16px 18px;
-  background:#F5F1E8;
-  border:1px solid #EAE4D6;
+  background:#f6f6f6;
+  border:2px dashed #938e837b;
   border-radius:12px;
 }
 
@@ -90,26 +90,26 @@
   gap:6px !important;
   white-space:nowrap !important;
   transition: all 0.2s ease !important;
-  
-  /* Solid primary blue - simple and clean */
-  background: #3b82f6 !important;
+
+  /* War theme: deep red (muted, not flashy) */
+  background: #7f1d1d !important;  /* 暗酒红 */
   color:#ffffff !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.10) !important;
 }
 
 .btn-upload-trigger:hover,
 .btn-tw-trigger:hover,
 .btn-we3-upload:hover{
-  background: #2563eb !important;
+  background: #991b1b !important;  /* 稍亮一点但仍克制 */
   color:#ffffff !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.16) !important;
   transform: translateY(-1px);
 }
 
 .btn-upload-trigger:active,
 .btn-tw-trigger:active,
 .btn-we3-upload:active{
-  background: #1d4ed8 !important;
+  background: #6b1616 !important;  /* 按下更深 */
   transform: translateY(0);
 }
 

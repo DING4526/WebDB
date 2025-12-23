@@ -16,6 +16,7 @@ $this->title = '编辑人物: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => '抗战人物管理', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = '编辑';
+$this->registerCssFile('@web/css/admin-common.css');
 $this->registerCssFile('@web/css/war-person.css');
 
 echo $this->render('_workspace', [

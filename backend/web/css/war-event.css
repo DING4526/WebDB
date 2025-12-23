@@ -132,20 +132,6 @@
 .we-actions-col .btn{ border-radius:12px;font-weight:900;padding:6px 10px; }
 .we-actions-col .btn + .btn{ margin-left:6px; }
 
-.btn-ghost{ background:rgba(17,24,39,.06);color:#111827;border:0; }
-.btn-ghost:hover{ background:rgba(17,24,39,.10); }
-
-.btn-soft-primary{ background:rgba(59,130,246,.14);color:#1e3a8a;border:0; }
-.btn-soft-primary:hover{ background:rgba(59,130,246,.22);color:#1e3a8a; }
-
-.btn-soft-success{ background:rgba(34,197,94,.14);color:#14532d;border:0; }
-.btn-soft-success:hover{ background:rgba(34,197,94,.22); }
-
-.btn-soft-warning{ background:rgba(245,158,11,.18);color:#78350f;border:0; }
-.btn-soft-warning:hover{ background:rgba(245,158,11,.26); }
-
-.btn-soft-danger{ background:rgba(239,68,68,.14);color:#7f1d1d;border:0; }
-.btn-soft-danger:hover{ background:rgba(239,68,68,.22); }
 
 /* ===== Tabs (Update) ===== */
 .we-tabs{ padding:0 12px; }
@@ -596,13 +582,24 @@
    ========================= */
 
 /* 分区区分：人物/媒资不同边条 + 轻底色 */
+/* 人物关联：暗酒红 */
 .we3-panel-people{
-  border-left: 6px solid rgba(34,197,94,.35);
-  background: linear-gradient(180deg, rgba(34,197,94,.04), #fff 40%);
+  border-left: 6px solid rgba(127, 29, 29, .42); /* 深红色条 */
+  background: linear-gradient(
+    180deg,
+    rgba(127, 29, 29, .06), /* 顶部淡红雾 */
+    #fff 42%
+  );
 }
+
+/* 媒资：铁灰（偏冷），避免和人物同色抢戏 */
 .we3-panel-media{
-  border-left: 6px solid rgba(59,130,246,.35);
-  background: linear-gradient(180deg, rgba(59,130,246,.04), #fff 40%);
+  border-left: 6px solid rgba(30, 41, 59, .38); /* 铁灰色条 */
+  background: linear-gradient(
+    180deg,
+    rgba(30, 41, 59, .055), /* 顶部淡灰雾 */
+    #fff 42%
+  );
 }
 .we3-panel-people .we3-panel-hd,
 .we3-panel-media .we3-panel-hd{
@@ -637,8 +634,8 @@
   display:flex; align-items:center; justify-content:center;
   font-weight: 900;
   color: #0f172a;
-  background: rgba(34,197,94,.14);
-  border: 1px solid rgba(34,197,94,.18);
+  background: rgba(197, 121, 34, 0.14);
+  border: 1px solid rgba(140, 114, 80, 0.18);
 }
 .we3-person-name{ font-weight: 700; color:#111827; line-height:1.1; }
 .we3-person-rel{
@@ -812,8 +809,8 @@
    Uploadbar：按钮左，提示右
    ------------------------- */
 .we3-uploadbar{
-  border: 1px dashed rgba(59,130,246,.35);
-  background: rgba(59,130,246,.04);
+  border: 1px dashed rgba(96, 96, 96, 0.35);
+  background: rgba(110, 110, 110, 0.04);
   border-radius: 16px;
   padding: 12px 12px;
   margin-bottom: 12px;

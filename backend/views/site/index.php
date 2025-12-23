@@ -93,7 +93,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
               <div style="color:#f59e0b;margin-top:4px;">学号未登记，请补充。</div>
             <?php endif; ?>
             <?php if ($isMember): ?>
-              <div style="margin-top:8px;">
+              <div class="adm-actions-col" style="margin-top:8px;">
                 <a class="btn btn-xs btn-soft-primary" href="<?= Url::to(['team-member/my']) ?>">更新学号</a>
               </div>
             <?php endif; ?>

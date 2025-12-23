@@ -211,18 +211,7 @@
   padding: 6px 10px;
 }
 .wm-actions .btn + .btn{ margin-left:6px; }
-.btn-ghost{
-  background: rgba(17,24,39,.06);
-  color:#111827;
-  border:0;
-}
-.btn-ghost:hover{ background: rgba(17,24,39,.10); }
-.btn-soft-success{ background: rgba(34,197,94,.14); color:#14532d; border:0; }
-.btn-soft-success:hover{ background: rgba(34,197,94,.22); color:#14532d; }
-.btn-soft-danger{ background: rgba(239,68,68,.14); color:#7f1d1d; border:0; }
-.btn-soft-danger:hover{ background: rgba(239,68,68,.22); color:#7f1d1d; }
-.btn-soft-warning{ background: rgba(245,158,11,.18); color:#78350f; border:0; }
-.btn-soft-warning:hover{ background: rgba(245,158,11,.26); color:#78350f; }
+
 
 /* modal */
 #messageDetailModal .modal-dialog{ margin-top: 60px; }

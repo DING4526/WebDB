@@ -121,7 +121,7 @@ $currentUserId = Yii::$app->user->id;
                   <?= date('Y-m-d H:i', $f['mtime']) ?>
                 </td>
                 <td class="text-right adm-actions-col">
-                  <a class="btn btn-xs btn-ghost" href="<?= Url::to(['download/file', 'type' => 'team', 'path' => $f['name']]) ?>">
+                  <a class="btn btn-xs btn-soft-ghost" href="<?= Url::to(['download/file', 'type' => 'team', 'path' => $f['name']]) ?>">
                     下载
                   </a>
                   <?php if (!empty($isRoot) || (!empty($f['owner_id']) && (int)$f['owner_id'] === (int)$currentUserId)): ?>
