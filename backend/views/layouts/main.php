@@ -82,43 +82,6 @@ $this->registerCssFile('@web/css/admin-common.css');
               <span class="fa fa-power-off pr5"></span> 登出 </a>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="menu-divider hidden-xs">
-          <i class="fa fa-circle"></i>
-        </li>
-        <li class="dropdown menu-merge">
-          <a href="#" class="dropdown-toggle fw600 p15" data-toggle="dropdown">
-          	<img src="../statics/assets/img/avatars/1.jpg" alt="avatar" class="mw30 br64">
-          	<span class="hidden-xs pl15"> 
-                <?= Yii::$app->user->isGuest ? '游客' : (Yii::$app->user->getUser()->username ?? '') ?>
-            </span>
-            <span class="caret caret-tp hidden-xs"></span>
-          </a>
-          
-          <ul class="dropdown-menu list-group dropdown-persist w250" role="menu">
-
-            <li class="dropdown-header clearfix">
-              <div class="pull-left ml10">
-                <div class="text-muted">当前身份</div>
-                <div><strong>
-                  <?php if (Yii::$app->user->isGuest): ?>
-                    游客 (guest)
-                  <?php else: ?>
-                    <?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
-                  <?php endif; ?>
-                </strong></div>
-              </div>
-
-              <!-- <div class="pull-right mr10 text-right">
-                <div class="text-muted">可访问范围</div>
-                <div class="label label-primary">作业/任务</div>
-              </div> -->
-            </li>
-   
-          </ul>
-        </li>
-      
-      </ul>
       
       
     </header>
@@ -140,9 +103,6 @@ $this->registerCssFile('@web/css/admin-common.css');
                 <img src="../statics/assets/img/avatars/3.jpg" class="img-responsive">
               </a>
               <div class="media-body">
-                <div class="media-links">
-                   <a href="#" class="sidebar-menu-toggle">用户菜单-</a> <a href="<?php echo Url::to(['site/logout']) ?>" data-method="post">登出 </a>
-                </div>
                 <div class="media-author">
                     <?= Yii::$app->user->isGuest ? '游客' : (Yii::$app->user->getUser()->username ?? '') ?>
                 </div>
