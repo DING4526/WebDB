@@ -23,8 +23,8 @@ $eventOptions = $eventOptions ?? [];
 $mediaList = $mediaList ?? [];
 $relationMap = $relationMap ?? [];
 
-$imageList = array_filter($mediaList, fn($m) => $m->type === 'image');
-$docList   = array_filter($mediaList, fn($m) => $m->type === 'document');
+$imageList = array_filter($mediaList, function ($m) { return $m->type === 'image'; });
+$docList   = array_filter($mediaList, function ($m) { return $m->type === 'document'; });
 $eventCount = count($model->events ?? []);
 
 $titleText = $isCreate ? '新增人物' : $model->name;
@@ -406,9 +406,12 @@ $subText = $isCreate
 
                 <div class="we3-media-grid">
                   <?php foreach ($docList as $m): ?>
-                    <?php $url = '/' . ltrim($m->path, '/'); ?>
+                    <?php
+                      $url = '/' . ltrim($m->path, '/');
+                      $docExt = strtoupper(pathinfo($m->path, PATHINFO_EXTENSION) ?: 'DOC');
+                    ?>
                     <div class="we3-media-card we3-media-card-doc">
-                      <div class="we3-docicon">PDF</div>
+                      <div class="we3-docicon"><?= Html::encode($docExt) ?></div>
                       <div class="we3-media-main">
                         <div class="we3-media-title">
                           <?= Html::encode(($m->title ?: '未命名')) ?>
@@ -602,4 +605,3 @@ JS;
 
 $this->registerJs($js);
 ?>
-
