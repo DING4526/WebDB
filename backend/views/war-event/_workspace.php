@@ -199,182 +199,243 @@ $subText = $isCreate
     <div class="we3-overlay" id="we3-overlay"></div>
 
     <!-- Drawer -->
-    <aside class="we3-drawer" id="we3-drawer" aria-hidden="true">
-      <div class="we3-drawer-hd">
-        <div>
-          <div class="we3-drawer-title">人物关联与媒资</div>
-          <div class="we3-drawer-sub">关联、上传、删除都在这里完成。</div>
-        </div>
-        <button type="button" class="we3-iconbtn" id="we3-close-drawer" aria-label="关闭">×</button>
+<aside class="we3-drawer" id="we3-drawer" aria-hidden="true">
+  <div class="we3-drawer-hd">
+    <div>
+      <div class="we3-drawer-title">人物关联与媒资</div>
+      <div class="we3-drawer-sub">关联、上传、删除都在这里完成。</div>
+    </div>
+    <button type="button" class="we3-iconbtn" id="we3-close-drawer" aria-label="关闭">×</button>
+  </div>
+
+  <div class="we3-drawer-bd">
+
+    <!-- People Panel (distinct style) -->
+    <div class="we3-panel we3-panel-people">
+      <div class="we3-panel-hd">
+        <div class="we3-panel-title">人物关联</div>
+        <div class="we3-panel-meta">已绑定：<?= count($model->people ?? []) ?></div>
       </div>
 
-      <div class="we3-drawer-bd">
+      <div class="we3-panel-bd">
 
-        <!-- People -->
-        <div class="we3-panel">
-          <div class="we3-panel-hd">
-            <div class="we3-panel-title">人物关联</div>
-            <div class="we3-panel-meta">已绑定：<?= count($model->people ?? []) ?></div>
+        <!-- People cards: grid, not full width -->
+        <div class="we3-person-grid">
+          <?php foreach (($model->people ?? []) as $person): ?>
+            <?php
+              $name = (string)$person->name;
+              $initial = mb_substr(trim($name), 0, 1, 'UTF-8');
+              $rel = $relationMap[$person->id] ?? '未填写';
+            ?>
+            <div class="we3-person-card">
+              <div class="we3-person-ava"><?= Html::encode($initial) ?></div>
+              <div class="we3-person-main">
+                <div class="we3-person-name"><?= Html::encode($name) ?></div>
+                <div class="we3-person-rel">关系：<?= Html::encode($rel) ?></div>
+              </div>
+
+              <div class="we3-person-op we3-editable-inline">
+                <?= Html::beginForm(['detach-person', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
+                    Html::hiddenInput('person_id', $person->id) .
+                    Html::submitButton('移除', ['class' => 'btn btn-xs btn-soft-danger']) .
+                    Html::endForm(); ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
+
+          <?php if (empty($model->people)): ?>
+            <div class="we3-empty">暂无关联人物</div>
+          <?php endif; ?>
+        </div>
+
+        <div class="we3-split"></div>
+
+        <!-- Bind form -->
+        <div class="we3-editable-inline">
+          <?php if ($relationForm): ?>
+            <?php $pf = ActiveForm::begin([
+              'action' => ['attach-person', 'id' => $model->id],
+              'options' => ['class' => 'we3-miniForm we3-miniForm-people']
+            ]); ?>
+
+            <div class="we3-miniGrid we3-miniGrid-people">
+              <div class="we3-miniCol">
+                <?= $pf->field($relationForm, 'person_id')
+                  ->dropDownList($personOptions, ['prompt' => '选择人物'])
+                  ->label('人物') ?>
+              </div>
+              <div class="we3-miniCol">
+                <?= $pf->field($relationForm, 'relation_type')
+                  ->textInput(['placeholder' => '如：指挥/参与/受害/相关'])
+                  ->label('关系（可选）') ?>
+              </div>
+
+              <div class="we3-miniCol we3-miniColBtn">
+                <?= Html::submitButton('绑定人物', [
+                  'class' => 'btn btn-soft-success we3-btn we3-btn-block',
+                ]) ?>
+              </div>
+            </div>
+
+            <?php ActiveForm::end(); ?>
+          <?php else: ?>
+            <div class="we3-empty">编辑页可维护人物关联</div>
+          <?php endif; ?>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Media Panel (distinct style) -->
+    <div class="we3-panel we3-panel-media">
+      <div class="we3-panel-hd">
+        <div class="we3-panel-title">媒资</div>
+        <div class="we3-panel-meta">图片 <?= count($imageList) ?> · 文档 <?= count($docList) ?></div>
+      </div>
+
+      <div class="we3-panel-bd">
+
+        <!-- Upload: make button obvious -->
+        <div class="we3-uploadbar">
+          <div class="we3-uploadrow">
+            <button type="button"
+                    class="btn btn-soft-primary we3-btn we3-btn-upload we3-editable-inline"
+                    id="we3-upload-btn">
+              上传文件
+            </button>
+
+            <div class="we3-uploadhint">
+              <div class="we3-uploadhint-title">上传后自动识别类型</div>
+              <div class="we3-uploadhint-sub">自动回填“标题/类型”，你只需要点“添加媒资”。</div>
+            </div>
           </div>
 
-          <div class="we3-panel-bd">
-            <div class="we3-list">
-              <?php foreach (($model->people ?? []) as $person): ?>
-                <div class="we3-item">
-                  <div class="we3-item-main">
-                    <div class="we3-item-title"><?= Html::encode($person->name) ?></div>
-                    <div class="we3-item-sub">关系：<?= Html::encode($relationMap[$person->id] ?? '未填写') ?></div>
-                  </div>
+          <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', [
+            'enctype' => 'multipart/form-data',
+            'id' => 'we3-upload-form',
+            'style' => 'display:none;',
+          ]) ?>
+            <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx">
+          <?= Html::endForm() ?>
+        </div>
 
-                  <div class="we3-item-op we3-editable-inline">
-                    <?= Html::beginForm(['detach-person', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
-                        Html::hiddenInput('person_id', $person->id) .
-                        Html::submitButton('移除', ['class' => 'btn btn-xs btn-soft-danger']) .
+        <!-- Add media form: type readonly, path hidden -->
+        <div class="we3-editable-inline">
+          <?php if ($mediaForm): ?>
+            <?php
+              $typeLabel = ($mediaForm->type === 'document') ? '文档' : '图片';
+            ?>
+            <?php $mf = ActiveForm::begin([
+              'action' => ['add-media', 'id' => $model->id],
+              'options' => ['class' => 'we3-miniForm we3-miniForm-media']
+            ]); ?>
+
+              <!-- keep hidden fields -->
+              <?= $mf->field($mediaForm, 'type')->hiddenInput()->label(false) ?>
+              <?= $mf->field($mediaForm, 'path')->hiddenInput()->label(false) ?>
+
+              <div class="we3-miniGrid we3-miniGrid-media">
+                <div class="we3-miniCol">
+                  <?= $mf->field($mediaForm, 'title')
+                    ->textInput(['maxlength' => true, 'placeholder' => '建议填写更易识别的标题'])
+                    ->label('标题') ?>
+                </div>
+
+                <div class="we3-miniCol">
+                  <div class="form-group">
+                    <label class="control-label">类型</label>
+                    <div class="we3-typebadge"><?= Html::encode($typeLabel) ?></div>
+                  </div>
+                </div>
+
+                <div class="we3-miniCol we3-miniColBtn">
+                  <?= Html::submitButton('添加媒资', [
+                    'class' => 'btn btn-soft-success we3-btn we3-btn-block',
+                  ]) ?>
+                </div>
+              </div>
+
+            <?php ActiveForm::end(); ?>
+          <?php else: ?>
+            <div class="we3-empty">编辑页可维护媒资</div>
+          <?php endif; ?>
+        </div>
+
+        <div class="we3-split"></div>
+
+        <!-- Media lists: thumbnails + short display -->
+        <div class="we3-media-sections">
+          <!-- Images -->
+          <div class="we3-media-sec">
+            <div class="we3-media-sec-hd">
+              <div class="we3-mini">图片</div>
+            </div>
+
+            <div class="we3-media-grid">
+              <?php foreach ($imageList as $m): ?>
+                <?php $url = '/' . ltrim($m->path, '/'); ?>
+                <div class="we3-media-card">
+                  <a class="we3-media-thumb" href="<?= Html::encode($url) ?>" target="_blank" title="打开原图">
+                    <img src="<?= Html::encode($url) ?>" alt="<?= Html::encode($m->title ?: '图片') ?>">
+                  </a>
+                  <div class="we3-media-main">
+                    <div class="we3-media-title">
+                      <?= Html::encode(($m->title ?: '未命名') . ' · 图片') ?>
+                    </div>
+                    <div class="we3-media-links">
+                      <?= Html::a('查看', $url, ['target' => '_blank', 'class' => 'we3-link']) ?>
+                    </div>
+                  </div>
+                  <div class="we3-media-op we3-editable-inline">
+                    <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
+                        Html::hiddenInput('media_id', $m->id) .
+                        Html::submitButton('删除', ['class' => 'btn btn-xs btn-soft-danger']) .
                         Html::endForm(); ?>
                   </div>
                 </div>
               <?php endforeach; ?>
-              <?php if (empty($model->people)): ?>
-                <div class="we3-empty">暂无关联人物</div>
-              <?php endif; ?>
+              <?php if (empty($imageList)): ?><div class="we3-empty">暂无图片</div><?php endif; ?>
             </div>
-
-            <div class="we3-split"></div>
-
-            <div class="we3-editable-inline">
-              <?php if ($relationForm): ?>
-                <?php $pf = ActiveForm::begin(['action' => ['attach-person', 'id' => $model->id], 'options' => ['class' => 'we3-miniForm']]); ?>
-
-                  <div class="we3-miniGrid">
-                    <div class="we3-miniCol">
-                      <?= $pf->field($relationForm, 'person_id')
-                        ->dropDownList($personOptions, ['prompt' => '选择人物'])
-                        ->label('人物') ?>
-                    </div>
-                    <div class="we3-miniCol">
-                      <?= $pf->field($relationForm, 'relation_type')
-                        ->textInput(['placeholder' => '如：指挥/参与/受害/相关'])
-                        ->label('关系（可选）') ?>
-                    </div>
-                    <div class="we3-miniCol we3-miniColBtn">
-                      <?= Html::submitButton('绑定', ['class' => 'btn btn-soft-success we3-btn', 'style' => 'width:100%;']) ?>
-                    </div>
-                  </div>
-
-                <?php ActiveForm::end(); ?>
-              <?php else: ?>
-                <div class="we3-empty">编辑页可维护人物关联</div>
-              <?php endif; ?>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Media -->
-        <div class="we3-panel">
-          <div class="we3-panel-hd">
-            <div class="we3-panel-title">媒资</div>
-            <div class="we3-panel-meta">图片 <?= count($imageList) ?> · 文档 <?= count($docList) ?></div>
           </div>
 
-          <div class="we3-panel-bd">
-
-            <div class="we3-minihead">
-              <div class="we3-mini">上传文件</div>
-              <button type="button" class="btn btn-xs btn-soft-primary we3-editable-inline" id="we3-upload-btn">选择文件</button>
-              <?= Html::beginForm(['upload-media', 'id' => $model->id], 'post', [
-                'enctype' => 'multipart/form-data',
-                'id' => 'we3-upload-form',
-                'style' => 'display:none;',
-              ]) ?>
-                <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx">
-              <?= Html::endForm() ?>
+          <!-- Docs -->
+          <div class="we3-media-sec">
+            <div class="we3-media-sec-hd">
+              <div class="we3-mini">文档</div>
             </div>
 
-            <div class="we3-note">上传后会自动回填到“添加媒资”表单，可改标题再保存。</div>
-
-            <div class="we3-editable-inline">
-              <?php if ($mediaForm): ?>
-                <?php $mf = ActiveForm::begin(['action' => ['add-media', 'id' => $model->id], 'options' => ['class' => 'we3-miniForm']]); ?>
-
-                  <div class="we3-miniGrid">
-                    <div class="we3-miniCol">
-                      <?= $mf->field($mediaForm, 'title')->textInput(['maxlength' => true])->label('标题') ?>
+            <div class="we3-media-grid">
+              <?php foreach ($docList as $m): ?>
+                <?php $url = '/' . ltrim($m->path, '/'); ?>
+                <div class="we3-media-card we3-media-card-doc">
+                  <div class="we3-docicon">PDF</div>
+                  <div class="we3-media-main">
+                    <div class="we3-media-title">
+                      <?= Html::encode(($m->title ?: '未命名') . ' · 文档') ?>
                     </div>
-                    <div class="we3-miniCol">
-                      <?= $mf->field($mediaForm, 'type')->dropDownList(['image' => '图片', 'document' => '文档'])->label('类型') ?>
-                    </div>
-                    <div class="we3-miniCol">
-                      <?= $mf->field($mediaForm, 'path')->textInput(['readonly' => true, 'placeholder' => '上传后自动填充'])->label('路径') ?>
-                    </div>
-                    <div class="we3-miniCol we3-miniColBtn">
-                      <?= Html::submitButton('添加媒资', ['class' => 'btn btn-soft-success we3-btn', 'style' => 'width:100%;']) ?>
+                    <div class="we3-media-links">
+                      <?= Html::a('查看', $url, ['target' => '_blank', 'class' => 'we3-link']) ?>
                     </div>
                   </div>
-
-                <?php ActiveForm::end(); ?>
-              <?php else: ?>
-                <div class="we3-empty">编辑页可维护媒资</div>
-              <?php endif; ?>
-            </div>
-
-            <div class="we3-split"></div>
-
-            <div class="we3-twoCols">
-              <!-- Images -->
-              <div>
-                <div class="we3-minihead">
-                  <div class="we3-mini">图片</div>
+                  <div class="we3-media-op we3-editable-inline">
+                    <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
+                        Html::hiddenInput('media_id', $m->id) .
+                        Html::submitButton('删除', ['class' => 'btn btn-xs btn-soft-danger']) .
+                        Html::endForm(); ?>
+                  </div>
                 </div>
-
-                <?php foreach ($imageList as $m): ?>
-                  <?php $url = '/' . ltrim($m->path, '/'); ?>
-                  <div class="we3-file">
-                    <div class="we3-file-main">
-                      <div class="we3-file-title"><?= Html::encode($m->title ?: '未命名') ?></div>
-                      <div class="we3-file-sub"><?= Html::a(Html::encode($m->path), $url, ['target' => '_blank']) ?></div>
-                    </div>
-                    <div class="we3-file-op we3-editable-inline">
-                      <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
-                          Html::hiddenInput('media_id', $m->id) .
-                          Html::submitButton('删除', ['class' => 'btn btn-xs btn-soft-danger']) .
-                          Html::endForm(); ?>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-                <?php if (empty($imageList)): ?><div class="we3-empty">暂无图片</div><?php endif; ?>
-              </div>
-
-              <!-- Docs -->
-              <div>
-                <div class="we3-minihead">
-                  <div class="we3-mini">文档</div>
-                </div>
-
-                <?php foreach ($docList as $m): ?>
-                  <?php $url = '/' . ltrim($m->path, '/'); ?>
-                  <div class="we3-file">
-                    <div class="we3-file-main">
-                      <div class="we3-file-title"><?= Html::encode($m->title ?: '未命名') ?></div>
-                      <div class="we3-file-sub"><?= Html::a(Html::encode($m->path), $url, ['target' => '_blank']) ?></div>
-                    </div>
-                    <div class="we3-file-op we3-editable-inline">
-                      <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
-                          Html::hiddenInput('media_id', $m->id) .
-                          Html::submitButton('删除', ['class' => 'btn btn-xs btn-soft-danger']) .
-                          Html::endForm(); ?>
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-                <?php if (empty($docList)): ?><div class="we3-empty">暂无文档</div><?php endif; ?>
-              </div>
+              <?php endforeach; ?>
+              <?php if (empty($docList)): ?><div class="we3-empty">暂无文档</div><?php endif; ?>
             </div>
-
           </div>
         </div>
 
       </div>
-    </aside>
+    </div>
+
+  </div>
+</aside>
+
   <?php endif; ?>
 
 </div>
