@@ -113,19 +113,22 @@ $userList = ArrayHelper::map(
                     <span class="adm-badge <?= $isActive ? 'adm-badge-active' : 'adm-badge-inactive' ?>">
                       <?= $isActive ? '正常' : '禁用' ?>
                     </span>
+                    <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
+                      'class' => 'btn btn-xs btn-soft-primary',
+                      'style' => 'margin-left:6px; border-radius:8px;'
+                    ]) ?>
                     <?php if ($isRoot): ?>
-                      <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
-                        'class' => 'btn btn-xs btn-info',
-                        'style' => 'margin-left:6px;'
-                      ]) ?>
                       <?= Html::a('编辑', ['team-member/update', 'id' => $m->id], [
-                        'class' => 'btn btn-xs btn-primary',
-                        'style' => 'margin-left:4px;'
+                        'class' => 'btn btn-xs btn-soft-success',
+                        'style' => 'margin-left:4px; border-radius:8px;'
                       ]) ?>
-                    <?php else: ?>
-                      <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
-                        'class' => 'btn btn-xs btn-info',
-                        'style' => 'margin-left:6px;'
+                      <?= Html::a('删除', ['team-member/delete', 'id' => $m->id], [
+                        'class' => 'btn btn-xs btn-soft-danger',
+                        'style' => 'margin-left:4px; border-radius:8px;',
+                        'data' => [
+                          'confirm' => '确认删除该成员？',
+                          'method' => 'post',
+                        ],
                       ]) ?>
                     <?php endif; ?>
                   </div>

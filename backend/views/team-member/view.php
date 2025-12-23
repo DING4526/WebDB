@@ -25,13 +25,6 @@ $isRoot = $currentUser && $currentUser->isRoot();
       <div class="adm-actions">
         <?php if ($isRoot): ?>
           <?= Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-          <?= Html::a('删除', ['delete', 'id' => $model->id], [
-              'class' => 'btn btn-danger',
-              'data' => [
-                  'confirm' => '确认删除该成员？',
-                  'method' => 'post',
-              ],
-          ]) ?>
         <?php endif; ?>
         <?= Html::a('返回团队管理', ['/team/index'], ['class' => 'btn btn-default']) ?>
       </div>

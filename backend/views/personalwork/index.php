@@ -72,27 +72,27 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
             请先在首页补充学号后再上传。
           </div>
         <?php else: ?>
-          <?= Html::beginForm(['personalwork/upload'], 'post', ['enctype' => 'multipart/form-data']) ?>
-            <div class="row">
-              <div class="col-sm-4">
-                <label class="control-label">学号目录</label>
-                <?php if (!empty($isRoot)): ?>
-                  <?= Html::textInput('student_no', $selectedFolder ?: $currentStudentNo, [
-                    'class' => 'form-control',
-                    'placeholder' => '如：2310xxxx',
-                  ]) ?>
-                <?php else: ?>
-                  <?= Html::hiddenInput('student_no', $currentStudentNo) ?>
-                  <div class="form-control" style="background:#f9fafb;"><?= Html::encode($currentStudentNo) ?></div>
-                <?php endif; ?>
+          <?= Html::beginForm(['personalwork/upload'], 'post', ['enctype' => 'multipart/form-data', 'id' => 'uploadForm']) ?>
+            <div class="pw-upload-modern">
+              <div class="pw-upload-field">
+                <label class="pw-upload-label">学号目录</label>
+                <?= Html::hiddenInput('student_no', $currentStudentNo) ?>
+                <div class="pw-upload-readonly">
+                  <span class="pw-upload-icon">🎓</span>
+                  <?= Html::encode($currentStudentNo) ?>
+                </div>
               </div>
-              <div class="col-sm-5">
-                <label class="control-label">选择文件</label>
-                <input type="file" name="file" required class="form-control">
-              </div>
-              <div class="col-sm-3">
-                <label class="control-label" style="visibility:hidden;">提交</label>
-                <?= Html::submitButton('上传', ['class' => 'btn btn-success btn-block']) ?>
+              
+              <div class="pw-upload-field pw-upload-field-file">
+                <label class="pw-upload-label">选择文件</label>
+                <div class="pw-file-wrapper">
+                  <input type="file" name="file" required id="fileInput" style="display:none;">
+                  <button type="button" class="btn btn-primary btn-file-trigger" id="fileTrigger">
+                    <span class="glyphicon glyphicon-paperclip"></span>
+                    <span id="fileName">选择文件并上传</span>
+                  </button>
+                  <div class="pw-file-hint">支持 pdf / docx / ppt / zip 等</div>
+                </div>
               </div>
             </div>
           <?= Html::endForm() ?>
@@ -100,6 +100,115 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
       </div>
     </div>
   <?php endif; ?>
+
+<style>
+.pw-upload-modern {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.pw-upload-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pw-upload-label {
+  font-weight: 900;
+  font-size: 13px;
+  color: #334155;
+  margin: 0;
+}
+
+.pw-upload-readonly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #0f172a;
+}
+
+.pw-upload-icon {
+  font-size: 18px;
+}
+
+.pw-file-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-file-trigger {
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-weight: 900;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: 0;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-file-trigger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59,130,246,0.35);
+}
+
+.btn-file-trigger:active {
+  transform: translateY(0);
+}
+
+.btn-file-trigger .glyphicon {
+  font-size: 16px;
+}
+
+.pw-file-hint {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .pw-upload-modern {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var fileInput = document.getElementById('fileInput');
+  var fileTrigger = document.getElementById('fileTrigger');
+  var fileName = document.getElementById('fileName');
+  var uploadForm = document.getElementById('uploadForm');
+  
+  if (fileTrigger && fileInput) {
+    fileTrigger.addEventListener('click', function() {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+      if (fileInput.files && fileInput.files.length > 0) {
+        var file = fileInput.files[0];
+        fileName.textContent = file.name;
+        // Auto submit
+        uploadForm.submit();
+      }
+    });
+  }
+});
+</script>
 
   <?php if (empty($members)): ?>
     <div class="alert alert-warning" style="border-radius:18px; margin-top:14px;">
