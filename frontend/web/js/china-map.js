@@ -2,6 +2,11 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('[ChinaMap] 脚本已加载 - 悬浮框版');
 
     // ---------------------------------------------------------
+    // 注意：页面顶部间距已移至 site.css 全局控制 (body { padding-top: 80px; })
+    // 这里不再需要单独设置 pageContainer.style.paddingTop
+    // ---------------------------------------------------------
+
+    // ---------------------------------------------------------
     // 修复：强制调整地图容器高度，解决底部显示不全的问题
     // ---------------------------------------------------------
     var mapObj = document.getElementById('china-map-object');
