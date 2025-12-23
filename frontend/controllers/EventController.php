@@ -24,20 +24,34 @@ class EventController extends Controller
      */
     public function actionIndex($location = null, $action = null)
     {
-        // 1. AJAX 接口：返回所有有数据的地点列表
+        // 1. AJAX 接口：返回所有有数据的地点及其事件列表
         if ($action === 'get-active-locations') {
             Yii::$app->response->format = Response::FORMAT_JSON;
             
-            // 查询 war_event 表中 location 字段不为空的所有去重记录
-            $locations = WarEvent::find()
-                ->select(['location'])
+            // 修改：查询 id, title, location，以便前端生成链接
+            $events = WarEvent::find()
+                ->select(['id', 'title', 'location'])
                 ->where(['status' => 1])
                 ->andWhere(['not', ['location' => null]])
                 ->andWhere(['!=', 'location', ''])
-                ->distinct()
-                ->column();
+                ->asArray()
+                ->all();
             
-            return $locations;
+            // 按地点分组数据
+            // 格式: { "上海": [{id:1, title:"淞沪会战"}, ...], "陕西": [...] }
+            $result = [];
+            foreach ($events as $event) {
+                $loc = $event['location'];
+                if (!isset($result[$loc])) {
+                    $result[$loc] = [];
+                }
+                $result[$loc][] = [
+                    'id' => $event['id'],
+                    'title' => $event['title']
+                ];
+            }
+            
+            return $result;
         }
 
         // 2. 页面渲染逻辑
