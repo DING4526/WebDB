@@ -322,7 +322,7 @@ $subText = $isCreate
                   
                   <div class="we3-upload-action">
                     <input type="file" name="file" id="we3-upload-input" accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx" style="display:none;">
-                    <button type="button" class="btn btn-primary btn-we3-upload" id="we3-upload-btn">
+                    <button type="button" class="btn-we3-upload" id="we3-upload-btn">
                       <span class="glyphicon glyphicon-cloud-upload"></span>
                       <span id="we3-upload-filename">选择文件并上传</span>
                     </button>

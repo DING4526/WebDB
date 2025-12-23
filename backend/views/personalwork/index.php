@@ -87,7 +87,7 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
               
               <div class="pw-upload-action">
                 <input type="file" name="file" required id="fileInput" style="display:none;">
-                <button type="button" class="btn btn-primary btn-upload-trigger" id="fileTrigger">
+                <button type="button" class="btn-upload-trigger" id="fileTrigger">
                   <span class="glyphicon glyphicon-cloud-upload"></span>
                   <span id="fileName">选择文件并上传</span>
                 </button>

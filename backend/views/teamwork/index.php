@@ -67,7 +67,7 @@ $currentUserId = Yii::$app->user->id;
             
             <div class="tw-upload-action">
               <input type="file" name="file" required id="twFileInput" style="display:none;">
-              <button type="button" class="btn btn-primary btn-tw-trigger" id="twFileTrigger">
+              <button type="button" class="btn-tw-trigger" id="twFileTrigger">
                 <span class="glyphicon glyphicon-cloud-upload"></span>
                 <span id="twFileName">选择文件并上传</span>
               </button>
