@@ -1,0 +1,140 @@
+/* ===== upload-modern.css (Simplified) =====
+   Used by: personalwork/index.php, teamwork/index.php, war-event/_workspace.php, war-person/_workspace.php
+   Goal: clean + simple + single-color button
+*/
+
+/* =========================
+   1) Containers
+   ========================= */
+.upload-modern,
+.pw-upload-modern,
+.tw-upload-modern,
+.we3-upload-modern{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  background:#f6f6f6;
+  border:2px dashed #938e837b;
+  border-radius:12px;
+}
+
+/* optional spacing for drawer */
+.we3-upload-modern{ margin-bottom: 12px; }
+
+/* =========================
+   2) Hint area
+   ========================= */
+.upload-hint,
+.pw-upload-hint,
+.tw-upload-hint,
+.we3-upload-hint{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  flex:1;
+  min-width:0;
+}
+
+.upload-icon,
+.pw-upload-icon,
+.tw-upload-icon,
+.we3-upload-icon{
+  font-size:20px;
+  line-height:1;
+  opacity:.7;
+  margin-top:2px;
+}
+
+.upload-hint-title,
+.pw-upload-hint-title,
+.tw-upload-hint-title,
+.we3-upload-hint-title{
+  font-size:14px;
+  font-weight:700;
+  color:#1f2937;
+  margin:0 0 3px;
+}
+
+.upload-hint-desc,
+.pw-upload-hint-desc,
+.tw-upload-hint-desc,
+.we3-upload-hint-desc{
+  font-size:12px;
+  color:#64748b;
+  line-height:1.4;
+  margin:0;
+}
+
+/* =========================
+   3) Action area + Button (Simple solid style)
+   ========================= */
+.upload-action,
+.pw-upload-action,
+.tw-upload-action,
+.we3-upload-action{
+  flex:0 0 auto;
+}
+
+.btn-upload-trigger,
+.btn-tw-trigger,
+.btn-we3-upload{
+  border:0 !important;
+  border-radius:8px !important;
+  padding:10px 18px !important;
+  font-size:13px !important;
+  font-weight:600 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:6px !important;
+  white-space:nowrap !important;
+  transition: all 0.2s ease !important;
+
+  /* War theme: deep red (muted, not flashy) */
+  background: #7f1d1d !important;  /* 暗酒红 */
+  color:#ffffff !important;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.10) !important;
+}
+
+.btn-upload-trigger:hover,
+.btn-tw-trigger:hover,
+.btn-we3-upload:hover{
+  background: #991b1b !important;  /* 稍亮一点但仍克制 */
+  color:#ffffff !important;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.16) !important;
+  transform: translateY(-1px);
+}
+
+.btn-upload-trigger:active,
+.btn-tw-trigger:active,
+.btn-we3-upload:active{
+  background: #6b1616 !important;  /* 按下更深 */
+  transform: translateY(0);
+}
+
+.btn-upload-trigger .glyphicon,
+.btn-tw-trigger .glyphicon,
+.btn-we3-upload .glyphicon{
+  font-size:14px;
+}
+
+/* =========================
+   4) Mobile
+   ========================= */
+@media (max-width: 768px){
+  .upload-modern,
+  .pw-upload-modern,
+  .tw-upload-modern,
+  .we3-upload-modern{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .btn-upload-trigger,
+  .btn-tw-trigger,
+  .btn-we3-upload{
+    width:100%;
+    justify-content:center;
+  }
+}
