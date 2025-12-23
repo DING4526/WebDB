@@ -6,97 +6,267 @@
  */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /** @var \common\models\WarPerson $model */
-$this->title = $model->name;
+$this->title = $model->name . ' - 抗战人物志';
 
-// 注册红色风格 CSS
+// 注册 CSS
 $this->registerCss("
-    .person-view h1, .person-view h3, .person-view h4 {
-        color: #a94442; /* 深红色 */
-        border-bottom: 1px solid #ebccd1;
-        padding-bottom: 10px;
+    /* 页面头部 */
+    .page-header {
+        margin: 20px 0 30px;
+        border-bottom: none;
+        text-align: center;
     }
-    .person-view .list-group-item {
-        border-color: #ebccd1;
+    .page-title {
+        color: #8b0000;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .page-subtitle {
         color: #a94442;
-        background-color: #f2dede;
+        font-size: 18px;
+        background: #fff5f5;
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
     }
-    .person-view .list-group-item strong {
-        color: #843534;
+
+    /* 通用卡片样式 */
+    .content-card {
+        background: #fff;
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    .section-title {
+        color: #8b0000;
+        font-size: 20px;
+        font-weight: bold;
+        border-left: 5px solid #a94442;
+        padding-left: 15px;
+        margin-bottom: 20px;
+        margin-top: 0;
+    }
+
+    /* 人物信息区 */
+    .person-image-box {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border: 4px solid #fff;
+    }
+    .person-image-box img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .person-intro-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #444;
+        text-indent: 2em;
+    }
+
+    /* 事件列表 */
+    .event-list {
+        list-style: none;
+        padding: 0;
+    }
+    .event-item {
+        position: relative;
+        padding: 15px 15px 15px 30px;
+        border-bottom: 1px dashed #eee;
+        transition: all 0.3s;
+    }
+    .event-item:last-child {
+        border-bottom: none;
+    }
+    .event-item:before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 22px;
+        width: 10px;
+        height: 10px;
+        background: #a94442;
+        border-radius: 50%;
+    }
+    .event-item:hover {
+        background-color: #fff9f9;
+    }
+    .event-date {
+        font-weight: bold;
+        color: #a94442;
+        margin-right: 10px;
+    }
+    .event-title {
+        color: #333;
+    }
+
+    /* 留言区 */
+    .comment-item {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 15px 0;
+    }
+    .comment-item:last-child {
+        border-bottom: none;
+    }
+    .comment-header {
+        margin-bottom: 8px;
+    }
+    .comment-user {
+        font-weight: bold;
+        color: #8b0000;
+    }
+    .comment-time {
+        color: #999;
+        font-size: 12px;
+        float: right;
+    }
+    .comment-content {
+        color: #555;
+        line-height: 1.6;
     }
 ");
 ?>
 
-<div class="person-view">
-    <h1><?= Html::encode($model->name) ?> <small style="color: #a94442;"><?= Html::encode($model->role_type) ?></small></h1>
-    <?php if ($model->intro): ?>
-        <p class="lead" style="color: #a94442;"><?= Html::encode($model->intro) ?></p>
-    <?php endif; ?>
+<div class="container person-view">
+    
+    <!-- 头部 -->
+    <div class="page-header">
+        <h1 class="page-title"><?= Html::encode($model->name) ?></h1>
+        <div class="page-subtitle"><?= Html::encode($model->role_type) ?></div>
+    </div>
 
-    <?php if ($model->biography): ?>
-        <div class="panel panel-danger">
-            <div class="panel-heading">生平</div>
-            <div class="panel-body">
-                <?= nl2br(Html::encode($model->biography)) ?>
+    <div class="row">
+        <!-- 左侧：图片与简介 -->
+        <div class="col-md-4">
+            <div class="content-card">
+                <?php if ($model->coverImage): ?>
+                    <div class="person-image-box">
+                        <?= Html::img($model->coverImage->path, ['alt' => $model->name]) ?>
+                    </div>
+                <?php else: ?>
+                    <div class="person-image-box" style="background:#f8f9fa; height:300px; display:flex; align-items:center; justify-content:center; color:#ccc;">
+                        <i class="glyphicon glyphicon-user" style="font-size: 80px;"></i>
+                    </div>
+                <?php endif; ?>
+                
+                <h4 class="section-title" style="font-size: 18px; margin-top: 20px;">人物简介</h4>
+                <?php if ($model->intro): ?>
+                    <p style="color: #666; line-height: 1.6;"><?= Html::encode($model->intro) ?></p>
+                <?php else: ?>
+                    <p class="text-muted">暂无简介</p>
+                <?php endif; ?>
             </div>
         </div>
-    <?php endif; ?>
 
-    <h3>相关事件</h3>
-    <?php if (empty($model->events)): ?>
-        <p class="text-muted">暂未关联事件</p>
-    <?php else: ?>
-        <ul class="list-group">
-            <?php foreach ($model->events as $event): ?>
-                <li class="list-group-item">
-                    <strong><?= Html::encode($event->event_date ?: '日期待定') ?></strong>
-                    <?= Html::encode($event->title) ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+        <!-- 右侧：生平与事件 -->
+        <div class="col-md-8">
+            <!-- 生平 -->
+            <?php if ($model->biography): ?>
+                <div class="content-card">
+                    <h3 class="section-title">生平事迹</h3>
+                    <div class="person-intro-text">
+                        <?= nl2br(Html::encode($model->biography)) ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
-    <hr style="border-top: 1px solid #ebccd1;">
-    
-    <div class="comments-section">
-        <h3>留言互动</h3>
-        
-        <!-- 留言列表 -->
-        <div class="comments-list">
-            <?php if (empty($comments)): ?>
-                <p class="text-muted">暂无留言，快来抢沙发吧！</p>
-            <?php else: ?>
-                <?php foreach ($comments as $comment): ?>
-                    <div class="panel panel-danger">
-                        <div class="panel-heading">
-                            <strong><?= Html::encode($comment->nickname) ?></strong>
-                            <span class="pull-right">
-                                <?= Yii::$app->formatter->asDatetime($comment->created_at) ?>
-                            </span>
+            <!-- 相关事件 -->
+            <div class="content-card">
+                <h3 class="section-title">相关历史事件</h3>
+                <?php if (empty($model->events)): ?>
+                    <p class="text-muted" style="padding-left: 15px;">暂未关联事件</p>
+                <?php else: ?>
+                    <ul class="event-list">
+                        <?php foreach ($model->events as $event): ?>
+                            <li class="event-item">
+                                <span class="event-date"><?= Html::encode($event->event_date ?: '日期待定') ?></span>
+                                <span class="event-title"><?= Html::encode($event->title) ?></span>
+                                <?= Html::a('<i class="glyphicon glyphicon-share-alt"></i>', ['timeline/view', 'id' => $event->id], [
+                                    'title' => '查看事件详情',
+                                    'class' => 'pull-right text-danger',
+                                    'style' => 'opacity: 0.6;'
+                                ]) ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+
+            <!-- 留言区 -->
+            <div class="content-card" id="comments">
+                <h3 class="section-title">
+                    留言互动 
+                    <small class="pull-right" style="font-size: 14px; font-weight: normal; color: #999; margin-top: 5px;">
+                        共 <?= count($comments) ?> 条留言
+                    </small>
+                </h3>
+                
+                <!-- 留言列表 -->
+                <div class="comments-list" style="margin-bottom: 30px; max-height: 500px; overflow-y: auto;">
+                    <?php if (empty($comments)): ?>
+                        <div class="alert alert-warning" style="background: #fff9f9; color: #a94442; border-color: #ebccd1;">
+                            暂无留言，快来抢沙发吧！
                         </div>
-                        <div class="panel-body">
-                            <?= nl2br(Html::encode($comment->content)) ?>
+                    <?php else: ?>
+                        <?php foreach ($comments as $comment): ?>
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <span class="comment-user">
+                                        <i class="glyphicon glyphicon-user"></i> <?= Html::encode($comment->nickname) ?>
+                                    </span>
+                                    <span class="comment-time">
+                                        <?= Yii::$app->formatter->asDatetime($comment->created_at) ?>
+                                    </span>
+                                </div>
+                                <div class="comment-content">
+                                    <?= nl2br(Html::encode($comment->content)) ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- 留言表单 -->
+                <div class="comment-form" style="background: #f8f9fa; padding: 20px; border-radius: 6px;">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: #333; font-weight: bold;">发表留言</h4>
+                    <?php $form = \yii\widgets\ActiveForm::begin(); ?>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <?= $form->field($newMessage, 'nickname')->textInput([
+                                'maxlength' => true, 
+                                'placeholder' => '您的昵称',
+                                'class' => 'form-control',
+                                'style' => 'border-radius: 4px;'
+                            ])->label(false) ?>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
-
-        <!-- 留言表单 -->
-        <div class="comment-form">
-            <h4>发表留言</h4>
-            <?php $form = \yii\widgets\ActiveForm::begin(); ?>
-            
-            <?= $form->field($newMessage, 'nickname')->textInput(['maxlength' => true, 'placeholder' => '请输入您的昵称']) ?>
-            
-            <?= $form->field($newMessage, 'content')->textarea(['rows' => 4, 'placeholder' => '请输入留言内容']) ?>
-            
-            <div class="form-group">
-                <?= Html::submitButton('提交留言', ['class' => 'btn btn-danger']) ?>
+                    
+                    <?= $form->field($newMessage, 'content')->textarea([
+                        'rows' => 4, 
+                        'placeholder' => '写下您的感言...',
+                        'class' => 'form-control',
+                        'style' => 'border-radius: 4px; resize: vertical;'
+                    ])->label(false) ?>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <?= Html::submitButton('<i class="glyphicon glyphicon-send"></i> 提交留言', [
+                            'class' => 'btn btn-danger',
+                            'style' => 'padding: 8px 25px; border-radius: 20px;'
+                        ]) ?>
+                    </div>
+                    
+                    <?php \yii\widgets\ActiveForm::end(); ?>
+                </div>
             </div>
-            
-            <?php \yii\widgets\ActiveForm::end(); ?>
         </div>
     </div>
 </div>
