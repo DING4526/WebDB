@@ -164,14 +164,23 @@ document.addEventListener('DOMContentLoaded', function () {
                             tooltip.innerHTML = html;
                             tooltip.style.display = 'block';
 
-                            // 计算位置 (e.clientX 在 object 内部是相对坐标，需要加上 object 的偏移)
-                            var mapRect = mapObj.getBoundingClientRect();
-                            var left = mapRect.left + e.clientX + 15;
-                            var top = mapRect.top + e.clientY + 15;
+                            // 修改：基于圆点元素位置定位，确保悬浮框始终在省份圆点附近
+                            var circleRect = this.getBoundingClientRect(); // 圆点相对 SVG 视口的位置
+                            var mapRect = mapObj.getBoundingClientRect();  // 地图容器相对浏览器视口的位置
+                            
+                            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            var scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
-                            // 防止溢出屏幕右侧
-                            if (left + 220 > window.innerWidth) {
-                                left = mapRect.left + e.clientX - 230;
+                            // 计算绝对坐标 (相对于文档)
+                            // 默认显示在圆点右侧：地图X + 滚动X + 圆点X + 圆点宽 + 间距
+                            var left = mapRect.left + scrollLeft + circleRect.left + circleRect.width + 10;
+                            // 垂直居中稍偏上
+                            var top = mapRect.top + scrollTop + circleRect.top + (circleRect.height / 2) - 20;
+
+                            // 防止溢出屏幕右侧 (假设悬浮框宽度约 230px)
+                            // 使用 clientWidth 获取可视区域宽度
+                            if (mapRect.left + circleRect.left + 250 > document.documentElement.clientWidth) {
+                                left = mapRect.left + scrollLeft + circleRect.left - 230; // 改为显示在圆点左侧
                             }
 
                             tooltip.style.left = left + 'px';
