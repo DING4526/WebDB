@@ -393,24 +393,6 @@ $this->registerCssFile('@web/css/admin-common.css');
             'links' => $this->params['breadcrumbs'] ?? [],
           ]) ?>
         </div>
-        <div class="topbar-right">
-          <!-- <div class="ib topbar-dropdown">
-            <label for="topbar-multiple" class="control-label pr10 fs11 text-muted">Reporting Period</label>
-            <select id="topbar-multiple" class="hidden">
-              <optgroup label="Filter By:">
-                <option value="1-1">Last 30 Days</option>
-                <option value="1-2" selected="selected">Last 60 Days</option>
-                <option value="1-3">Last Year</option>
-              </optgroup>
-            </select>
-          </div> -->
-          <div class="ml15 ib va-m" id="toggle_sidemenu_r">
-            <a href="#" class="pl5">
-              <i class="fa fa-sign-in fs22 text-primary"></i>
-              <span class="badge badge-hero badge-danger"></span>
-            </a>
-          </div>
-        </div>
       </header>
       <!-- End: Topbar -->
 
@@ -422,175 +404,104 @@ $this->registerCssFile('@web/css/admin-common.css');
       <!-- End: Content -->
 
     </section>
-
-    <!-- Start: Right Sidebar -->
-    <aside id="sidebar_right" class="nano affix">
-
-      <!-- Start: Sidebar Right Content -->
-      <div class="sidebar-right-content nano-content">
-
-        <div class="tab-block sidebar-block br-n">
-          <ul class="nav nav-tabs tabs-border nav-justified hidden">
-            <li class="active">
-              <a href="#sidebar-right-tab1" data-toggle="tab">Tab 1</a>
-            </li>
-            <li>
-              <a href="#sidebar-right-tab2" data-toggle="tab">Tab 2</a>
-            </li>
-            <li>
-              <a href="#sidebar-right-tab3" data-toggle="tab">Tab 3</a>
-            </li>
-          </ul>
-          <div class="tab-content br-n">
-            <div id="sidebar-right-tab1" class="tab-pane active">
-
-              <h5 class="title-divider text-muted mb20"> Server Statistics
-                <span class="pull-right"> 2013
-                  <i class="fa fa-caret-down ml5"></i>
-                </span>
-              </h5>
-              <div class="progress mh5">
-                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 44%">
-                  <span class="fs11">DB Request</span>
-                </div>
-              </div>
-
-
-              <h5 class="title-divider text-muted mt30 mb10">Traffic Margins</h5>
-              <div class="row">
-                <div class="col-xs-5">
-                  <h3 class="text-primary mn pl5">132</h3>
-                </div>
-                <div class="col-xs-7 text-right">
-                  <h3 class="text-success-dark mn">
-                    <i class="fa fa-caret-up"></i> 13.2% </h3>
-                </div>
-              </div>
-
-            </div>
-            <div id="sidebar-right-tab2" class="tab-pane"></div>
-            <div id="sidebar-right-tab3" class="tab-pane"></div>
-          </div>
-          <!-- end: .tab-content -->
-        </div>
-      </div>
-    </aside>
-    <!-- End: Right Sidebar -->
+    <!-- End: Content-Wrapper -->
 
   </div>
   <!-- End: Main -->
 
-  <!-- Admin Dock Quick Compose Message -->
- <!--  <div class="quick-compose-form">
-    <form id="">
-      <input type="email" class="form-control" id="inputEmail" placeholder="Email">
-      <input type="text" class="form-control" id="inputSubject" placeholder="Subject">
-      <div class="summernote-quick">Compose your message here...</div>
-    </form>
-  </div>
- -->
+  <!-- BEGIN: PAGE SCRIPTS -->
+  <script type="text/javascript">
+    <?php $this->beginBlock('js_end') ?>
+    jQuery(document).ready(function() {
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+      "use strict";
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
-</footer>
+      // Init Theme Core
+      Core.init();
 
- 
- <script type="text/javascript">
- <?php $this->beginBlock('js_end') ?>
-  jQuery(document).ready(function() {
+      // Init Demo JS
+      Demo.init();
 
-    "use strict";
+      var msgListing = $('#message-table > tbody > tr > td');
+      var msgCheckbox = $('#message-table > tbody > tr input[type=checkbox]');
 
-    // Init Theme Core
-    Core.init();
-
-    // Init Demo JS
-    Demo.init();
-
-    var msgListing = $('#message-table > tbody > tr > td');
-    var msgCheckbox = $('#message-table > tbody > tr input[type=checkbox]');
-
-    // on message table checkbox click, toggle highlighted class
-    msgCheckbox.on('click', function() {
-      $(this).parents('tr').toggleClass('highlight');
-    });
-
-    // on message table row click, redirect page. Unless target was a checkbox
-    msgListing.not(":first-child").on('click', function(e) {
-
-      // stop event bubble if clicked item is not a checkbox
-      e.stopPropagation();
-      e.preventDefault();
-
-      // Redirect to message compose page if clicked item is not a checkbox
-      window.location = "pages_compose.html";
-    });
-
-    // On button click display quick compose message form
-    $('#quick-compose').on('click', function() {
-
-      // Admin Dock Plugin
-      $('.quick-compose-form').dockmodal({
-        minimizedWidth: 260,
-        width: 470,
-        height: 480,
-        title: 'Compose Message',
-        initialState: "docked",
-        buttons: [{
-          html: "Send",
-          buttonClass: "btn btn-primary btn-sm",
-          click: function(e, dialog) {
-            // do something when the button is clicked
-            dialog.dockmodal("close");
-
-            // after dialog closes fire a success notification
-            setTimeout(function() {
-              msgCallback();
-            }, 500);
-          }
-        }]
+      // on message table checkbox click, toggle highlighted class
+      msgCheckbox.on('click', function() {
+        $(this).parents('tr').toggleClass('highlight');
       });
+
+      // on message table row click, redirect page. Unless target was a checkbox
+      msgListing.not(":first-child").on('click', function(e) {
+
+        // stop event bubble if clicked item is not a checkbox
+        e.stopPropagation();
+        e.preventDefault();
+
+        // Redirect to message compose page if clicked item is not a checkbox
+        window.location = "pages_compose.html";
+      });
+
+      // On button click display quick compose message form
+      $('#quick-compose').on('click', function() {
+
+        // Admin Dock Plugin
+        $('.quick-compose-form').dockmodal({
+          minimizedWidth: 260,
+          width: 470,
+          height: 480,
+          title: 'Compose Message',
+          initialState: "docked",
+          buttons: [{
+            html: "Send",
+            buttonClass: "btn btn-primary btn-sm",
+            click: function(e, dialog) {
+              // do something when the button is clicked
+              dialog.dockmodal("close");
+
+              // after dialog closes fire a success notification
+              setTimeout(function() {
+                msgCallback();
+              }, 500);
+            }
+          }]
+        });
+      });
+
+      // example email compose success notification
+      function msgCallback() {
+        (new PNotify({
+          title: 'Message Success!',
+          text: 'Your message has been <b>Sent.</b>',
+          hide: false,
+          type: 'success',
+          addclass: "mt50",
+          buttons: {
+            closer: false,
+            sticker: false
+          },
+          history: {
+            history: false
+          }
+        }));
+      };
+
+      // Init Summernote
+      $('.summernote-quick').summernote({
+        height: 275, //set editable area's height
+        focus: false, //set focus editable area after Initialize summernote
+        toolbar: [
+          ['style', ['bold', 'italic', 'underline', ]],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['height', ['height']],
+        ]
+      });
+
     });
-
-    // example email compose success notification
-    function msgCallback() {
-      (new PNotify({
-        title: 'Message Success!',
-        text: 'Your message has been <b>Sent.</b>',
-        hide: false,
-        type: 'success',
-        addclass: "mt50",
-        buttons: {
-          closer: false,
-          sticker: false
-        },
-        history: {
-          history: false
-        }
-      }));
-    };
-
-    // Init Summernote
-    $('.summernote-quick').summernote({
-      height: 275, //set editable area's height
-      focus: false, //set focus editable area after Initialize summernote
-      toolbar: [
-        ['style', ['bold', 'italic', 'underline', ]],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['height', ['height']],
-      ]
-    });
-
-  });
-  <?php $this->endBlock() ?>
+    <?php $this->endBlock() ?>
   </script>
   <?php $this->registerJs($this->blocks['js_end'], yii\web\View::POS_LOAD) ?>
-  
   <!-- END: PAGE SCRIPTS -->
+
 <?php $this->endBody() ?>
 </body>
 
