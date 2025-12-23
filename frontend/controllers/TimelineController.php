@@ -30,31 +30,40 @@ class TimelineController extends Controller
     {
         $model = \common\models\WarEvent::find()
             ->where(['id' => $id])
-            ->with(['people.coverImage', 'medias']) // 预加载关联数据
+            ->with(['people.coverImage', 'medias'])
             ->one();
 
         if (!$model) throw new \yii\web\NotFoundHttpException("事件未找到");
 
-        // 分类媒体文件：图片放一组，文章/文档放一组
         $images = [];
         $articles = [];
+        
         foreach ($model->medias as $media) {
             if ($media->type === 'image') {
                 $images[] = $media;
-            } elseif ($media->type === 'article' || $media->type === 'link') {
+            } 
+            elseif ($media->type === 'article' || $media->type === 'link' || $media->type === 'document') {
                 $articles[] = $media;
             }
         }
 
-        $messages = \common\models\WarMessage::find()
-            ->where(['target_type' => 'event', 'target_id' => $id, 'status' => 1])
-            ->all();
-
         return $this->render('view', [
             'model' => $model,
-            'images' => $images,     // 传给轮播图
-            'articles' => $articles, // 传给相关文章栏目
-            'messages' => $messages,
+            'images' => $images,
+            'articles' => $articles,
+            'messages' => $this->findApprovedMessages($id),
         ]);
+    }
+
+    protected function findApprovedMessages($event_id)
+    {
+        return \common\models\WarMessage::find()
+            ->where([
+                'target_type' => 'event', 
+                'target_id' => $event_id, 
+                'status' => 1
+            ])
+            ->orderBy('id DESC')
+            ->all();
     }
 }
