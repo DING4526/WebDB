@@ -18,18 +18,34 @@ use common\models\User;
 
 $this->title = '团队管理';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/admin-common.css');
+
 $currentUser = Yii::$app->user->getUser();
 $isRoot = $currentUser && $currentUser->isRoot();
+$memberCount = (int)$memberDataProvider->getTotalCount();
 ?>
 <div class="team-index">
 
-  <div class="panel panel-info">
-    <div class="panel-heading">
-      <span class="glyphicon glyphicon-briefcase"></span>
-      团队信息（单团队模式）
-      <?php if (!$isRoot): ?><span class="label label-default ml10">只读</span><?php endif; ?>
+  <div class="adm-hero">
+    <div class="adm-hero-inner">
+      <div>
+        <h2><?= Html::encode($this->title) ?></h2>
+        <div class="desc">管理团队信息与成员列表</div>
+      </div>
+      <div class="adm-actions">
+        <?= Html::a('刷新', ['index'], ['class' => 'btn btn-default']) ?>
+      </div>
     </div>
-    <div class="panel-body">
+  </div>
+
+  <div class="adm-card">
+    <div class="adm-card-head">
+      <h3 class="adm-card-title">团队信息（单团队模式）</h3>
+      <?php if (!$isRoot): ?>
+        <span class="adm-badge adm-badge-info">只读</span>
+      <?php endif; ?>
+    </div>
+    <div class="adm-card-body adm-form">
       <?php if ($isRoot): ?>
         <?php $form = ActiveForm::begin(['options' => ['class' => 'form-horizontal']]); ?>
           <?= $form->field($team, 'name')->textInput(['maxlength' => true]) ?>
@@ -38,12 +54,12 @@ $isRoot = $currentUser && $currentUser->isRoot();
           <?= $form->field($team, 'status')->dropDownList(Team::getStatusList()) ?>
           <div class="form-group">
             <div class="col-sm-offset-1 col-sm-11">
-              <?= Html::submitButton('保存团队信息', ['class' => 'btn btn-primary']) ?>
+              <?= Html::submitButton('保存团队信息', ['class' => 'btn btn-success']) ?>
             </div>
           </div>
         <?php ActiveForm::end(); ?>
       <?php else: ?>
-        <p class="text-muted">以下为当前单一团队信息（只读）。如需调整请联系 root。</p>
+        <p class="adm-hint">以下为当前单一团队信息（只读）。如需调整请联系 root。</p>
         <dl class="dl-horizontal">
           <dt>团队名称</dt><dd><?= Html::encode($team->name) ?></dd>
           <dt>主题</dt><dd><?= Html::encode($team->topic) ?></dd>
@@ -54,20 +70,19 @@ $isRoot = $currentUser && $currentUser->isRoot();
     </div>
   </div>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <span class="glyphicon glyphicon-user"></span>
-      团队成员
-      <?php if (!$isRoot): ?><span class="label label-default ml10">只读</span><?php endif; ?>
+  <div class="adm-card">
+    <div class="adm-card-head">
+      <h3 class="adm-card-title">团队成员</h3>
+      <span class="adm-pill"><span class="adm-dot"></span> 当前成员总数：<?= $memberCount ?></span>
     </div>
-    <div class="panel-body">
-      <p>
+    <div class="adm-grid">
+      <div style="margin-bottom: 12px;">
         <?php if ($isRoot): ?>
-          <?= Html::a('新增成员', ['team-member/create'], ['class' => 'btn btn-success']) ?>
+          <?= Html::a('新增成员', ['team-member/create'], ['class' => 'btn btn-soft-success']) ?>
         <?php else: ?>
-          <span class="text-muted">仅 root 可新增/编辑成员，当前为只读模式。</span>
+          <span class="adm-hint">仅 root 可新增/编辑成员，当前为只读模式。</span>
         <?php endif; ?>
-      </p>
+      </div>
 
       <?php
         $userList = ArrayHelper::map(
@@ -80,7 +95,8 @@ $isRoot = $currentUser && $currentUser->isRoot();
       <?= GridView::widget([
           'dataProvider' => $memberDataProvider,
           'filterModel' => $memberSearchModel,
-          'tableOptions' => ['class' => 'table table-striped table-condensed'],
+          'summary' => false,
+          'tableOptions' => ['class' => 'table table-hover'],
           'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
               [
@@ -88,17 +104,46 @@ $isRoot = $currentUser && $currentUser->isRoot();
                   'value' => fn($m) => $m->user ? $m->user->username : '',
                   'filter' => $userList,
               ],
-              'name',
+              [
+                  'attribute' => 'name',
+                  'contentOptions' => ['style' => 'font-weight:900;'],
+              ],
               'student_no',
               [
                   'attribute' => 'status',
-                  'value' => fn($m) => TeamMember::getStatusList()[$m->status] ?? $m->status,
+                  'format' => 'raw',
+                  'value' => function ($m) {
+                      $isActive = (bool)$m->status;
+                      return $isActive
+                          ? '<span class="adm-badge adm-badge-active">正常</span>'
+                          : '<span class="adm-badge adm-badge-inactive">禁用</span>';
+                  },
                   'filter' => TeamMember::getStatusList(),
+                  'contentOptions' => ['style' => 'width:90px;'],
               ],
               [
                   'class' => 'yii\grid\ActionColumn',
                   'controller' => 'team-member',
+                  'header' => '操作',
                   'template' => $isRoot ? '{view} {update} {delete}' : '{view}',
+                  'buttons' => [
+                      'view' => function ($url, $model) {
+                          return Html::a('查看', ['team-member/view', 'id' => $model->id], ['class' => 'btn btn-xs btn-ghost']);
+                      },
+                      'update' => function ($url, $model) {
+                          return Html::a('编辑', ['team-member/update', 'id' => $model->id], ['class' => 'btn btn-xs btn-soft-primary']);
+                      },
+                      'delete' => function ($url, $model) {
+                          return Html::a('删除', ['team-member/delete', 'id' => $model->id], [
+                              'class' => 'btn btn-xs btn-soft-danger',
+                              'data' => [
+                                  'confirm' => '确认删除该成员？',
+                                  'method' => 'post',
+                              ],
+                          ]);
+                      },
+                  ],
+                  'contentOptions' => ['class' => 'adm-actions-col', 'style' => 'min-width:200px;'],
               ],
           ],
       ]); ?>
