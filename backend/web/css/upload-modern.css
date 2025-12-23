@@ -7,6 +7,7 @@
    1) Containers
    ========================= */
 .upload-modern,
+.pw-upload-modern,
 .tw-upload-modern,
 .we3-upload-modern{
   display:flex;
@@ -26,6 +27,7 @@
    2) Hint area
    ========================= */
 .upload-hint,
+.pw-upload-hint,
 .tw-upload-hint,
 .we3-upload-hint{
   display:flex;
@@ -36,6 +38,7 @@
 }
 
 .upload-icon,
+.pw-upload-icon,
 .tw-upload-icon,
 .we3-upload-icon{
   font-size:20px;
@@ -45,6 +48,7 @@
 }
 
 .upload-hint-title,
+.pw-upload-hint-title,
 .tw-upload-hint-title,
 .we3-upload-hint-title{
   font-size:14px;
@@ -54,6 +58,7 @@
 }
 
 .upload-hint-desc,
+.pw-upload-hint-desc,
 .tw-upload-hint-desc,
 .we3-upload-hint-desc{
   font-size:12px;
@@ -66,6 +71,7 @@
    3) Action area + Button (Simple solid style)
    ========================= */
 .upload-action,
+.pw-upload-action,
 .tw-upload-action,
 .we3-upload-action{
   flex:0 0 auto;
@@ -118,6 +124,7 @@
    ========================= */
 @media (max-width: 768px){
   .upload-modern,
+  .pw-upload-modern,
   .tw-upload-modern,
   .we3-upload-modern{
     flex-direction:column;
