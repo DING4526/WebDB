@@ -337,7 +337,7 @@ $subText = $isCreate
               <div class="we3-miniGrid we3-miniGrid-media">
                 <div class="we3-miniCol">
                   <?= $mf->field($mediaForm, 'title')
-                    ->textInput(['maxlength' => true, 'placeholder' => '建议填写更易识别的标题'])
+                    ->textInput(['maxlength' => true, 'placeholder' => '自动填入'])
                     ->label('标题') ?>
                 </div>
 
@@ -380,7 +380,7 @@ $subText = $isCreate
                   </a>
                   <div class="we3-media-main">
                     <div class="we3-media-title">
-                      <?= Html::encode(($m->title ?: '未命名') . ' · 图片') ?>
+                      <?= Html::encode($m->title ?: '未命名') ?>
                     </div>
                     <div class="we3-media-links">
                       <?= Html::a('查看', $url, ['target' => '_blank', 'class' => 'we3-link']) ?>
@@ -411,7 +411,7 @@ $subText = $isCreate
                   <div class="we3-docicon">PDF</div>
                   <div class="we3-media-main">
                     <div class="we3-media-title">
-                      <?= Html::encode(($m->title ?: '未命名') . ' · 文档') ?>
+                      <?= Html::encode(($m->title ?: '未命名')) ?>
                     </div>
                     <div class="we3-media-links">
                       <?= Html::a('查看', $url, ['target' => '_blank', 'class' => 'we3-link']) ?>
