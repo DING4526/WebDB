@@ -114,8 +114,17 @@ $userList = ArrayHelper::map(
                       <?= $isActive ? '正常' : '禁用' ?>
                     </span>
                     <?php if ($isRoot): ?>
+                      <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
+                        'class' => 'btn btn-xs btn-info',
+                        'style' => 'margin-left:6px;'
+                      ]) ?>
                       <?= Html::a('编辑', ['team-member/update', 'id' => $m->id], [
-                        'class' => 'btn btn-xs btn-soft-primary',
+                        'class' => 'btn btn-xs btn-primary',
+                        'style' => 'margin-left:4px;'
+                      ]) ?>
+                    <?php else: ?>
+                      <?= Html::a('查看', ['team-member/view', 'id' => $m->id], [
+                        'class' => 'btn btn-xs btn-info',
                         'style' => 'margin-left:6px;'
                       ]) ?>
                     <?php endif; ?>

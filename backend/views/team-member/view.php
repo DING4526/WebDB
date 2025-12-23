@@ -6,8 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\TeamMember */
 
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => '成员管理', 'url' => ['index']];
+$this->title = '查看成员';
+$this->params['breadcrumbs'][] = ['label' => '团队管理', 'url' => ['/team/index']];
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/admin-common.css');
 \yii\web\YiiAsset::register($this);
@@ -16,43 +16,43 @@ $isRoot = $currentUser && $currentUser->isRoot();
 ?>
 <div class="team-member-view">
 
-  <div class="adm-card">
-    <div class="adm-card-head">
-      <h3 class="adm-card-title">
-        <?= Html::encode($this->title) ?>
-      </h3>
+  <div class="adm-hero">
+    <div class="adm-hero-inner">
       <div>
-        <?php if (!$isRoot): ?>
-          <span class="adm-badge adm-badge-info">只读</span>
-        <?php endif; ?>
+        <h2><?= Html::encode($model->name) ?></h2>
+        <div class="desc">成员详细信息</div>
       </div>
-    </div>
-    <div class="adm-card-body">
-      <div style="margin-bottom:16px;">
+      <div class="adm-actions">
         <?php if ($isRoot): ?>
-          <?= Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-soft-primary']) ?>
+          <?= Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
           <?= Html::a('删除', ['delete', 'id' => $model->id], [
-              'class' => 'btn btn-soft-danger',
+              'class' => 'btn btn-danger',
               'data' => [
                   'confirm' => '确认删除该成员？',
                   'method' => 'post',
               ],
           ]) ?>
-          <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-ghost']) ?>
-        <?php else: ?>
-          <span class="adm-hint">仅 root 可编辑/删除。</span>
-          <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-ghost']) ?>
         <?php endif; ?>
+        <?= Html::a('返回团队管理', ['/team/index'], ['class' => 'btn btn-default']) ?>
       </div>
+    </div>
+  </div>
 
+  <div class="adm-card">
+    <div class="adm-card-head">
+      <h3 class="adm-card-title">成员信息</h3>
+      <?php if (!$isRoot): ?>
+        <span class="adm-badge adm-badge-info">只读</span>
+      <?php endif; ?>
+    </div>
+    <div class="adm-card-body">
       <?= DetailView::widget([
           'model' => $model,
           'options' => ['class' => 'table table-striped table-bordered detail-view'],
           'attributes' => [
-              'team_id',
               [
-                  'attribute' => 'user_id',
-                  'value' => $model->user ? $model->user->username : '（未关联）',
+                  'attribute' => 'team_id',
+                  'value' => $model->team ? $model->team->name : $model->team_id,
               ],
               'name',
               'student_no',
