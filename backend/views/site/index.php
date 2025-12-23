@@ -8,6 +8,7 @@ use common\models\TeamMember;
 
 $this->title = '团队后台主页';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/admin-common.css');
 
 $currentUser = Yii::$app->user->getUser();
 $isRoot = $currentUser && $currentUser->isRoot();
@@ -46,37 +47,25 @@ $roleMatrix = [
 ];
 
 $applySteps = [
-    '提交成员信息' => '通过“成员管理”录入或发起申请；暂未上线自助申请，可由管理员代填。',
+    '提交成员信息' => '通过"成员管理"录入或发起申请；暂未上线自助申请，可由管理员代填。',
     '管理员审批' => 'root / 管理员确认信息后设为启用状态，必要时分配角色。',
     '通知与初始权限' => '审批通过后即可访问作业与任务模块；高级操作需管理员调整角色。',
-];
-
-$contentPipelines = [
-    [
-        'title' => '团队作业',
-        'path' => 'data/team',
-        'route' => ['teamwork/index'],
-        'items' => ['需求/设计/实现文档', '数据库文件、PPT 等'],
-    ],
-    [
-        'title' => '个人作业',
-        'path' => 'data/personal/{学号或姓名}/',
-        'route' => ['personalwork/index'],
-        'items' => ['个人提交的作业文件', '按成员独立目录放置'],
-    ],
 ];
 
 $teamInfo = Yii::$app->teamProvider->getTeam();
 ?>
 
 <div class="site-index">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="panel panel-info panel-border top">
-        <div class="panel-heading">
-          <span class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> 后台概览</span>
-        </div>
-        <div class="panel-body" style="padding:18px 22px;">
+  
+  <div class="adm-hero">
+    <div class="adm-hero-inner">
+      <div>
+        <h2><?= Html::encode($this->title) ?></h2>
+        <div class="desc">管理团队信息、成员权限、作业文件与项目数据</div>
+      </div>
+    </div>
+  </div>
+
   <div class="adm-card">
     <div class="adm-card-head">
       <h3 class="adm-card-title">后台概览</h3>
@@ -144,15 +133,14 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" style="margin-top:14px;">
     <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-lock"></span>
-          角色与权限模型
+      <div class="adm-card">
+        <div class="adm-card-head">
+          <h3 class="adm-card-title">角色与权限模型</h3>
         </div>
-        <div class="panel-body p15">
-          <p class="text-muted mb10">用角色而非登录态区分能力范围，后续可接入 RBAC。</p>
+        <div class="adm-card-body">
+          <p class="adm-hint" style="margin-bottom:12px;">用角色而非登录态区分能力范围，后续可接入 RBAC。</p>
           <div class="table-responsive">
             <table class="table table-condensed">
               <thead>
@@ -165,41 +153,39 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <?php foreach ($roleMatrix as $role): ?>
                   <tr>
                     <td>
-                      <span class="label label-<?= $role['color'] ?>"><?= Html::encode($role['name']) ?></span>
+                      <span class="adm-badge adm-badge-<?= $role['color'] === 'danger' ? 'inactive' : ($role['color'] === 'primary' ? 'active' : 'info') ?>">
+                        <?= Html::encode($role['name']) ?>
+                      </span>
                     </td>
-                    <td><?= Html::encode(implode(' / ', $role['abilities'])) ?></td>
+                    <td class="adm-muted"><?= Html::encode(implode(' / ', $role['abilities'])) ?></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
             </table>
           </div>
-          <!-- <div class="alert alert-warning" style="margin-bottom: 0;">
-            当前系统仅基于“是否登录”区分身份，以上为规划基线，后续逐步接入。
-          </div> -->
         </div>
       </div>
     </div>
 
     <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-user"></span>
-          成员注册/管理链路
+      <div class="adm-card">
+        <div class="adm-card-head">
+          <h3 class="adm-card-title">成员注册/管理链路</h3>
         </div>
-        <div class="panel-body p15">
-          <p class="text-muted mb10">优先打通“申请 → 审批 → 角色分配”闭环。</p>
-          <ol class="mb15" style="padding-left: 18px;">
+        <div class="adm-card-body">
+          <p class="adm-hint" style="margin-bottom:12px;">优先打通"申请 → 审批 → 角色分配"闭环。</p>
+          <ol style="padding-left: 18px;margin-bottom:16px;">
             <?php foreach ($applySteps as $step => $desc): ?>
               <li style="margin-bottom: 8px;">
                 <strong><?= Html::encode($step) ?>：</strong>
-                <?= Html::encode($desc) ?>
+                <span class="adm-muted"><?= Html::encode($desc) ?></span>
               </li>
             <?php endforeach; ?>
           </ol>
-          <div class="well well-sm" style="margin-bottom: 0;">
+          <div class="adm-section" style="margin-bottom:0;">
             管理员入口：
             <a href="<?= Url::to(['team-member-apply/index']) ?>">成员申请审批</a>
-            <span class="text-muted">（root 可审批并授予 member）</span>
+            <span class="adm-muted">（root 可审批并授予 member）</span>
           </div>
         </div>
       </div>
