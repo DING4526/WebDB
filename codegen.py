@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 # 用法：
-# python get_current_code.py
+# python codegen.py
 
 # =====================================================
 # 你只要编辑这里即可，每个 preset 只需要两个字段：
@@ -59,6 +59,32 @@ PRESETS = {
             "backend/models/TeamMemberSearch.php",
         ],
         "output": "_current_code/team_module.txt"
+    },
+    "war-event": {
+        "files": [
+            "backend/views/war-event/*.php",
+            "backend/controllers/WarEventController.php",
+            "common/models/WarEvent.php",
+            "backend/web/css/war-event.css",
+        ],
+        "output": "_current_code/war-event.txt"
+    },
+    "war-message": {
+        "files": [
+            "backend/views/war-message/*.php",
+            "backend/controllers/WarMessageController.php",
+            "common/models/WarMessage.php",
+            # "backend/web/css/war-message.css",
+        ],
+        "output": "_current_code/war-message.txt"
+    },
+    "war-person": {
+        "files": [
+            "backend/views/war-person/*.php",
+            "backend/controllers/WarPersonController.php",
+            "common/models/WarPerson.php",
+        ],
+        "output": "_current_code/war-person.txt"
     },
 }
 # =====================================================
