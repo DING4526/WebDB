@@ -22,6 +22,8 @@ $initialEdit = in_array($mode, ['edit', 'create'], true);
 $eventOptions = $eventOptions ?? [];
 $mediaList = $mediaList ?? [];
 $relationMap = $relationMap ?? [];
+$relationForm = $relationForm ?? null;
+$mediaForm    = $mediaForm ?? null;
 
 $imageList = array_filter($mediaList, function ($m) { return $m->type === 'image'; });
 $docList   = array_filter($mediaList, function ($m) { return $m->type === 'document'; });
