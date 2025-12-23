@@ -30,7 +30,6 @@ $relationMap = $relationMap ?? [];
 
 $imageList = array_filter($mediaList, fn($m) => $m->type === 'image');
 $docList   = array_filter($mediaList, fn($m) => $m->type === 'document');
-$articleList = array_filter($mediaList, fn($m) => $m->type === 'article');
 
 $titleText = $isCreate ? '新增事件' : $model->title;
 $subText = $isCreate
@@ -324,9 +323,7 @@ $subText = $isCreate
         <div class="we3-editable-inline">
           <?php if ($mediaForm): ?>
             <?php
-              $typeLabel = '图片';
-              if ($mediaForm->type === 'document') $typeLabel = '文档';
-              if ($mediaForm->type === 'article') $typeLabel = '链接/文章';
+              $typeLabel = ($mediaForm->type === 'document') ? '文档' : '图片';
             ?>
             <?php $mf = ActiveForm::begin([
               'action' => ['add-media', 'id' => $model->id],
@@ -429,41 +426,6 @@ $subText = $isCreate
                 </div>
               <?php endforeach; ?>
               <?php if (empty($docList)): ?><div class="we3-empty">暂无文档</div><?php endif; ?>
-            </div>
-          </div>
-          <!-- Articles / Links (新增加的文章列表部分) -->
-          <div class="we3-media-sec">
-            <div class="we3-media-sec-hd">
-              <div class="we3-mini">相关链接与文章</div>
-            </div>
-
-            <div class="we3-media-grid">
-              <?php foreach ($articleList as $m): ?>
-                <?php 
-                  // 智能识别：如果是http开头直接用，否则补斜杠
-                  $url = (strpos($m->path, 'http') === 0) ? $m->path : '/' . ltrim($m->path, '/');
-                ?>
-                <div class="we3-media-card we3-media-card-doc" style="border-left: 3px solid #007bff;">
-                  <div class="we3-docicon" style="background: #e7f3ff; color: #007bff; font-size: 10px;">LINK</div>
-                  <div class="we3-media-main">
-                    <div class="we3-media-title">
-                      <?= Html::encode(($m->title ?: '未命名链接')) ?>
-                    </div>
-                    <div class="we3-media-links">
-                      <?= Html::a('打开链接', $url, ['target' => '_blank', 'class' => 'we3-link']) ?>
-                    </div>
-                  </div>
-                  <div class="we3-media-op we3-editable-inline">
-                    <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
-                        Html::hiddenInput('media_id', $m->id) .
-                        Html::submitButton('删除', ['class' => 'btn btn-xs btn-soft-danger']) .
-                        Html::endForm(); ?>
-                  </div>
-                </div>
-              <?php endforeach; ?>
-              <?php if (empty($articleList)): ?>
-                <div class="we3-empty">暂无相关链接</div>
-              <?php endif; ?>
             </div>
           </div>
         </div>
