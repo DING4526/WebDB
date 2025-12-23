@@ -16,7 +16,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 $this->registerCssFile('@web/css/upload-modern.css');
-$this->registerJsFile('@web/js/upload-modern.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+$this->registerJsFile('@web/js/upload-modern.js');
 
 $mode = $mode ?? 'view';
 $isCreate = ($mode === 'create');
@@ -313,7 +313,7 @@ $subText = $isCreate
               ]) ?>
                 <div class="we3-upload-modern">
                   <div class="we3-upload-hint">
-                    <span class="we3-upload-icon">📎</span>
+                    <span class="we3-upload-icon">🔗</span>
                     <div>
                       <div class="we3-upload-hint-title">上传媒资文件</div>
                       <div class="we3-upload-hint-desc">上传后自动识别类型，支持图片 / PDF / DOC 等</div>
@@ -328,11 +328,8 @@ $subText = $isCreate
                     </button>
                   </div>
                 </div>
-              }
-            })();
-            </script>
-
-
+              <?= Html::endForm() ?>
+            </div>
 
             <div class="we3-editable-inline">
               <?php if ($mediaForm): ?>
@@ -609,23 +606,6 @@ $js = <<<JS
   }, true);
 
   restoreState();
-
-  var uploadBtn = document.getElementById('we3-upload-btn');
-  var uploadInput = document.getElementById('we3-upload-input');
-  var uploadForm = document.getElementById('we3-upload-form');
-
-  if(uploadBtn && uploadInput){
-    uploadBtn.addEventListener('click', function(){
-      if(typeof saveState === 'function') saveState();
-      uploadInput.click();
-    });
-  }
-  if(uploadInput && uploadForm){
-    uploadInput.addEventListener('change', function(){
-      if(!uploadInput.files || !uploadInput.files.length) return;
-      uploadForm.submit();
-    });
-  }
 
 })();
 JS;

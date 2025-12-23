@@ -12,7 +12,7 @@ $this->title = '团队作业';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/admin-common.css');
 $this->registerCssFile('@web/css/upload-modern.css');
-$this->registerJsFile('@web/js/upload-modern.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+$this->registerJsFile('@web/js/upload-modern.js');
 $currentUserId = Yii::$app->user->id;
 ?>
 
@@ -76,12 +76,11 @@ $currentUserId = Yii::$app->user->id;
         <?= Html::endForm() ?>
       </div>
     </div>
-});
-</script>
+  <?php endif; ?>
 
   <?php if (empty($files)): ?>
     <div class="alert alert-warning" style="border-radius:18px; margin-top:14px;">
-      <strong>目录为空：</strong>请把需求文档 / 设计文档 / 实现文档 / 用户手册 / PPT / 数据库文件等放入 <code>data/team</code>。
+      <strong>目录为空：</strong>请把需求文档 / 设计文档 / 实现文档 / 用户手册 / PPT / 数据库文件等放入 <code>data/team</code>.
     </div>
   <?php else: ?>
     <!-- 文件列表 -->

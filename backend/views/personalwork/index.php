@@ -10,7 +10,7 @@ $this->title = '个人作业';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/admin-common.css');
 $this->registerCssFile('@web/css/upload-modern.css');
-$this->registerJsFile('@web/js/upload-modern.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+$this->registerJsFile('@web/js/upload-modern.js');
 
 // 选中目录：root 可通过 ?folder=xxx 切换；普通用户默认自己的 $currentStudentNo
 $selectedFolder = Yii::$app->request->get('folder');
@@ -97,8 +97,7 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
         <?php endif; ?>
       </div>
     </div>
-});
-</script>
+  <?php endif; ?>
 
   <?php if (empty($members)): ?>
     <div class="alert alert-warning" style="border-radius:18px; margin-top:14px;">

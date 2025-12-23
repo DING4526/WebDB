@@ -1,124 +1,129 @@
-/* ===== Modern Upload Interface (Unified Style) ===== */
-/* Used by: personalwork/index.php, teamwork/index.php, war-event/_workspace.php, war-person/_workspace.php */
+/* ===== upload-modern.css (Simple Unified) =====
+   Used by: personalwork/index.php, teamwork/index.php, war-event/_workspace.php, war-person/_workspace.php
+   Goal: clean + minimal + consistent
+*/
 
-/* Common upload container */
+/* =========================
+   1) Containers
+   ========================= */
 .upload-modern,
-.pw-upload-modern,
 .tw-upload-modern,
-.we3-upload-modern {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 16px;
-  border: 2px dashed rgba(0,0,0,0.12);
+.we3-upload-modern{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:14px 14px;
+  background:#f8fafc;
+  border:1px solid rgba(0,0,0,.10);
+  border-radius:14px;
 }
 
-.we3-upload-modern {
-  margin-bottom: 16px;
-}
+/* optional spacing for drawer */
+.we3-upload-modern{ margin-bottom: 12px; }
 
-/* Hint section (left side) */
+/* =========================
+   2) Hint area
+   ========================= */
 .upload-hint,
-.pw-upload-hint,
 .tw-upload-hint,
-.we3-upload-hint {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
+.we3-upload-hint{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  flex:1;
+  min-width:0;
 }
 
 .upload-icon,
-.pw-upload-icon,
 .tw-upload-icon,
-.we3-upload-icon {
-  font-size: 32px;
+.we3-upload-icon{
+  font-size:18px;
+  line-height:1;
+  opacity:.75;
+  margin-top:2px;
 }
 
 .upload-hint-title,
-.pw-upload-hint-title,
 .tw-upload-hint-title,
-.we3-upload-hint-title {
-  font-weight: 900;
-  font-size: 16px;
-  color: #0f172a;
-  margin-bottom: 4px;
+.we3-upload-hint-title{
+  font-size:13px;
+  font-weight:800;
+  color:#111827;
+  margin:0 0 2px;
 }
 
 .upload-hint-desc,
-.pw-upload-hint-desc,
 .tw-upload-hint-desc,
-.we3-upload-hint-desc {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 700;
+.we3-upload-hint-desc{
+  font-size:12px;
+  font-weight:600;
+  color:#64748b;
+  line-height:1.35;
+  margin:0;
 }
 
-/* Action section (right side) */
+/* =========================
+   3) Action area + Button
+   ========================= */
 .upload-action,
-.pw-upload-action,
 .tw-upload-action,
-.we3-upload-action {
-  flex-shrink: 0;
+.we3-upload-action{
+  flex:0 0 auto;
 }
 
-/* Upload button (unified green gradient) */
 .btn-upload-trigger,
 .btn-tw-trigger,
-.btn-we3-upload {
-  border-radius: 12px;
-  padding: 14px 28px;
-  font-weight: 900;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: 0;
-  box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  color: #fff;
+.btn-we3-upload{
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:800;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+
+  /* soft primary */
+  background: rgba(59,130,246,.14);
+  color:#1e3a8a;
 }
 
 .btn-upload-trigger:hover,
 .btn-tw-trigger:hover,
-.btn-we3-upload:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16,185,129,0.35);
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  color: #fff;
+.btn-we3-upload:hover{
+  background: rgba(59,130,246,.22);
+  color:#1e3a8a;
 }
 
 .btn-upload-trigger:active,
 .btn-tw-trigger:active,
-.btn-we3-upload:active {
-  transform: translateY(0);
+.btn-we3-upload:active{
+  background: rgba(59,130,246,.26);
 }
 
 .btn-upload-trigger .glyphicon,
 .btn-tw-trigger .glyphicon,
-.btn-we3-upload .glyphicon {
-  font-size: 18px;
+.btn-we3-upload .glyphicon{
+  font-size:14px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* =========================
+   4) Mobile
+   ========================= */
+@media (max-width: 768px){
   .upload-modern,
-  .pw-upload-modern,
   .tw-upload-modern,
-  .we3-upload-modern {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
+  .we3-upload-modern{
+    flex-direction:column;
+    align-items:stretch;
   }
-  
+
   .btn-upload-trigger,
   .btn-tw-trigger,
-  .btn-we3-upload {
-    width: 100%;
-    justify-content: center;
+  .btn-we3-upload{
+    width:100%;
+    justify-content:center;
   }
 }
