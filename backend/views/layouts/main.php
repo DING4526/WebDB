@@ -232,39 +232,25 @@ $this->registerCssFile('@web/css/admin-common.css');
             </a>
           </li>
 
-          <!-- 2) 项目数据管理：点击展开 -->
+          <!-- 2) 项目数据管理：扁平化菜单 -->
           <?php if ($isRoot || $isMember): ?>
-          <li class="<?= $isWarManageActive ? 'active' : '' ?>">
-            <a class="accordion-toggle <?= $isWarManageActive ? '' : 'collapsed' ?>"
-              data-toggle="collapse"
-              href="#menu-war-manage"
-              aria-expanded="<?= $isWarManageActive ? 'true' : 'false' ?>">
-              <span class="glyphicon glyphicon-folder-open"></span>
-              <span class="sidebar-title">项目数据管理</span>
-              <span class="caret"></span>
+          <li class="<?= $activeCtl('war-event') ?>">
+            <a href="<?= Url::to(['war-event/index']) ?>">
+              <span class="glyphicon glyphicon-time"></span>
+              <span class="sidebar-title">抗战事件</span>
             </a>
-
-            <ul id="menu-war-manage" class="nav sub-nav collapse <?= $isWarManageActive ? 'in' : '' ?>">
-              <!-- 核心 CRUD -->
-              <li class="<?= $activeCtl('war-event') ?>">
-                <a href="<?= Url::to(['war-event/index']) ?>">
-                  <span class="glyphicon glyphicon-time"></span>
-                  抗战事件
-                </a>
-              </li>
-              <li class="<?= $activeCtl('war-person') ?>">
-                <a href="<?= Url::to(['war-person/index']) ?>">
-                  <span class="glyphicon glyphicon-education"></span>
-                  抗战人物
-                </a>
-              </li>
-              <li class="<?= $activeCtl('war-message') ?>">
-                <a href="<?= Url::to(['war-message/index']) ?>">
-                  <span class="glyphicon glyphicon-comment"></span>
-                  留言审核
-                </a>
-              </li>
-            </ul>
+          </li>
+          <li class="<?= $activeCtl('war-person') ?>">
+            <a href="<?= Url::to(['war-person/index']) ?>">
+              <span class="glyphicon glyphicon-education"></span>
+              <span class="sidebar-title">抗战人物</span>
+            </a>
+          </li>
+          <li class="<?= $activeCtl('war-message') ?>">
+            <a href="<?= Url::to(['war-message/index']) ?>">
+              <span class="glyphicon glyphicon-comment"></span>
+              <span class="sidebar-title">留言审核</span>
+            </a>
           </li>
           <?php endif; ?>
 

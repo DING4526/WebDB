@@ -210,23 +210,23 @@
 }
 
 .adm-badge-active {
-  background: rgba(34, 197, 94, 0.14);
-  color: #14532d;
+  background: rgba(165, 42, 42, 0.14);
+  color: #7f1d1d;
 }
 
 .adm-badge-inactive {
-  background: rgba(107, 114, 128, 0.14);
-  color: #374151;
+  background: rgba(107, 107, 107, 0.14);
+  color: #4A5568;
 }
 
 .adm-badge-pending {
-  background: rgba(245, 158, 11, 0.18);
-  color: #78350f;
+  background: rgba(184, 134, 11, 0.18);
+  color: #6B4423;
 }
 
 .adm-badge-info {
-  background: rgba(59, 130, 246, 0.14);
-  color: #1e3a8a;
+  background: rgba(107, 107, 107, 0.14);
+  color: #4A5568;
 }
 
 /* ===== Action Buttons (table) ===== */
@@ -255,44 +255,47 @@
 }
 
 .btn-soft-primary {
-  background: rgba(59, 130, 246, 0.14);
-  color: #1e3a8a;
+  background: rgba(184, 134, 11, 0.14);
+  color: #6B4423;
   border: 0;
 }
 
 .btn-soft-primary:hover {
-  background: rgba(59, 130, 246, 0.22);
-  color: #1e3a8a;
+  background: rgba(184, 134, 11, 0.22);
+  color: #6B4423;
 }
 
 .btn-soft-success {
-  background: rgba(34, 197, 94, 0.14);
-  color: #14532d;
+  background: rgba(165, 42, 42, 0.14);
+  color: #7f1d1d;
   border: 0;
 }
 
 .btn-soft-success:hover {
-  background: rgba(34, 197, 94, 0.22);
+  background: rgba(165, 42, 42, 0.22);
+  color: #7f1d1d;
 }
 
 .btn-soft-warning {
-  background: rgba(245, 158, 11, 0.18);
-  color: #78350f;
+  background: rgba(205, 133, 63, 0.18);
+  color: #6B4423;
   border: 0;
 }
 
 .btn-soft-warning:hover {
-  background: rgba(245, 158, 11, 0.26);
+  background: rgba(205, 133, 63, 0.26);
+  color: #6B4423;
 }
 
 .btn-soft-danger {
-  background: rgba(239, 68, 68, 0.14);
+  background: rgba(139, 37, 0, 0.14);
   color: #7f1d1d;
   border: 0;
 }
 
 .btn-soft-danger:hover {
-  background: rgba(239, 68, 68, 0.22);
+  background: rgba(139, 37, 0, 0.22);
+  color: #7f1d1d;
 }
 
 /* ===== Form styles ===== */
@@ -431,4 +434,48 @@
   .adm-stat-card {
     min-width: 100%;
   }
+}
+
+/* ===== Links (Military History Theme) ===== */
+a {
+  color: #B8860B;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+a:hover,
+a:focus {
+  color: #CD853F;
+  text-decoration: underline;
+}
+
+/* ===== pwFolderList (Personal Work Folder List) ===== */
+#pwFolderList .list-group-item {
+  border: 1px solid #EAE4D6 !important;
+  border-radius: 8px !important;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+#pwFolderList .list-group-item:hover {
+  background: rgba(184, 134, 11, 0.08) !important;
+  border-color: #B8860B !important;
+  transform: translateX(2px);
+}
+
+#pwFolderList .list-group-item.active,
+#pwFolderList .list-group-item.active:hover,
+#pwFolderList .list-group-item.active:focus {
+  background: linear-gradient(135deg, rgba(139, 37, 0, 0.12), rgba(107, 68, 35, 0.12)) !important;
+  border-color: #A52A2A !important;
+  color: #111827 !important;
+  font-weight: 700;
+  z-index: 2;
+}
+
+#pwFolderList .badge {
+  background: #B8860B !important;
+  color: #fff !important;
+  border-radius: 999px;
+  font-weight: 700;
 }
