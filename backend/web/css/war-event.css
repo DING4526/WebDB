@@ -346,7 +346,9 @@
 .we3-form select.form-control{
   height: 36px;
   padding: 7px 10px;
-  max-width: 250px;
+  max-width: 420px;
+  font-size: 13px;
+  font-weight: 500;
 }
 .we3-form textarea.form-control{
   padding: 9px 10px;
@@ -438,7 +440,7 @@
   top: 0;
   right: 0;
   height: 100vh;
-  width: 520px;
+  width: 680px;
   max-width: calc(100vw - 16px);
   background:#fff;
   border-left: 1px solid rgba(0,0,0,.10);
@@ -448,6 +450,9 @@
   z-index: 99;
   display:flex;
   flex-direction:column;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #0f172a;
 }
 .we3-drawer.is-open{ transform: translateX(0); }
 .we3-drawer-hd{
@@ -488,15 +493,21 @@
   margin-bottom: 12px;
 }
 .we3-panel-hd{
-  padding: 10px 12px;
+  padding: 12px 12px;
   border-bottom: 1px solid rgba(0,0,0,.06);
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
 }
-.we3-panel-title{ font-weight:900; color:#111827; }
-.we3-panel-meta{ color:#64748b; font-weight:800; font-size:12px; }
+.we3-panel-title{
+  font-weight:700;
+  font-size: 18px;
+  letter-spacing: .2px;
+  color:#0f172a;
+  line-height: 1.15;
+}
+.we3-panel-meta{ color:#64748b; font-weight:600; font-size:12px; }
 .we3-panel-bd{ padding: 10px 12px 12px; }
 .we3-list{ display:flex; flex-direction:column; gap:8px; }
 .we3-item{
@@ -510,8 +521,8 @@
   align-items:flex-start;
 }
 .we3-item-title{ font-weight:900; color:#111827; }
-.we3-item-sub{ margin-top:4px; color:#64748b; font-weight:700; font-size:12px; }
-.we3-empty{ padding: 6px 2px; color:#64748b; font-weight:700; }
+.we3-item-sub{ margin-top:4px; color:#64748b; font-weight:500; font-size:12px; }
+.we3-empty{ padding: 6px 2px; color:#64748b; font-weight:500; font-size:12px; }
 .we3-minihead{
   display:flex; justify-content:space-between; align-items:center; gap:10px;
   margin: 6px 0 10px;
@@ -520,7 +531,7 @@
 .we3-note{
   margin: 0 0 10px;
   color:#64748b;
-  font-weight:700;
+  font-weight:500;
   font-size:12px;
 }
 .we3-file{
@@ -537,7 +548,7 @@
 .we3-file-title{ font-weight:900; color:#111827; }
 .we3-file-sub{
   margin-top:4px;
-  font-weight:700;
+  font-weight:500;
   font-size:12px;
   color:#64748b;
   max-width: 420px;
@@ -564,13 +575,19 @@
 .we3-miniColBtn .btn{ height: 36px; padding: 8px 12px; }
 .we3-miniForm .form-group{ margin:0; }
 .we3-miniForm label.control-label{
-  font-size:12px;
-  font-weight:900;
+  font-size: 12px;
+  font-weight: 700;
   color:#64748b;
   margin: 0 0 6px;
 }
 .we3-miniForm .help-block{ display:none; }
-.we3-miniForm .form-control{ border-radius: 12px; }
+.we3-miniForm .form-control{
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  height: 36px;
+  padding: 7px 10px;
+}
 .we3-miniop{ margin:0; }
 
 /* =========================
@@ -623,11 +640,11 @@
   background: rgba(34,197,94,.14);
   border: 1px solid rgba(34,197,94,.18);
 }
-.we3-person-name{ font-weight: 900; color:#111827; line-height:1.1; }
+.we3-person-name{ font-weight: 700; color:#111827; line-height:1.1; }
 .we3-person-rel{
   margin-top: 4px;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 500;
   color:#64748b;
 }
 .we3-person-op{
@@ -636,39 +653,6 @@
   right: 8px;
 }
 
-/* 绑定/添加媒资按钮统一：block + 强一致 */
-.we3-btn-block{
-  width: 100%;
-  height: 36px;
-  padding: 8px 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.we3-miniGrid-people,
-.we3-miniGrid-media{
-  grid-template-columns: 1fr 1fr;
-}
-@media (max-width: 740px){
-  .we3-miniGrid-people,
-  .we3-miniGrid-media{
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 上传按钮更明显 */
-.we3-uploadbar{
-  border: 1px dashed rgba(59,130,246,.35);
-  background: rgba(59,130,246,.04);
-  border-radius: 16px;
-  padding: 12px 12px;
-  margin-bottom: 10px;
-}
-.we3-btn-upload{
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-weight: 900;
-}
 .we3-typebadge{
   height: 36px;
   border-radius: 12px;
@@ -742,13 +726,21 @@
   display:block;
 }
 .we3-media-title{
-  font-weight: 900;
+  font-weight: 700;
   color:#111827;
   font-size: 13px;
-  line-height: 1.2;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .we3-media-links{
   margin-top: 6px;
+}
+.we3-media-links .we3-link{
+  font-size: 12px;
+  font-weight: 600;
 }
 .we3-link{
   font-weight: 900;
@@ -816,15 +808,6 @@
   }
 }
 
-/* 让“人物/关系”输入行的视觉更一致：label/控件间距更紧凑 */
-.we3-miniForm label.control-label{
-  margin: 0 0 6px;
-}
-.we3-miniForm .form-control{
-  height: 36px;
-  padding: 7px 10px;
-}
-
 /* -------------------------
    Uploadbar：按钮左，提示右
    ------------------------- */
@@ -888,133 +871,6 @@
 }
 .we3-media-sec:last-child .we3-media-card{
   grid-template-columns: 64px 1fr !important; /* 文档卡片更舒展 */
-}
-
-/* ========= Drawer typography system v2 (clear hierarchy) ========= */
-
-/* 抽屉整体基线：正文别再粗 */
-.we3-drawer{
-  font-size: 13px;
-  line-height: 1.5;
-  color: #0f172a;
-}
-
-/* 面板标题：大一点可以，但别 900，保持干净 */
-.we3-panel-title{
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: .2px;
-  color:#0f172a;
-}
-
-/* 右侧 meta：更轻、更淡，避免抢 */
-.we3-panel-meta{
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-}
-
-/* 小标题（图片/文档/上传/分区标题） */
-.we3-mini{
-  font-size: 13px;
-  font-weight: 700;
-  color: #111827;
-}
-
-/* uploadbar 提示：标题 700，说明 500 */
-.we3-uploadhint-title{
-  font-size: 13px;
-  font-weight: 700;
-  color:#111827;
-}
-.we3-uploadhint-sub{
-  font-size: 12px;
-  font-weight: 500;
-  color:#64748b;
-  line-height: 1.35;
-}
-
-/* 表单 label：700 即可，别 900 */
-.we3-miniForm label.control-label{
-  font-size: 12px;
-  font-weight: 700;
-  color:#64748b;
-  margin: 0 0 6px;
-}
-
-/* 输入框文字：恢复正常阅读粗细 */
-.we3-miniForm .form-control{
-  font-size: 13px;
-  font-weight: 500;
-  color:#0f172a;
-}
-
-/* 人物卡片：姓名 700，关系 500 */
-.we3-person-name{
-  font-size: 13px;
-  font-weight: 700;
-  color:#111827;
-}
-.we3-person-rel{
-  font-size: 12px;
-  font-weight: 500;
-  color:#64748b;
-}
-
-/* 媒资卡片：标题 700，别 900；行数限制修正写法 */
-.we3-media-title{
-  font-size: 13px;
-  font-weight: 700;
-  color:#111827;
-  line-height: 1.25;
-  display: -webkit-box;
-  line-clamp: 2;   
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* 链接：略重点，但不要像标题 */
-.we3-media-links .we3-link{
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* 卡片/说明类小字统一降噪 */
-.we3-note,
-.we3-empty,
-.we3-item-sub,
-.we3-file-sub{
-  font-size: 12px;
-  font-weight: 500;
-  color:#64748b;
-}
-
-.we3-panel-hd{
-  padding: 12px 12px;
-}
-.we3-panel-title{
-  line-height: 1.15;
-}
-
-
-/* “删除”按钮不要过于抢眼（仍然危险色，但更克制） */
-.we3-drawer .btn-soft-danger{
-  background: rgba(239,68,68,.10);
-}
-.we3-drawer .btn-soft-danger:hover{
-  background: rgba(239,68,68,.16);
-}
-
-/* 面板内部留白稍微收紧，减少“散” */
-.we3-panel-bd{
-  padding: 10px 12px 10px;
-}
-.we3-split{
-  margin: 10px 0;
-}
-
-/* ========= Doc card actions: avoid overlay on long titles ========= */
-.we3-media-sec:last-child .we3-media-card{
   position: relative;
   padding-right: 54px; /* 预留给右侧按钮 */
 }
@@ -1022,4 +878,3 @@
   top: 12px;
   right: 12px;
 }
-
