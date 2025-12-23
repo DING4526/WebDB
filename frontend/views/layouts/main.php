@@ -46,7 +46,7 @@ $activeCtl = function($id) use ($cur) { return $cur === $id; };
     }
     .hero h3 { margin-top:0; font-weight:800; }
     .hero .btn { margin-right:8px; }
-    .content-wrap { margin-top: 14px; }
+    .content-wrap { margin-top: 120px; }
     .footer { background:#fff; border-top:1px solid #eef1f5; }
   </style>
 </head>
@@ -93,8 +93,8 @@ NavBar::end();
 ?>
 
 <div class="container">
-  <!-- 顶部专题横幅（可留可删） -->
-  <div class="hero">
+         <!-- 顶部专题横幅（可留可删）  -->
+  <!-- <div class="hero">
     <h3>抗战史实时间轴 · 人物群像数据库</h3>
     <div class="text-muted" style="margin-bottom:10px;">
       以时间作证，以数据铭记 —— 1931–1945 史实与人物关联展示
@@ -105,7 +105,7 @@ NavBar::end();
     <a class="btn btn-default btn-sm" href="<?= Url::to(['/person/index']) ?>">
       <span class="glyphicon glyphicon-user"></span> 浏览人物库
     </a>
-  </div>
+  </div>  -->
 
   <div class="content-wrap">
     <?= Breadcrumbs::widget([
