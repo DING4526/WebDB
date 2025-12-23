@@ -56,7 +56,7 @@ $currentUserId = Yii::$app->user->id;
         <?= Html::beginForm(['teamwork/upload'], 'post', ['enctype' => 'multipart/form-data', 'id' => 'twUploadForm']) ?>
           <div class="tw-upload-modern">
             <div class="tw-upload-hint">
-              <span class="tw-upload-icon">📎</span>
+              <span class="tw-upload-icon">🔗</span>
               <div>
                 <div class="tw-upload-hint-title">上传团队作业文件</div>
                 <div class="tw-upload-hint-desc">支持 pdf / docx / ppt / zip 等格式</div>
@@ -198,23 +198,20 @@ document.addEventListener('DOMContentLoaded', function() {
           <table class="table table-hover">
             <thead>
               <tr>
-                <th style="width:55%;">文件</th>
+                <th style="width:45%;">文件</th>
                 <th style="width:15%;">上传者</th>
-                <th style="width:20%;">更新时间</th>
-                <th style="width:10%;" class="text-right">操作</th>
+                <th style="width:25%;">更新时间</th>
+                <th style="width:15%;" class="text-right">操作</th>
               </tr>
             </thead>
             <tbody>
             <?php foreach ($files as $f): ?>
               <tr>
                 <td style="font-weight:700;">
-                  <span class="glyphicon glyphicon-file text-primary" style="margin-right:8px;"></span>
-                  <a href="<?= Url::to(['download/file', 'type' => 'team', 'path' => $f['name']]) ?>">
-                    <?= Html::encode($f['display'] ?? $f['name']) ?>
-                  </a>
-                  <div class="adm-hint" style="font-size:12px; margin-top:4px;">
+                  <span class="glyphicon glyphicon-file text-primary" style="margin-right:8px; margin-left:4px;"></span>
+                  <span class="adm-hint" style="font-size:12px; margin-top:4px;">
                     <?= Html::encode($f['name']) ?>
-                  </div>
+                  </span>
                 </td>
                 <td>
                   <?php if (!empty($f['owner_id']) && !empty($ownerMap[$f['owner_id']])): ?>

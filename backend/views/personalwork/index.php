@@ -283,10 +283,10 @@ document.addEventListener('DOMContentLoaded', function() {
                   <?php foreach ($selectedFiles as $f): ?>
                     <tr>
                       <td style="font-weight:700;">
-                        <span class="glyphicon glyphicon-file text-info" style="margin-right:8px;"></span>
-                        <a href="<?= Url::to(['download/file', 'type' => 'personal', 'path' => $selectedFolder.'/'.$f['name']]) ?>">
-                          <?= Html::encode($f['name']) ?>
-                        </a>
+                  <span class="glyphicon glyphicon-file text-primary" style="margin-right:8px; margin-left:4px;"></span>
+                  <span class="adm-hint" style="font-size:12px; margin-top:4px;">
+                    <?= Html::encode($f['name']) ?>
+                  </span>
                       </td>
                       <td class="adm-muted">
                         <span class="glyphicon glyphicon-time"></span>
