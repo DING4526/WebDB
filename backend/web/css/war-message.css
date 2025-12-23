@@ -10,9 +10,9 @@
 .wm-hero{
   border-radius: 18px;
   padding: 18px 18px 16px;
-  background: linear-gradient(135deg, #1f6feb 0%, #7c3aed 60%, #db2777 120%);
+  background: linear-gradient(135deg, #8B2500 0%, #6B4423 50%, #4A5568 100%);
   color: #fff;
-  box-shadow: 0 18px 50px rgba(31,111,235,.20);
+  box-shadow: 0 18px 50px rgba(139,37,0,.15);
   position: relative;
   overflow: hidden;
 }
@@ -47,8 +47,8 @@
   color:#fff;
 }
 .wm-hero-actions .btn-default:hover{ background: rgba(255,255,255,.26); color:#fff; }
-.wm-hero-actions .btn-success{ background:#22c55e; }
-.wm-hero-actions .btn-success:hover{ background:#16a34a; }
+.wm-hero-actions .btn-success{ background:#A52A2A; }
+.wm-hero-actions .btn-success:hover{ background:#8B2500; }
 .wm-hero-actions .btn-warning{ background:#fbbf24; color:#1f2937; }
 .wm-hero-actions .btn-warning:hover{ background:#f59e0b; color:#111827; }
 

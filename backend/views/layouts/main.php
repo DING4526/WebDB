@@ -470,19 +470,19 @@ $this->registerCssFile('@web/css/admin-common.css');
 
 /* 侧边栏选中项：渐变背景 + 左侧高亮条 */
 #sidebar_left .sidebar-menu > li.active > a {
-  background: linear-gradient(90deg, rgba(74,163,255,0.15) 0%, rgba(99,102,241,0.08) 100%) !important;
+  background: linear-gradient(90deg, rgba(139,37,0,0.15) 0%, rgba(107,68,35,0.08) 100%) !important;
   color: #fff !important;
-  border-left: 4px solid #4aa3ff;
+  border-left: 4px solid #A52A2A;
   padding-left: 5px;
   border-radius: 0 8px 8px 0;
   margin-right: 8px;
-  box-shadow: 0 4px 12px rgba(74,163,255,0.15);
+  box-shadow: 0 4px 12px rgba(139,37,0,0.15);
 }
 
 /* 选中项图标增强 */
 #sidebar_left .sidebar-menu > li.active > a .glyphicon,
 #sidebar_left .sidebar-menu > li.active > a .fa {
-  color: #4aa3ff !important;
+  color: #CD853F !important;
   font-weight: 900;
 }
 
@@ -505,8 +505,8 @@ $this->registerCssFile('@web/css/admin-common.css');
 
 /* 子菜单样式优化 */
 #sidebar_left .sidebar-menu .sub-nav > li.active > a {
-  background: rgba(74,163,255,0.12) !important;
-  border-left: 3px solid #4aa3ff;
+  background: rgba(139,37,0,0.12) !important;
+  border-left: 3px solid #A52A2A;
   padding-left: 28px;
   color: #fff !important;
 }
@@ -534,7 +534,7 @@ $this->registerCssFile('@web/css/admin-common.css');
 .breadcrumb > li + li:before {
   content: "›" !important;
   padding: 0 8px;
-  color: #94a3b8;
+  color: #8B7355;
   font-size: 16px;
 }
 
@@ -548,7 +548,7 @@ $this->registerCssFile('@web/css/admin-common.css');
 }
 
 .breadcrumb > li > a:hover {
-  color: #3b82f6;
+  color: #B8860B;
 }
 
 .breadcrumb > .active {
@@ -558,7 +558,7 @@ $this->registerCssFile('@web/css/admin-common.css');
 
 /* 内容区域优化 */
 #content {
-  background: #f8fafc !important;
+  background: #F5F1E8 !important;
   min-height: calc(100vh - 160px);
   padding: 20px !important;
 }
