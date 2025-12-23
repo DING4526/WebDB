@@ -4,11 +4,6 @@
  * Ding 2310724
  * 抗战人物详情
  */
-
-use yii\helpers\Html;
-use yii\widgets\DetailView;
-use yii\widgets\ActiveForm;
-
 /* @var $this yii\web\View */
 /* @var $model common\models\WarPerson */
 /* @var $eventOptions array */
@@ -20,51 +15,11 @@ use yii\widgets\ActiveForm;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => '抗战人物管理', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-?>
-<div class="war-person-view">
+$this->registerCssFile('@web/css/war-person.css');
 
-    <p>
-        <?= Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('删除', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => '确认删除该人物？',
-                'method' => 'post',
-            ],
-        ]) ?>
-        <?= Html::a($model->status ? '下线' : '发布', ['toggle-status', 'id' => $model->id], [
-            'class' => 'btn ' . ($model->status ? 'btn-warning' : 'btn-success'),
-            'data-method' => 'post',
-        ]) ?>
-    </p>
-
-    <div class="panel panel-default">
-        <div class="panel-heading">基本信息</div>
-        <div class="panel-body">
-            <?= DetailView::widget([
-                'model' => $model,
-                'attributes' => [
-                    'id',
-                    'name',
-                    'role_type',
-                    'birth_year',
-                    'death_year',
-                    'intro:ntext',
-                    'biography:ntext',
-                    [
-                        'attribute' => 'status',
-                        'value' => $model->status ? '展示' : '隐藏',
-                    ],
-                    'created_at:datetime',
-                    'updated_at:datetime',
-                ],
-            ]) ?>
-        </div>
-    </div>
-
-    <?= $this->render('_relations_media_view', [
-        'model' => $model,
-        'mediaList' => $mediaList,
-        'relationMap' => $relationMap,
-    ]) ?>
-</div>
+echo $this->render('_workspace', [
+  'mode' => 'view',
+  'model' => $model,
+  'mediaList' => $mediaList,
+  'relationMap' => $relationMap,
+]);
