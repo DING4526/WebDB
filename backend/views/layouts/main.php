@@ -45,6 +45,9 @@ $activeCtl = function($controllerId) {
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     
+    <!-- 引入统一后端样式 -->
+    <link href="<?= Yii::getAlias('@web') ?>/css/admin-common.css" rel="stylesheet">
+    
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -732,23 +735,126 @@ $activeCtl = function($controllerId) {
 </body>
 
 <style>
-/* 侧边栏选中项：背景色 + 左侧高亮条 */
+/* ===== 侧边栏现代化样式增强 ===== */
+
+/* 侧边栏选中项：渐变背景 + 左侧高亮条 */
 #sidebar_left .sidebar-menu > li.active > a {
-  background: rgba(255,255,255,0.10) !important; /* 深色侧边栏上更明显 */
+  background: linear-gradient(90deg, rgba(74,163,255,0.15) 0%, rgba(99,102,241,0.08) 100%) !important;
   color: #fff !important;
-  border-left: 4px solid #4aa3ff;  /* 你可以换成主题色 */
-  padding-left: 5px;             /* 配合左边border */
+  border-left: 4px solid #4aa3ff;
+  padding-left: 5px;
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
+  box-shadow: 0 4px 12px rgba(74,163,255,0.15);
 }
 
-/* 选中项图标也亮一点 */
+/* 选中项图标增强 */
 #sidebar_left .sidebar-menu > li.active > a .glyphicon,
 #sidebar_left .sidebar-menu > li.active > a .fa {
+  color: #4aa3ff !important;
+  font-weight: 900;
+}
+
+/* hover 效果优化 */
+#sidebar_left .sidebar-menu > li > a:hover {
+  background: rgba(255,255,255,0.08);
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
+  transition: all 0.2s ease;
+}
+
+/* 侧边栏标签现代化 */
+.sidebar-label {
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 11px !important;
+  color: rgba(255,255,255,0.5) !important;
+}
+
+/* 子菜单样式优化 */
+#sidebar_left .sidebar-menu .sub-nav > li.active > a {
+  background: rgba(74,163,255,0.12) !important;
+  border-left: 3px solid #4aa3ff;
+  padding-left: 28px;
   color: #fff !important;
 }
 
-/* hover 也顺滑些（可选） */
-#sidebar_left .sidebar-menu > li > a:hover {
+#sidebar_left .sidebar-menu .sub-nav > li > a:hover {
   background: rgba(255,255,255,0.06);
+  padding-left: 28px;
+}
+
+/* 徽章优化 */
+.sidebar-menu .label {
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-weight: 900;
+  font-size: 10px;
+}
+
+/* 顶部导航栏优化 */
+.navbar-branding {
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 80%) !important;
+}
+
+.navbar-brand b {
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* 面包屑现代化 */
+.breadcrumb {
+  background: transparent !important;
+  padding: 8px 0 !important;
+  margin: 0 !important;
+}
+
+.breadcrumb > li + li:before {
+  content: "›" !important;
+  padding: 0 8px;
+  color: #94a3b8;
+  font-size: 16px;
+}
+
+.breadcrumb > li {
+  font-weight: 700;
+}
+
+.breadcrumb > li > a {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.breadcrumb > li > a:hover {
+  color: #3b82f6;
+}
+
+.breadcrumb > .active {
+  color: #0f172a;
+  font-weight: 900;
+}
+
+/* 内容区域优化 */
+#content {
+  background: #f8fafc !important;
+  min-height: calc(100vh - 160px);
+  padding: 20px !important;
+}
+
+/* footer 优化 */
+.footer {
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  margin-top: 0;
+  padding: 20px 0;
+}
+
+.footer p {
+  margin: 0;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 13px;
 }
 </style>
 
