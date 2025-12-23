@@ -1,30 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('[ChinaMap] 脚本已加载 - 悬浮框版');
+    console.log('[ChinaMap] 脚本已加载 - 区块交互版');
 
     // ---------------------------------------------------------
-    // 注意：页面顶部间距已移至 site.css 全局控制 (body { padding-top: 80px; })
-    // 这里不再需要单独设置 pageContainer.style.paddingTop
-    // ---------------------------------------------------------
-
-    // ---------------------------------------------------------
-    // 修复：强制调整地图容器高度，解决底部显示不全的问题
+    // 修复：强制调整地图容器高度
     // ---------------------------------------------------------
     var mapObj = document.getElementById('china-map-object');
     if (mapObj) {
-        // 900px 通常足以显示包含南海诸岛的完整中国地图
         mapObj.style.height = '900px'; 
     }
     // ---------------------------------------------------------
 
     var baseUrl = window._EVENT_INDEX_URL || '/event/index';
     
-    // 创建悬浮框 (Tooltip)
+    // 创建悬浮框 (Tooltip) - 初始隐藏
     var tooltip = document.createElement('div');
     tooltip.id = 'map-tooltip';
-    tooltip.style.cssText = 'position:absolute; display:none; background:rgba(255,255,255,0.95); border:1px solid #ccc; padding:15px; border-radius:4px; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:9999; min-width:200px; pointer-events:auto; font-size:14px; line-height:1.6; color:#333; text-align:left;';
+    // 增加关闭按钮样式，调整 z-index
+    tooltip.style.cssText = 'position:absolute; display:none; background:rgba(255,255,255,0.98); border:1px solid #ccc; padding:15px; border-radius:4px; box-shadow:0 4px 20px rgba(0,0,0,0.3); z-index:10000; min-width:220px; pointer-events:auto; font-size:14px; line-height:1.6; color:#333; text-align:left;';
     document.body.appendChild(tooltip);
 
-    var hideTimeout; // 用于控制悬浮框消失的延时
+    // 点击页面其他地方关闭弹窗
+    document.addEventListener('click', function(e) {
+        // 如果点击的不是地图对象，也不是弹窗本身，则关闭弹窗
+        if (e.target !== mapObj && !tooltip.contains(e.target)) {
+            tooltip.style.display = 'none';
+        }
+    });
 
     var provinceMap = {
         "Shaanxi Province": "陕西省",
@@ -65,9 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 辅助函数：根据地图名称获取对应的事件列表
     function getEventsForMapName(mapName, data) {
-        // data 结构: { "上海": [...], "陕西": [...] }
         for (var dbName in data) {
-            // 模糊匹配：兼容 "上海" 和 "上海市"
             if (dbName === mapName || mapName.indexOf(dbName) > -1 || dbName.indexOf(mapName) > -1) {
                 return data[dbName];
             }
@@ -76,28 +75,46 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function initMap(svgDoc) {
-        // 1. 查找圆点
-        var circles = svgDoc.querySelectorAll('#label_points circle');
+        // 1. 隐藏原有的圆点 (根据需求，不再展示圆点)
+        var labelPoints = svgDoc.getElementById('label_points');
+        if (labelPoints) labelPoints.style.display = 'none';
         
-        // 兼容性回退
-        if (!circles.length) {
-             circles = svgDoc.querySelectorAll('circle[class*="Province"], circle[class*="Municipality"]');
-        }
+        var points = svgDoc.getElementById('points');
+        if (points) points.style.display = 'none';
 
-        if (!circles.length) {
-            console.warn('[ChinaMap] 警告: 未找到任何 circle 元素。');
+        // 2. 获取所有省份区块 (Path)
+        // 根据你提供的 SVG 结构，省份都在 #features 下
+        var paths = svgDoc.querySelectorAll('#features path');
+
+        if (!paths.length) {
+            console.warn('[ChinaMap] 警告: 未在 #features 下找到 path 元素。');
             return;
         }
 
-        // 初始化样式
-        circles.forEach(function(circle) {
-            if (!circle.getAttribute('r') || circle.getAttribute('r') == '0') circle.setAttribute('r', 6);
-            if (!circle.style.fill && !circle.getAttribute('fill')) circle.style.fill = '#555';
-            circle.style.opacity = '1';
-            circle.style.transition = 'all 0.3s ease';
+        // 3. 初始化区块样式 & 绑定基础悬浮效果
+        paths.forEach(function(path) {
+            // 设置基础样式，确保可以响应鼠标
+            path.style.cursor = 'default'; // 默认普通指针
+            path.style.transition = 'fill 0.3s ease, opacity 0.3s ease';
+            
+            // 保存原始颜色 (SVG 中定义的 fill)
+            // 如果 SVG 标签上有 fill 属性，path 可能没有内联 fill，这里取 computed style 或置空
+            var originalFill = path.getAttribute('fill') || ''; 
+
+            // --- 悬浮高亮逻辑 (所有区块生效) ---
+            path.addEventListener('mouseenter', function () {
+                // 高亮颜色：比原色 #9c6f6fff 更亮或更红
+                this.style.fill = '#d9534f'; 
+                this.style.opacity = '0.9';
+            });
+
+            path.addEventListener('mouseleave', function () {
+                this.style.fill = originalFill; // 恢复原色
+                this.style.opacity = '1';
+            });
         });
 
-        // 3. 请求后端数据
+        // 4. 请求后端数据
         var sep = baseUrl.indexOf('?') === -1 ? '?' : '&';
         var fetchUrl = baseUrl + sep + 'action=get-active-locations';
         
@@ -106,62 +123,48 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(activeData => {
                 console.log('[ChinaMap] 事件数据:', activeData);
 
-                if (!activeData || Object.keys(activeData).length === 0) return;
+                if (!activeData) activeData = {};
 
-                circles.forEach(function (circle) {
-                    var className = circle.getAttribute('class');
-                    if (!className) return;
+                paths.forEach(function (path) {
+                    // 获取省份名称 (SVG 中的 name 属性)
+                    var mapEngName = path.getAttribute('name');
+                    if (!mapEngName) return;
                     
-                    className = className.trim();
-                    var mapChineseName = provinceMap[className];
+                    var mapChineseName = provinceMap[mapEngName];
+                    if (!mapChineseName) return;
 
                     // 获取该省份的事件列表
                     var events = getEventsForMapName(mapChineseName, activeData);
+                    var hasEvents = events && events.length > 0;
 
-                    if (mapChineseName && events && events.length > 0) {
-                        // 激活样式
-                        circle.style.cursor = 'pointer';
-                        circle.style.fill = '#d9534f';
-                        
-                        var originalR = circle.getAttribute('r');
+                    if (hasEvents) {
+                        // 如果有事件，鼠标变手型
+                        path.style.cursor = 'pointer';
 
-                        // 鼠标移入：显示悬浮框
-                        circle.addEventListener('mouseenter', function (e) {
-                            // 高亮圆点
-                            this.style.fill = '#ff0000';
-                            this.setAttribute('r', parseFloat(originalR) + 4);
+                        // --- 点击逻辑 (仅有事件时触发) ---
+                        path.addEventListener('click', function (e) {
+                            e.stopPropagation(); // 阻止冒泡，防止触发 document 的关闭逻辑
 
-                            // 构建悬浮框内容
-                            var html = '<div style="font-weight:bold; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:16px;">' + mapChineseName + '</div>';
-                            html += '<ul style="margin:0; padding-left:20px; max-height:250px; overflow-y:auto;">';
+                            // 1. 关闭已打开的弹窗 (可选，如果希望同时只显示一个)
+                            // tooltip.style.display = 'none';
+
+                            // 2. 构建弹窗内容
+                            var html = '<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:8px;">';
+                            html += '<span style="font-weight:bold; font-size:16px;">' + mapChineseName + '</span>';
+                            html += '<span style="cursor:pointer; color:#999; font-size:18px;" onclick="document.getElementById(\'map-tooltip\').style.display=\'none\'">×</span>';
+                            html += '</div>';
                             
+                            html += '<ul style="margin:0; padding-left:20px; max-height:250px; overflow-y:auto;">';
                             events.forEach(function(ev) {
-                                // 构建跳转链接：替换 event/index 为 timeline/view
                                 var url = baseUrl;
-                                
-                                // 针对 Yii2 默认路由 ?r=event%2Findex 或 ?r=event/index 进行处理
                                 if (url.indexOf('event%2Findex') > -1) {
-                                    // 情况1: URL编码的路由 (例如 index.php?r=event%2Findex)
-                                    url = url.replace('event%2Findex', 'timeline%2Fview');
-                                    url += '&id=' + ev.id;
+                                    url = url.replace('event%2Findex', 'timeline%2Fview') + '&id=' + ev.id;
                                 } else if (url.indexOf('event/index') > -1) {
-                                    // 情况2: 未编码路由或伪静态 (例如 index.php?r=event/index 或 /event/index)
                                     url = url.replace('event/index', 'timeline/view');
-                                    // 如果已有参数(如 ?r=...)，用 & 连接，否则用 ?
-                                    if (url.indexOf('?') > -1) {
-                                        url += '&id=' + ev.id;
-                                    } else {
-                                        url += '?id=' + ev.id;
-                                    }
+                                    url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + ev.id;
                                 } else {
-                                    // 兜底情况
-                                    if (url.indexOf('?') > -1) {
-                                        url += '&id=' + ev.id;
-                                    } else {
-                                        url += '?id=' + ev.id;
-                                    }
+                                    url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + ev.id;
                                 }
-
                                 html += '<li style="margin-bottom:5px;"><a href="' + url + '" target="_blank" style="text-decoration:none; color:#0056b3; display:block;">' + ev.title + '</a></li>';
                             });
                             html += '</ul>';
@@ -169,59 +172,34 @@ document.addEventListener('DOMContentLoaded', function () {
                             tooltip.innerHTML = html;
                             tooltip.style.display = 'block';
 
-                            // 修改：基于圆点元素位置定位，确保悬浮框始终在省份圆点附近
-                            var circleRect = this.getBoundingClientRect(); // 圆点相对 SVG 视口的位置
-                            var mapRect = mapObj.getBoundingClientRect();  // 地图容器相对浏览器视口的位置
+                            // 3. 定位弹窗 (跟随地区位置)
+                            // 获取当前点击的 path 元素的边界矩形 (相对于 SVG/Object 视口)
+                            var pathRect = this.getBoundingClientRect();
+                            // 获取地图容器的边界矩形 (相对于浏览器视口)
+                            var mapRect = mapObj.getBoundingClientRect();
                             
                             var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                             var scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
-                            // 计算绝对坐标 (相对于文档)
-                            // 默认显示在圆点右侧：地图X + 滚动X + 圆点X + 圆点宽 + 间距
-                            var left = mapRect.left + scrollLeft + circleRect.left + circleRect.width + 10;
-                            // 垂直居中稍偏上
-                            var top = mapRect.top + scrollTop + circleRect.top + (circleRect.height / 2) - 20;
+                            // 计算中心点坐标 (相对于文档)
+                            // pathRect.left/top 是相对于 object 左上角的
+                            var centerX = mapRect.left + scrollLeft + pathRect.left + (pathRect.width / 2);
+                            var centerY = mapRect.top + scrollTop + pathRect.top + (pathRect.height / 2);
 
-                            // 防止溢出屏幕右侧 (假设悬浮框宽度约 230px)
-                            // 使用 clientWidth 获取可视区域宽度
-                            if (mapRect.left + circleRect.left + 250 > document.documentElement.clientWidth) {
-                                left = mapRect.left + scrollLeft + circleRect.left - 230; // 改为显示在圆点左侧
+                            // 默认显示在中心点右侧一点
+                            var left = centerX + 20;
+                            var top = centerY - 50; // 稍微向上提一点，避免遮挡中心
+
+                            // 边界检查
+                            if (left + 240 > document.documentElement.clientWidth) {
+                                // 如果右侧溢出，显示在左侧
+                                left = centerX - 260;
                             }
 
                             tooltip.style.left = left + 'px';
                             tooltip.style.top = top + 'px';
-
-                            clearTimeout(hideTimeout);
                         });
-
-                        // 鼠标移出：延时隐藏
-                        circle.addEventListener('mouseleave', function () {
-                            this.style.fill = '#d9534f';
-                            this.setAttribute('r', originalR);
-                            
-                            // 修改：将延时从 300ms 增加到 1000ms (1秒)，给用户足够时间移动鼠标进入悬浮框
-                            hideTimeout = setTimeout(function() {
-                                tooltip.style.display = 'none';
-                            }, 1000); 
-                        });
-                    } else {
-                        // 非活跃省份
-                        circle.style.cursor = 'default';
                     }
-                });
-
-                // 悬浮框交互：鼠标移入悬浮框时取消隐藏
-                tooltip.addEventListener('mouseenter', function() {
-                    clearTimeout(hideTimeout);
-                });
-                
-                // 鼠标移出悬浮框时隐藏
-                tooltip.addEventListener('mouseleave', function() {
-                    // 修改：增加 500ms 缓冲时间，防止鼠标意外滑出导致立即消失
-                    var _this = this;
-                    hideTimeout = setTimeout(function() {
-                        _this.style.display = 'none';
-                    }, 500);
                 });
             })
             .catch(err => console.error('[ChinaMap] 请求失败:', err));
