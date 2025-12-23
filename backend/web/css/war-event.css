@@ -446,3 +446,172 @@
 
 /* drawer edit-only areas */
 .we3-canvas.is-view .we3-editable-inline{ display:none; }
+
+/* ======================================================================
+   we3 compact + align to index look
+   追加到 war-event.css 末尾（覆盖现有 we3 样式）
+   ====================================================================== */
+
+/* 统一一些尺度（更紧凑） */
+.we3{
+  padding: 10px 0 18px;
+}
+
+/* 顶部 sticky bar：更像 index 的 card 头，减少“磨砂感”，间距更紧 */
+.we3-bar{
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: #fff;
+  backdrop-filter: none;
+  box-shadow: 0 18px 45px rgba(0,0,0,.06);
+}
+.we3-h1{ font-size: 17px; }
+.we3-sub{ margin-top: 4px; font-weight: 700; }
+.we3-bar-right{ gap: 8px; }
+
+/* 主画布：整体更紧凑 */
+.we3-strip{
+  padding: 10px 12px;
+}
+.we3-section{
+  padding: 10px 12px 12px;
+}
+.we3-sec-hd{ margin-bottom: 10px; }
+.we3-sec-title{ font-size: 13px; }
+.we3-sec-desc{ margin-top: 4px; }
+
+/* 表单布局更紧凑：gap 变小 + label 更协调 */
+.we3-grid{
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 10px;
+}
+.we3-label{
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none; /* 中文更自然 */
+  color: #64748b;
+}
+
+/* 输入框“收窄”：短字段更像表单而不是铺满整列 */
+.we3-form input.form-control,
+.we3-form select.form-control{
+  max-width: 420px;   /* 关键：从 520 收窄 */
+  height: 34px;       /* 更紧凑 */
+  padding: 6px 10px;
+  border-radius: 12px;
+}
+.we3-form textarea.form-control{
+  padding: 8px 10px;
+  border-radius: 12px;
+  line-height: 1.55;
+}
+/* summary/content 这种跨两列字段允许更宽一点，但仍别太铺满 */
+.we3-span-2 .form-control{
+  max-width: 920px;
+}
+
+/* readonly 也一起变紧凑 */
+.we3-readonly{
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+/* Save bar 更紧凑 */
+.we3-save{
+  padding: 10px 12px;
+  gap: 10px;
+}
+
+/* ================= Drawer：减少“又长又窄”的观感 ================= */
+
+/* 让 drawer 更像侧边面板而不是窄栏 */
+.we3-drawer{
+  width: 500px; 
+}
+.we3-drawer-hd{
+  padding: 12px 12px 10px;
+}
+.we3-drawer-bd{
+  padding: 10px 12px 14px;
+}
+
+/* 面板/列表项更紧凑 */
+.we3-panel{ border-radius: 18px; }
+.we3-panel-hd{ padding: 9px 10px; }
+.we3-panel-bd{ padding: 9px 10px 10px; }
+
+.we3-list{ gap: 6px; }
+.we3-item{
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+.we3-item-sub{ margin-top: 3px; }
+
+.we3-minihead{ margin: 4px 0 8px; }
+.we3-file{
+  padding: 8px 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+.we3-file-sub{
+  margin-top: 3px;
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.we3-split{ margin: 10px 0; }
+
+/* Drawer 里的 ActiveForm 默认 form-group 太松，压紧一点 */
+.we3-drawer .form-group{ margin-bottom: 10px; }
+.we3-drawer label.control-label{
+  font-size: 12px;
+  font-weight: 900;
+  color:#64748b;
+  margin-bottom: 4px;
+}
+
+/* ================= Workspace 按钮风格贴近 index（仅在 .we3 范围内生效） ================= */
+.we3 .btn{
+  border-radius: 12px;
+  font-weight: 900;
+  border: 0;
+}
+.we3 .btn-default{
+  background: rgba(17,24,39,.06);
+  color: #111827;
+}
+.we3 .btn-default:hover{ background: rgba(17,24,39,.10); }
+
+.we3 .btn-primary{
+  background: rgba(59,130,246,.14);
+  color: #1e3a8a;
+}
+.we3 .btn-primary:hover{
+  background: rgba(59,130,246,.22);
+  color: #1e3a8a;
+}
+
+.we3 .btn-success{
+  background:#22c55e;
+  color:#fff;
+}
+.we3 .btn-success:hover{ background:#16a34a; }
+
+.we3 .btn-warning{
+  background: rgba(245,158,11,.18);
+  color:#78350f;
+}
+.we3 .btn-warning:hover{ background: rgba(245,158,11,.26); }
+
+.we3 .btn-danger{
+  background: rgba(239,68,68,.14);
+  color:#7f1d1d;
+}
+.we3 .btn-danger:hover{ background: rgba(239,68,68,.22); }
+
+/* 小按钮更紧凑 */
+.we3 .btn-xs{ padding: 5px 8px; border-radius: 10px; }

@@ -47,23 +47,29 @@ $subText = $isCreate ? '填写基础信息后创建，创建成功后可继续�
       <?= Html::a('返回列表', ['index'], ['class' => 'btn btn-default we3-btn']) ?>
 
       <?php if (!$isCreate): ?>
-        <?= Html::button('人物关联与媒资', ['class' => 'btn btn-primary we3-btn', 'id' => 'we3-open-drawer']) ?>
-
-        <?= Html::a($model->status ? '下线' : '发布', ['toggle-status', 'id' => $model->id], [
-          'class' => 'btn ' . ($model->status ? 'btn-warning' : 'btn-success') . ' we3-btn',
-          'data-method' => 'post',
-          'data-pjax' => 0,
+        <?= Html::button('人物关联与媒资', [
+          'class' => 'btn btn-soft-primary we3-btn',
+          'id' => 'we3-open-drawer'
         ]) ?>
 
-        <?= Html::a('删除', ['delete', 'id' => $model->id], [
-          'class' => 'btn btn-danger we3-btn',
-          'data' => ['confirm' => '确认删除该事件？', 'method' => 'post'],
-          'data-pjax' => 0,
-        ]) ?>
+<?= Html::a($model->status ? '下线' : '发布', ['toggle-status', 'id' => $model->id], [
+  'class' => 'btn ' . ($model->status ? 'btn-soft-warning' : 'btn-soft-success') . ' we3-btn',
+  'data-method' => 'post',
+  'data-pjax' => 0,
+]) ?>
+
+<?= Html::a('删除', ['delete', 'id' => $model->id], [
+  'class' => 'btn btn-soft-danger we3-btn',
+  'data' => ['confirm' => '确认删除该事件？', 'method' => 'post'],
+  'data-pjax' => 0,
+]) ?>
       <?php endif; ?>
 
       <?php if (!$isCreate): ?>
-        <?= Html::button('编辑', ['class' => 'btn btn-primary we3-btn', 'id' => 'we3-toggle-edit']) ?>
+<?= Html::button('编辑', [
+  'class' => 'btn btn-soft-primary we3-btn',
+  'id' => 'we3-toggle-edit'
+]) ?>
       <?php endif; ?>
     </div>
   </div>
