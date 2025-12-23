@@ -11,6 +11,8 @@ use yii\helpers\Url;
 $this->title = '团队作业';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/admin-common.css');
+$this->registerCssFile('@web/css/upload-modern.css');
+$this->registerJsFile('@web/js/upload-modern.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 $currentUserId = Yii::$app->user->id;
 ?>
 
@@ -74,111 +76,6 @@ $currentUserId = Yii::$app->user->id;
         <?= Html::endForm() ?>
       </div>
     </div>
-  <?php endif; ?>
-
-<style>
-.tw-upload-modern {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 16px;
-  border: 2px dashed rgba(0,0,0,0.12);
-}
-
-.tw-upload-hint {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.tw-upload-icon {
-  font-size: 32px;
-}
-
-.tw-upload-hint-title {
-  font-weight: 900;
-  font-size: 16px;
-  color: #0f172a;
-  margin-bottom: 4px;
-}
-
-.tw-upload-hint-desc {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 700;
-}
-
-.tw-upload-action {
-  flex-shrink: 0;
-}
-
-.btn-tw-trigger {
-  border-radius: 12px;
-  padding: 14px 28px;
-  font-weight: 900;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: 0;
-  box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.btn-tw-trigger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16,185,129,0.35);
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-}
-
-.btn-tw-trigger:active {
-  transform: translateY(0);
-}
-
-.btn-tw-trigger .glyphicon {
-  font-size: 18px;
-}
-
-@media (max-width: 768px) {
-  .tw-upload-modern {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  
-  .btn-tw-trigger {
-    width: 100%;
-    justify-content: center;
-  }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var twFileInput = document.getElementById('twFileInput');
-  var twFileTrigger = document.getElementById('twFileTrigger');
-  var twFileName = document.getElementById('twFileName');
-  var twUploadForm = document.getElementById('twUploadForm');
-  
-  if (twFileTrigger && twFileInput) {
-    twFileTrigger.addEventListener('click', function() {
-      twFileInput.click();
-    });
-    
-    twFileInput.addEventListener('change', function() {
-      if (twFileInput.files && twFileInput.files.length > 0) {
-        var file = twFileInput.files[0];
-        twFileName.textContent = file.name;
-        // Auto submit
-        twUploadForm.submit();
-      }
-    });
-  }
 });
 </script>
 

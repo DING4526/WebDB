@@ -9,6 +9,8 @@ use yii\helpers\Url;
 $this->title = '个人作业';
 $this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('@web/css/admin-common.css');
+$this->registerCssFile('@web/css/upload-modern.css');
+$this->registerJsFile('@web/js/upload-modern.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 
 // 选中目录：root 可通过 ?folder=xxx 切换；普通用户默认自己的 $currentStudentNo
 $selectedFolder = Yii::$app->request->get('folder');
@@ -95,111 +97,6 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
         <?php endif; ?>
       </div>
     </div>
-  <?php endif; ?>
-
-<style>
-.pw-upload-modern {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 16px;
-  border: 2px dashed rgba(0,0,0,0.12);
-}
-
-.pw-upload-hint {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.pw-upload-icon {
-  font-size: 32px;
-}
-
-.pw-upload-hint-title {
-  font-weight: 900;
-  font-size: 16px;
-  color: #0f172a;
-  margin-bottom: 4px;
-}
-
-.pw-upload-hint-desc {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 700;
-}
-
-.pw-upload-action {
-  flex-shrink: 0;
-}
-
-.btn-upload-trigger {
-  border-radius: 12px;
-  padding: 14px 28px;
-  font-weight: 900;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: 0;
-  box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.btn-upload-trigger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16,185,129,0.35);
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-}
-
-.btn-upload-trigger:active {
-  transform: translateY(0);
-}
-
-.btn-upload-trigger .glyphicon {
-  font-size: 18px;
-}
-
-@media (max-width: 768px) {
-  .pw-upload-modern {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-  
-  .btn-upload-trigger {
-    width: 100%;
-    justify-content: center;
-  }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var fileInput = document.getElementById('fileInput');
-  var fileTrigger = document.getElementById('fileTrigger');
-  var fileName = document.getElementById('fileName');
-  var uploadForm = document.getElementById('uploadForm');
-  
-  if (fileTrigger && fileInput) {
-    fileTrigger.addEventListener('click', function() {
-      fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', function() {
-      if (fileInput.files && fileInput.files.length > 0) {
-        var file = fileInput.files[0];
-        fileName.textContent = file.name;
-        // Auto submit
-        uploadForm.submit();
-      }
-    });
-  }
 });
 </script>
 

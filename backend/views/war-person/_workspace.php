@@ -15,6 +15,9 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+$this->registerCssFile('@web/css/upload-modern.css');
+$this->registerJsFile('@web/js/upload-modern.js', ['depends' => [\yii\web\JqueryAsset::class]]);
+
 $mode = $mode ?? 'view';
 $isCreate = ($mode === 'create');
 $initialEdit = in_array($mode, ['edit', 'create'], true);
@@ -325,112 +328,6 @@ $subText = $isCreate
                     </button>
                   </div>
                 </div>
-              <?= Html::endForm() ?>
-            </div>
-
-            <style>
-            .we3-upload-modern {
-              display: flex;
-              align-items: center;
-              gap: 24px;
-              padding: 20px;
-              background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-              border-radius: 16px;
-              border: 2px dashed rgba(0,0,0,0.12);
-              margin-bottom: 16px;
-            }
-
-            .we3-upload-hint {
-              display: flex;
-              align-items: center;
-              gap: 12px;
-              flex: 1;
-            }
-
-            .we3-upload-icon {
-              font-size: 32px;
-            }
-
-            .we3-upload-hint-title {
-              font-weight: 900;
-              font-size: 16px;
-              color: #0f172a;
-              margin-bottom: 4px;
-            }
-
-            .we3-upload-hint-desc {
-              font-size: 13px;
-              color: #64748b;
-              font-weight: 700;
-            }
-
-            .we3-upload-action {
-              flex-shrink: 0;
-            }
-
-            .btn-we3-upload {
-              border-radius: 12px;
-              padding: 14px 28px;
-              font-weight: 900;
-              font-size: 15px;
-              display: flex;
-              align-items: center;
-              gap: 10px;
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              border: 0;
-              box-shadow: 0 4px 12px rgba(16,185,129,0.25);
-              transition: all 0.2s ease;
-              white-space: nowrap;
-            }
-
-            .btn-we3-upload:hover {
-              transform: translateY(-2px);
-              box-shadow: 0 6px 16px rgba(16,185,129,0.35);
-              background: linear-gradient(135deg, #059669 0%, #047857 100%);
-            }
-
-            .btn-we3-upload:active {
-              transform: translateY(0);
-            }
-
-            .btn-we3-upload .glyphicon {
-              font-size: 18px;
-            }
-
-            @media (max-width: 768px) {
-              .we3-upload-modern {
-                flex-direction: column;
-                gap: 16px;
-                align-items: stretch;
-              }
-              
-              .btn-we3-upload {
-                width: 100%;
-                justify-content: center;
-              }
-            }
-            </style>
-
-            <script>
-            (function() {
-              var fileInput = document.getElementById('we3-upload-input');
-              var uploadBtn = document.getElementById('we3-upload-btn');
-              var filenameSpan = document.getElementById('we3-upload-filename');
-              var uploadForm = document.getElementById('we3-upload-form');
-              
-              if (uploadBtn && fileInput) {
-                uploadBtn.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  fileInput.click();
-                });
-                
-                fileInput.addEventListener('change', function() {
-                  if (fileInput.files && fileInput.files.length > 0) {
-                    var file = fileInput.files[0];
-                    filenameSpan.textContent = file.name;
-                    uploadForm.submit();
-                  }
-                });
               }
             })();
             </script>
