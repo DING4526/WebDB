@@ -57,7 +57,7 @@ $activeCtl = function($controllerId) {
 
 
   <!-- Start: Theme Preview Pane -->
-  <div id="skin-toolbox">
+  <!-- <div id="skin-toolbox">
     <div class="panel">
       <div class="panel-heading">
         <span class="panel-icon">
@@ -190,7 +190,7 @@ $activeCtl = function($controllerId) {
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
   <!-- End: Theme Preview Pane -->
 
   <!-- Start: Main -->
