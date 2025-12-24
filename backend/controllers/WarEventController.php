@@ -74,8 +74,12 @@ class WarEventController extends Controller
 
     public function actionView($id)
     {
-        // 统一详情入口：view 路由只负责跳转到 workspace
-        return $this->redirect(['update', 'id' => $id, 'mode' => 'view']);
+        $model = $this->findModel($id);
+        return $this->render('view', [
+            'model' => $model,
+            'mediaList' => $this->getMediaList($id),
+            'relationMap' => $this->getRelationMap($id),
+        ]);
     }
 
 
@@ -97,17 +101,14 @@ class WarEventController extends Controller
     {
         $model = $this->findModel($id);
 
-        $mode = Yii::$app->request->get('mode', 'edit');
-        $mode = in_array($mode, ['view', 'edit'], true) ? $mode : 'edit';
-
-        if ($mode === 'edit' && $model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', '事件已更新');
-            // 保存后回到查看态（更符合“详情页”习惯；不想就改成 edit）
-            return $this->redirect(['update', 'id' => $model->id, 'mode' => 'view']);
+            // 保存后返回详情页
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
-            'mode' => $mode,
+            'mode' => 'edit',
             'model' => $model,
             'stageList' => $this->getStageList(),
             'personOptions' => $this->getPersonList(),

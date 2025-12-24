@@ -40,23 +40,48 @@ $this->registerCssFile('@web/css/team-workspace.css');
           </div>
         </div>
       </div>
+            
+      <!-- 选择账号（User） -->
+      <div class="team-ws-fieldline">
+        <div class="team-ws-label">选择账号</div>
+        <div class="team-ws-control">
+          <?php
+            $activeUsers = \common\models\User::find()->where(['status' => \common\models\User::STATUS_ACTIVE])->all();
+            $userItems = ArrayHelper::map($activeUsers, 'id', function($u) {
+                $name = ArrayHelper::getValue($u->getAttributes(), 'name');
+                $student = ArrayHelper::getValue($u->getAttributes(), 'student_no');
+                $label = $u->username;
+                if ($name || $student) {
+                    $label .= '（' . ($name ?: '-') . ' / ' . ($student ?: '-') . '）';
+                }
+                return $label;
+            });
+            $optionAttrs = [];
+            foreach ($activeUsers as $u) {
+                $attrs = $u->getAttributes();
+                $optionAttrs[$u->id] = [
+                    'data-name' => ArrayHelper::getValue($attrs, 'name'),
+                    'data-student' => ArrayHelper::getValue($attrs, 'student_no'),
+                    'data-username' => $u->username,
+                ];
+            }
+            echo $form->field($model, 'user_id', ['options' => ['class' => 'team-ws-field']])
+              ->dropDownList($userItems, [
+                  'prompt' => '请选择一个账号',
+                  'options' => $optionAttrs,
+                  'class' => 'form-control',
+                  'id' => 'team-member-user-select',
+              ])->label(false);
+          ?>
+        </div>
+      </div>
 
       <!-- 姓名 -->
       <div class="team-ws-fieldline">
         <div class="team-ws-label">姓名</div>
         <div class="team-ws-control">
           <?= $form->field($model, 'name', ['options' => ['class' => 'team-ws-field']])
-            ->textInput(['maxlength' => true, 'placeholder' => '输入成员姓名'])
-            ->label(false) ?>
-        </div>
-      </div>
-
-      <!-- 学号 -->
-      <div class="team-ws-fieldline">
-        <div class="team-ws-label">学号</div>
-        <div class="team-ws-control">
-          <?= $form->field($model, 'student_no', ['options' => ['class' => 'team-ws-field']])
-            ->textInput(['maxlength' => true, 'placeholder' => '输入学号'])
+            ->textInput(['maxlength' => true, 'placeholder' => '将自动填充所选账号姓名', 'readonly' => true, 'id' => 'team-member-name'])
             ->label(false) ?>
         </div>
       </div>
@@ -71,6 +96,29 @@ $this->registerCssFile('@web/css/team-workspace.css');
         </div>
       </div>
 
+    <?php
+      $js = <<<JS
+      (function(){
+        var sel = document.getElementById('team-member-user-select');
+        if (!sel) return;
+        function fillBySelect(){
+          var opt = sel.options[sel.selectedIndex];
+          if (!opt || !opt.getAttribute) return;
+          var name = opt.getAttribute('data-name');
+          var student = opt.getAttribute('data-student');
+          var username = opt.getAttribute('data-username');
+          var nameInput = document.getElementById('team-member-name');
+          var stuInput = document.getElementById('team-member-student');
+          if (nameInput) nameInput.value = name || username || '';
+          if (stuInput) stuInput.value = student || '';
+        }
+        sel.addEventListener('change', fillBySelect);
+        // 初始化时尝试填充
+        fillBySelect();
+      })();
+      JS;
+      $this->registerJs($js);
+    ?>
       <!-- 工作范围 -->
       <div class="team-ws-fieldline team-ws-fieldline-full">
         <div class="team-ws-label">工作范围</div>

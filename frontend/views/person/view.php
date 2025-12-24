@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ding 2310724
+ * 苏奕扬 2311330
  * 前台人物详情视图
  */
 
@@ -173,7 +173,15 @@ $this->registerCss("
                 <div class="content-card">
                     <h3 class="section-title">生平事迹</h3>
                     <div class="person-intro-text">
-                        <?= nl2br(Html::encode($model->biography)) ?>
+                        <?php 
+                        // 按换行符分割，并过滤空行，为每段添加缩进
+                        $paragraphs = array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", $model->biography)));
+                        foreach ($paragraphs as $p): 
+                            $p = trim($p);
+                            if (empty($p)) continue;
+                        ?>
+                            <p><?= Html::encode($p) ?></p>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             <?php endif; ?>

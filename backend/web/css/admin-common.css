@@ -3,7 +3,7 @@
    Common Admin UI for backend modules (Team, Member, Personal Work, etc.)
    Consistent with war-event.css style
    ========================================================================== */
-
+/* ===== Global content padding adjustment ===== */
 #content.table-layout > div {
   padding: 15px !important;
 }
