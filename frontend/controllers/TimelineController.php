@@ -51,6 +51,29 @@ class TimelineController extends Controller
             ->where(['target_type' => 'event', 'target_id' => $id])
             ->count();
 
+        // 留言区
+        $newMessage = new \common\models\WarMessage();
+        if ($newMessage->load(\Yii::$app->request->post())) {
+            $newMessage->target_type = 'event';
+            $newMessage->target_id = $id;
+            $newMessage->status = 0; // 默认待审核
+            $newMessage->created_at = time();
+            $newMessage->updated_at = time();
+            if ($newMessage->save()) {
+                \Yii::$app->session->setFlash('success', '感言提交成功，请等待管理员审核。');
+                return $this->refresh('#comments'); 
+            }
+        }
+
+        // 统计数据
+        $visitCount = \common\models\WarVisitLog::find()->where(['target_type' => 'event', 'target_id' => $id])->count();
+        
+        // 获取已审核的留言列表
+        $comments = \common\models\WarMessage::find()
+            ->where(['target_type' => 'event', 'target_id' => $id, 'status' => 1])
+            ->orderBy('id DESC')
+            ->all();
+
         // 媒资分类
         $images = [];
         $articles = [];
@@ -66,7 +89,8 @@ class TimelineController extends Controller
             'model' => $model,
             'images' => $images,
             'articles' => $articles,
-            'messages' => $this->findApprovedMessages($id), 
+            'comments' => $comments,      
+            'newMessage' => $newMessage,  
             'visitCount' => $visitCount,
         ]);
     }

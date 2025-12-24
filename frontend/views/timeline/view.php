@@ -100,47 +100,84 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             <?php endif; ?>
 
-            <!-- 2. 正文内容 -->
+            <!-- 正文 -->
             <div class="article-body" style="font-size: 1.1em; line-height: 2; color: #333; text-align: justify; margin-bottom: 40px;">
                 <?= nl2br(Html::encode($model->content)) ?>
             </div>
 
-            <!-- 3. 留言展示区域-->
-            <div id="comments" style="margin-top: 60px; border-top: 1px dashed #eee; padding-top: 30px;">
-                <h3 style="border-left: 5px solid #8b0000; padding-left: 15px; margin-bottom: 25px; font-weight: bold;">
-                    缅怀区
+            <!-- 缅怀感言区 -->
+            <div class="content-card" id="comments">
+                <h3 class="section-title">
+                    缅怀与致敬 
+                    <small class="pull-right" style="font-size: 14px; font-weight: normal; color: #999; margin-top: 5px;">
+                        已有 <?= count($comments) ?> 位同胞发表致敬感言
+                    </small>
                 </h3>
                 
-                <?php if (empty($messages)): ?>
-                    <p class="text-muted well">暂无留言，欢迎发表你的缅怀之情。</p>
-                <?php else: ?>
-                    <?php foreach ($messages as $msg): ?>
-                        <div class="media well" style="background: #fdfdfd; border: 1px solid #eee;">
-                            <div class="media-body">
-                                <h4 class="media-heading">
-                                    <strong style="color: #8b0000;"><?= Html::encode($msg->nickname) ?></strong>
-                                    <small class="pull-right text-muted">
-                                        <i class="glyphicon glyphicon-time"></i> <?= date('Y-m-d H:i', $msg->created_at) ?>
-                                    </small>
-                                </h4>
-                                <div style="margin-top: 10px; color: #555;">
-                                    <?= Html::encode($msg->content) ?>
+                <!-- 感言列表 -->
+                <div class="comments-list" style="margin-bottom: 30px; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                    <?php if (empty($comments)): ?>
+                        <div class="alert alert-info" style="background: #fcfcfc; color: #666; border-color: #eee;">
+                            <i class="glyphicon glyphicon-info-sign"></i> 暂无致敬感言。铭记历史，从你我开始。
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($comments as $comment): ?>
+                            <div class="comment-item" style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                                <!-- 头部：署名居左，时间居右 -->
+                                <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                                    <span class="comment-user" style="font-weight: bold; color: #8b0000;">
+                                        <i class="glyphicon glyphicon-user"></i> <?= Html::encode($comment->nickname) ?>
+                                    </span>
+                                    <span class="comment-time" style="color: #999;">
+                                        <?= Yii::$app->formatter->asDatetime($comment->created_at) ?>
+                                    </span>
+                                </div>
+                                <!-- 内容：另起一行 -->
+                                <div class="comment-content" style="color: #333; line-height: 1.6; font-size: 14px; text-align: justify;">
+                                    <?= nl2br(Html::encode($comment->content)) ?>
                                 </div>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
 
-                <!-- 留言按钮 -->
-                <div class="text-center" style="margin: 40px 0;">
-                    <?= Html::a('<i class="glyphicon glyphicon-edit"></i> 我要发表缅怀留言', [
-                        'message/create', 
-                        'target_type' => 'event', 
-                        'target_id' => $model->id
-                    ], [
-                        'class' => 'btn btn-lg btn-danger',
-                        'style' => 'padding: 12px 50px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 10px rgba(217, 83, 79, 0.3);'
-                    ]) ?>
+                <!-- 提交致敬表单 -->
+                <div class="comment-form" style="background: #fdfdfd; padding: 20px; border-radius: 8px; border: 1px solid #f0f0f0;">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: #333; font-weight: bold; font-size: 16px;">
+                        <i class="glyphicon glyphicon-edit"></i> 寄托哀思
+                    </h4>
+                    
+                    <?php $form = \yii\widgets\ActiveForm::begin([
+                        'action' => ['view', 'id' => $model->id, '#' => 'comments'],
+                    ]); ?>
+                    
+                    <div class="row">
+                        <div class="col-md-5">
+                            <?= $form->field($newMessage, 'nickname')->textInput([
+                                'maxlength' => true, 
+                                'placeholder' => '您的署名',
+                                'style' => 'border-radius: 4px; border: 1px solid #ddd; box-shadow: none;'
+                            ])->label(false) ?>
+                        </div>
+                    </div>
+                    
+                    <?= $form->field($newMessage, 'content')->textarea([
+                        'rows' => 3, 
+                        'placeholder' => '铭记这段历史，缅怀英勇先烈。请写下您的致敬感言或思考...',
+                        'style' => 'border-radius: 4px; border: 1px solid #ddd; resize: vertical; box-shadow: none;'
+                    ])->label(false) ?>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <?= Html::submitButton('<i class="glyphicon glyphicon-send"></i> 提交致敬感言', [
+                            'class' => 'btn btn-danger',
+                            'style' => 'padding: 8px 35px; border-radius: 20px; font-weight: bold; background-color: #8b0000; border: none;'
+                        ]) ?>
+                        <span class="text-muted small" style="margin-left: 15px;">
+                            * 您的感言将在审核后公开展示，以示敬意。
+                        </span>
+                    </div>
+                    
+                    <?php \yii\widgets\ActiveForm::end(); ?>
                 </div>
             </div>
         </div> 
