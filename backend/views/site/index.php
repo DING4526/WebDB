@@ -110,12 +110,12 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
         <div class="col-md-8">
             <!-- 访问趋势（折线图）-->
             <div class="adm-card">
-                <div class="adm-card-head">
+                                <div class="adm-card-head">
                     <h3 class="adm-card-title">访问趋势</h3>
-                    <div class="chart-toggle">
+                          <div class="chart-toggle" id="visit-chart-toggle">
                       <div class="adm-actions-col">
-                        <button type="button" class="btn btn-xs btn-soft-ghost active" data-mode="day">按天</button>
-                        <button type="button" class="btn btn-xs btn-soft-ghost" data-mode="hour">按小时</button>
+                          <button type="button" class="btn btn-xs btn-soft-ghost" data-mode="day">最近七天</button>
+                          <button type="button" class="btn btn-xs btn-soft-primary active" data-mode="hour">最近24小时</button>
                       </div>
                     </div>
                 </div>
@@ -130,11 +130,12 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
             <div class="adm-card">
                 <div class="adm-card-head">
                     <h3 class="adm-card-title">留言趋势</h3>
-                    <?php if ($isRoot || $isMember): ?>
-                      <div class="adm-actions-col">
-                        <a href="<?= Url::to(['war-message/index']) ?>" class="btn btn-xs btn-soft-primary">查看详情</a>
-                      </div>
-                    <?php endif; ?>
+                    <div class="chart-toggle" id="message-chart-toggle">
+                        <div class="adm-actions-col">
+                            <button type="button" class="btn btn-xs btn-soft-ghost" data-mode="day">最近七天</button>
+                            <button type="button" class="btn btn-xs btn-soft-primary active" data-mode="hour">最近24小时</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="adm-card-body">
                     <div class="chart-container">
@@ -337,18 +338,18 @@ $js = <<<'JS'
     var visitChart = null;
     var messageChart = null;
     var visitMode = 'hour';  // 默认按小时
+    var messageMode = 'hour'; // 默认按小时
 
     // 这些变量由 PHP 注入（下面会替换）
     var DASHBOARD_URL = '__DASHBOARD_URL__';
     var EVENT_VIEW_BASE = '__EVENT_VIEW_BASE__';
     var PERSON_VIEW_BASE = '__PERSON_VIEW_BASE__';
 
-    function loadDashboardData(mode) {
-        mode = mode || visitMode;
+    function loadDashboardData() {
         $.ajax({
             url: DASHBOARD_URL,
             type: 'GET',
-            data: { visitMode: mode },
+            data: { visitMode: visitMode, messageMode: messageMode },
             dataType: 'json',
             success: function(data) {
                 $('#kpi-members').text(data.memberCount);
@@ -453,7 +454,7 @@ $js = <<<'JS'
                 { label: '拒绝', data: rejected }
             ]},
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, 
-            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true} } }
         });
     }
 
@@ -494,7 +495,7 @@ $js = <<<'JS'
         var btn = $(this);
         btn.prop('disabled', true);
         btn.find('.glyphicon').addClass('spin');
-        loadDashboardData(visitMode);
+        loadDashboardData();
         setTimeout(function() {
             btn.prop('disabled', false);
             btn.find('.glyphicon').removeClass('spin');
@@ -503,14 +504,16 @@ $js = <<<'JS'
 
     function setVisitMode(mode) {
         visitMode = mode;
+        var $btns = $('#visit-chart-toggle button');
+        $btns.removeClass('active btn-soft-primary').addClass('btn-soft-ghost');
+        $('#visit-chart-toggle button[data-mode="' + mode + '"]').addClass('active btn-soft-primary').removeClass('btn-soft-ghost');
+    }
 
-        $('.chart-toggle button')
-            .removeClass('active btn-soft-primary')
-            .addClass('btn-soft-ghost');
-
-        $('.chart-toggle button[data-mode="' + mode + '"]')
-            .addClass('active btn-soft-primary')
-            .removeClass('btn-soft-ghost');
+    function setMessageMode(mode) {
+        messageMode = mode;
+        var $btns = $('#message-chart-toggle button');
+        $btns.removeClass('active btn-soft-primary').addClass('btn-soft-ghost');
+        $('#message-chart-toggle button[data-mode="' + mode + '"]').addClass('active btn-soft-primary').removeClass('btn-soft-ghost');
     }
 
     $(document).on('click', '.todo-item.todo-clickable', function() {
@@ -518,16 +521,54 @@ $js = <<<'JS'
         if (href) window.location.href = href;
     });
 
-    $(document).on('click', '.chart-toggle button', function() {
+    // 单独加载访问趋势（仅刷新访问图表）
+    function loadVisitTrend() {
+        $.ajax({
+            url: DASHBOARD_URL,
+            type: 'GET',
+            data: { visitMode: visitMode, messageMode: messageMode },
+            dataType: 'json',
+            success: function(data) {
+                renderVisitChart(data.visitTrend || []);
+            },
+            error: function(xhr) { console.error('访问趋势加载失败', xhr.status); }
+        });
+    }
+
+    // 单独加载留言趋势（仅刷新留言图表）
+    function loadMessageTrend() {
+        $.ajax({
+            url: DASHBOARD_URL,
+            type: 'GET',
+            data: { visitMode: visitMode, messageMode: messageMode },
+            dataType: 'json',
+            success: function(data) {
+                renderMessageChart(data.messageTrend || []);
+            },
+            error: function(xhr) { console.error('留言趋势加载失败', xhr.status); }
+        });
+    }
+
+    // 访问趋势切换
+    $(document).on('click', '#visit-chart-toggle button', function() {
         var mode = $(this).data('mode');
         if (mode === visitMode) return;
         setVisitMode(mode);
-        loadDashboardData(visitMode);
+        loadVisitTrend();
+    });
+
+    // 留言趋势切换
+    $(document).on('click', '#message-chart-toggle button', function() {
+        var mode = $(this).data('mode');
+        if (mode === messageMode) return;
+        setMessageMode(mode);
+        loadMessageTrend();
     });
 
     $(document).ready(function() {
-        setVisitMode(visitMode);   // ✅ 先把 UI 状态对齐
-        loadDashboardData(visitMode);
+        setVisitMode(visitMode);     // 访问趋势按钮状态
+        setMessageMode(messageMode); // 留言趋势按钮状态
+        loadDashboardData();
     });
 })();
 JS;

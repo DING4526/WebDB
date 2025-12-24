@@ -129,6 +129,7 @@ class SiteController extends Controller
 
         $teamId = Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null;
         $visitMode = Yii::$app->request->get('visitMode', 'day');
+        $messageMode = Yii::$app->request->get('messageMode', 'day');
 
         // 基础统计
         $memberCount = TeamMember::find()
@@ -201,32 +202,64 @@ class SiteController extends Controller
             }
         }
 
-        // 留言趋势数据（按天，分状态）
+        // 留言趋势数据（小时/天，分状态）
         $messageTrend = [];
-        for ($i = $trendDays - 1; $i >= 0; $i--) {
-            $dayStart = strtotime("-{$i} days 00:00:00");
-            $dayEnd = strtotime("-{$i} days 23:59:59");
-            $pending = WarMessage::find()
-                ->andWhere(['>=', 'created_at', $dayStart])
-                ->andWhere(['<=', 'created_at', $dayEnd])
-                ->andWhere(['status' => WarMessage::STATUS_PENDING])
-                ->count();
-            $approved = WarMessage::find()
-                ->andWhere(['>=', 'created_at', $dayStart])
-                ->andWhere(['<=', 'created_at', $dayEnd])
-                ->andWhere(['status' => WarMessage::STATUS_APPROVED])
-                ->count();
-            $rejected = WarMessage::find()
-                ->andWhere(['>=', 'created_at', $dayStart])
-                ->andWhere(['<=', 'created_at', $dayEnd])
-                ->andWhere(['status' => WarMessage::STATUS_REJECTED])
-                ->count();
-            $messageTrend[] = [
-                'date' => date('m-d', $dayStart),
-                'pending' => (int)$pending,
-                'approved' => (int)$approved,
-                'rejected' => (int)$rejected,
-            ];
+        if ($messageMode === 'hour') {
+            $trendHours = 24;
+            $endHourStart = strtotime(date('Y-m-d H:00:00'));
+            for ($i = $trendHours - 1; $i >= 0; $i--) {
+                $hourStart = $endHourStart - ($i * 3600);
+                $hourEnd = $hourStart + 3599;
+
+                $pending = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $hourStart])
+                    ->andWhere(['<=', 'created_at', $hourEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_PENDING])
+                    ->count();
+                $approved = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $hourStart])
+                    ->andWhere(['<=', 'created_at', $hourEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_APPROVED])
+                    ->count();
+                $rejected = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $hourStart])
+                    ->andWhere(['<=', 'created_at', $hourEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_REJECTED])
+                    ->count();
+
+                $messageTrend[] = [
+                    'date' => date('H:i', $hourStart),
+                    'pending' => (int)$pending,
+                    'approved' => (int)$approved,
+                    'rejected' => (int)$rejected,
+                ];
+            }
+        } else {
+            for ($i = $trendDays - 1; $i >= 0; $i--) {
+                $dayStart = strtotime("-{$i} days 00:00:00");
+                $dayEnd = strtotime("-{$i} days 23:59:59");
+                $pending = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $dayStart])
+                    ->andWhere(['<=', 'created_at', $dayEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_PENDING])
+                    ->count();
+                $approved = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $dayStart])
+                    ->andWhere(['<=', 'created_at', $dayEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_APPROVED])
+                    ->count();
+                $rejected = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $dayStart])
+                    ->andWhere(['<=', 'created_at', $dayEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_REJECTED])
+                    ->count();
+                $messageTrend[] = [
+                    'date' => date('m-d', $dayStart),
+                    'pending' => (int)$pending,
+                    'approved' => (int)$approved,
+                    'rejected' => (int)$rejected,
+                ];
+            }
         }
 
         // 内容质量概览
