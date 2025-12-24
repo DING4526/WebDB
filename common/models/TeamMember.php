@@ -121,4 +121,34 @@ class TeamMember extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    /**
+     * 在校验前根据选择的账号填充姓名与学号，确保后端数据一致。
+     */
+    public function beforeValidate()
+    {
+        if (!parent::beforeValidate()) {
+            return false;
+        }
+
+        if ($this->user_id) {
+            $user = User::findOne(['id' => $this->user_id, 'status' => User::STATUS_ACTIVE]);
+            if ($user) {
+                $attrs = $user->getAttributes();
+                // 若 User 未配置 name/student_no 字段，做兼容处理
+                $nameFromUser = $attrs['name'] ?? null;
+                $studentFromUser = $attrs['student_no'] ?? null;
+                if ($nameFromUser) {
+                    $this->name = $nameFromUser;
+                } elseif (empty($this->name)) {
+                    $this->name = $user->username; // 兜底使用用户名
+                }
+                if ($studentFromUser) {
+                    $this->student_no = $studentFromUser;
+                }
+            }
+        }
+
+        return true;
+    }
 }

@@ -47,6 +47,12 @@ PRESETS = {
         ],
         "output": "_current_code/console.txt"
     },
+    "models": {
+        "files": [
+            "common/models/*.php",
+        ],
+        "output": "_current_code/models.txt"
+    },
     "team": {
         "files": [
             "common/models/Team.php",

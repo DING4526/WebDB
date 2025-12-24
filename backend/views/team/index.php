@@ -90,15 +90,9 @@ $userList = ArrayHelper::map(
                       <?= Html::encode($m->name) ?>
                     </div>
                     <div class="team-ws-member-meta">
-                      <?php if ($m->user): ?>
-                        <span class="team-ws-meta-item">
-                          <span class="team-ws-icon">👤</span>
-                          <?= Html::encode($m->user->username) ?>
-                        </span>
-                      <?php endif; ?>
                       <?php if ($m->student_no): ?>
                         <span class="team-ws-meta-item">
-                          <span class="team-ws-icon">🎓</span>
+                          <span class="team-ws-icon">👤</span>
                           <?= Html::encode($m->student_no) ?>
                         </span>
                       <?php endif; ?>
