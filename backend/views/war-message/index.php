@@ -211,7 +211,7 @@ $totalCount    = $pendingCount + $approvedCount + $rejectedCount;
                                             'view' => function ($url, $model) use ($getTargetInfo) {
                                                 $info = $getTargetInfo($model);
                                                 return Html::button('查看', [
-                                                    'class' => 'btn btn-xs btn-ghost js-view-message',
+                                                    'class' => 'btn btn-xs btn-soft-ghost js-view-message',
                                                     'data-nickname' => Html::encode($model->nickname),
                                                     'data-content' => Html::encode($model->content),
                                                     'data-target-type' => Html::encode($info['type']),
@@ -284,7 +284,7 @@ $totalCount    = $pendingCount + $approvedCount + $rejectedCount;
                                             'view' => function ($url, $model) use ($getTargetInfo) {
                                                 $info = $getTargetInfo($model);
                                                 return Html::button('查看', [
-                                                    'class' => 'btn btn-xs btn-ghost js-view-message',
+                                                    'class' => 'btn btn-xs btn-soft-ghost js-view-message',
                                                     'data-nickname' => Html::encode($model->nickname),
                                                     'data-content' => Html::encode($model->content),
                                                     'data-target-type' => Html::encode($info['type']),
@@ -351,7 +351,7 @@ $totalCount    = $pendingCount + $approvedCount + $rejectedCount;
                                             'view' => function ($url, $model) use ($getTargetInfo) {
                                                 $info = $getTargetInfo($model);
                                                 return Html::button('查看', [
-                                                    'class' => 'btn btn-xs btn-ghost js-view-message',
+                                                    'class' => 'btn btn-xs btn-soft-ghost js-view-message',
                                                     'data-nickname' => Html::encode($model->nickname),
                                                     'data-content' => Html::encode($model->content),
                                                     'data-target-type' => Html::encode($info['type']),

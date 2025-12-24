@@ -5,6 +5,7 @@ use yii\helpers\Url;
 
 $this->title = '任务分工板';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/admin-common.css');
 
 // 你可以先用静态数据，后面接 tasks 表时只改这里的数据来源
 $milestones = [
@@ -62,53 +63,54 @@ $p2 = [
 <div class="taskboard-index">
 
   <!-- 顶部操作 -->
-  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;">
-    <div>
-      <h2 style="margin:0;"><?= Html::encode($this->title) ?></h2>
-      <div class="text-muted" style="margin-top:6px;">
-        目标：让每个人清楚“我现在做什么、交付到哪一步、卡在哪里”。
+  <div class="adm-hero">
+    <div class="adm-hero-inner">
+      <div>
+        <h2><?= Html::encode($this->title) ?></h2>
+        <div class="desc">让每个人清楚"我现在做什么、交付到哪一步、卡在哪里"</div>
       </div>
-    </div>
-    <div>
-      <a class="btn btn-default" href="<?= Url::to(['site/index']) ?>">返回后台主页</a>
+      <div class="adm-actions">
+        <?= Html::a('返回后台主页', ['site/index'], ['class' => 'btn btn-default']) ?>
+      </div>
     </div>
   </div>
 
   <!-- 里程碑 -->
-  <div class="panel panel-primary" style="box-shadow:0 2px 10px rgba(0,0,0,.05);">
-    <div class="panel-heading">
-      <span class="glyphicon glyphicon-flag"></span> 项目里程碑
+  <div class="adm-card">
+    <div class="adm-card-head">
+      <h3 class="adm-card-title">项目里程碑</h3>
     </div>
-    <div class="panel-body">
+    <div class="adm-card-body">
       <?php foreach ($milestones as $m): ?>
-        <span class="label <?= $m['done'] ? 'label-success' : 'label-default' ?>" style="margin-right:8px;display:inline-block;margin-bottom:6px;">
+        <span class="adm-badge <?= $m['done'] ? 'adm-badge-active' : 'adm-badge-inactive' ?>" style="margin-right:8px;margin-bottom:6px;">
           <?= $m['done'] ? '✓ ' : '· ' ?><?= Html::encode($m['name']) ?>
         </span>
       <?php endforeach; ?>
-      <div class="text-muted" style="margin-top:8px;font-size:12px;">
-        建议每次组会只更新这里的“完成状态”，不必长篇汇报。
+      <div class="adm-hint" style="margin-top:12px;font-size:12px;">
+        建议每次组会只更新这里的"完成状态"，不必长篇汇报。
       </div>
     </div>
   </div>
 
   <!-- 负责人卡片 -->
-  <div class="row">
+  <div class="row" style="margin-top:14px;">
     <?php foreach ($owners as $o): ?>
       <div class="col-md-6">
-        <div class="panel panel-default" style="box-shadow:0 2px 10px rgba(0,0,0,.05);">
-          <div class="panel-heading" style="background:#f7f9fb;">
-            <span class="glyphicon glyphicon-user"></span>
-            <strong><?= Html::encode($o['name']) ?></strong>
-            <span class="text-muted">· <?= Html::encode($o['scope']) ?></span>
+        <div class="adm-card" style="margin-bottom:12px;">
+          <div class="adm-card-head">
+            <h3 class="adm-card-title">
+              <strong><?= Html::encode($o['name']) ?></strong>
+              <span class="adm-muted">· <?= Html::encode($o['scope']) ?></span>
+            </h3>
           </div>
-          <div class="panel-body">
-            <div style="margin-bottom:8px;"><strong>本周交付</strong></div>
+          <div class="adm-card-body">
+            <div style="margin-bottom:8px;font-weight:900;">本周交付</div>
             <ul style="padding-left:18px;margin-bottom:10px;">
               <?php foreach ($o['todo'] as $t): ?>
                 <li><?= Html::encode($t) ?></li>
               <?php endforeach; ?>
             </ul>
-            <div class="text-muted" style="font-size:12px;">
+            <div class="adm-hint" style="font-size:12px;">
               <strong>阻塞：</strong><?= Html::encode($o['blocker']) ?>
             </div>
           </div>
@@ -120,9 +122,11 @@ $p2 = [
   <!-- P0/P1/P2 -->
   <div class="row">
     <div class="col-md-4">
-      <div class="panel panel-danger" style="box-shadow:0 2px 10px rgba(0,0,0,.05);">
-        <div class="panel-heading"><span class="glyphicon glyphicon-fire"></span> P0 必须完成（能演示）</div>
-        <div class="panel-body">
+      <div class="adm-card" style="border-left:4px solid #ef4444;">
+        <div class="adm-card-head" style="background:rgba(239,68,68,0.04);">
+          <h3 class="adm-card-title" style="color:#dc2626;">P0 必须完成（能演示）</h3>
+        </div>
+        <div class="adm-card-body">
           <ul style="padding-left:18px;margin:0;">
             <?php foreach ($p0 as $x): ?><li><?= Html::encode($x) ?></li><?php endforeach; ?>
           </ul>
@@ -130,9 +134,11 @@ $p2 = [
       </div>
     </div>
     <div class="col-md-4">
-      <div class="panel panel-warning" style="box-shadow:0 2px 10px rgba(0,0,0,.05);">
-        <div class="panel-heading"><span class="glyphicon glyphicon-star"></span> P1 加分项</div>
-        <div class="panel-body">
+      <div class="adm-card" style="border-left:4px solid #f59e0b;">
+        <div class="adm-card-head" style="background:rgba(245,158,11,0.04);">
+          <h3 class="adm-card-title" style="color:#d97706;">P1 加分项</h3>
+        </div>
+        <div class="adm-card-body">
           <ul style="padding-left:18px;margin:0;">
             <?php foreach ($p1 as $x): ?><li><?= Html::encode($x) ?></li><?php endforeach; ?>
           </ul>
@@ -140,9 +146,11 @@ $p2 = [
       </div>
     </div>
     <div class="col-md-4">
-      <div class="panel panel-info" style="box-shadow:0 2px 10px rgba(0,0,0,.05);">
-        <div class="panel-heading"><span class="glyphicon glyphicon-leaf"></span> P2 体验优化</div>
-        <div class="panel-body">
+      <div class="adm-card" style="border-left:4px solid #3b82f6;">
+        <div class="adm-card-head" style="background:rgba(59,130,246,0.04);">
+          <h3 class="adm-card-title" style="color:#2563eb;">P2 体验优化</h3>
+        </div>
+        <div class="adm-card-body">
           <ul style="padding-left:18px;margin:0;">
             <?php foreach ($p2 as $x): ?><li><?= Html::encode($x) ?></li><?php endforeach; ?>
           </ul>
@@ -151,8 +159,8 @@ $p2 = [
     </div>
   </div>
 
-  <div class="alert alert-info" style="margin-top:10px;">
-    <strong>用法建议：</strong>每次开会只更新两处：①里程碑状态 ②每个人的“本周交付/阻塞”。其余不改。
+  <div class="alert alert-info" style="margin-top:14px;border-radius:18px;">
+    <strong>用法建议：</strong>每次开会只更新两处：①里程碑状态 ②每个人的"本周交付/阻塞"。其余不改。
   </div>
 
 </div>

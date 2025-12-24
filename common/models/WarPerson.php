@@ -73,6 +73,7 @@ class WarPerson extends ActiveRecord
     public function getCoverImage()
     {
         return $this->hasOne(WarMedia::class, ['person_id' => 'id'])
-            ->where(['type' => 'image']);
+            ->where(['type' => 'image'])
+            ->orderBy(['uploaded_at' => SORT_ASC, 'id' => SORT_ASC]);
     }
 }
