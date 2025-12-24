@@ -64,7 +64,7 @@ $this->title = '抗战人物志';
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
     margin-bottom: 25px;
-    height: 100%;
+    height: 420px; /* 固定高度 */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -127,6 +127,44 @@ $this->title = '抗战人物志';
     text-align: right;
     margin-top: auto;
 }
+
+/* 分页样式红色主题 */
+.pagination > li > a,
+.pagination > li > span {
+    color: #a94442;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+.pagination > li > a:hover,
+.pagination > li > span:hover,
+.pagination > li > a:focus,
+.pagination > li > span:focus {
+    color: #8b0000;
+    background-color: #f2dede;
+    border-color: #ddd;
+}
+.pagination > .active > a,
+.pagination > .active > span,
+.pagination > .active > a:hover,
+.pagination > .active > span:hover,
+.pagination > .active > a:focus,
+.pagination > .active > span:focus {
+    z-index: 2;
+    color: #fff;
+    cursor: default;
+    background-color: #a94442;
+    border-color: #a94442;
+}
+.pagination > .disabled > span,
+.pagination > .disabled > span:hover,
+.pagination > .disabled > span:focus,
+.pagination > .disabled > a,
+.pagination > .disabled > a:hover,
+.pagination > .disabled > a:focus {
+    color: #ccc;
+    background-color: #fff;
+    border-color: #ddd;
+}
 </style>
 
 <div class="person-index container">
@@ -165,7 +203,7 @@ $this->title = '抗战人物志';
         <div class="col-md-9">
             <?= ListView::widget([
                 'dataProvider' => $dataProvider,
-                'layout' => "{items}\n<div class='text-center'>{pager}</div>",
+                'layout' => "{items}\n<div class='col-xs-12 text-center'>{pager}</div>",
                 'itemView' => function ($model) {
                     /** @var \common\models\WarPerson $model */
                     $imgUrl = $model->coverImage ? $model->coverImage->path : 'images/default-person.png'; // 假设有个默认图

@@ -9,6 +9,7 @@ namespace frontend\controllers;
 
 use common\models\WarPerson;
 use common\models\WarMessage;
+use common\models\WarVisitLog;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -47,6 +48,14 @@ class PersonController extends Controller
         if (!$model) {
             throw new NotFoundHttpException('未找到人物信息');
         }
+
+        // 记录访问日志
+        $visitLog = new WarVisitLog();
+        $visitLog->target_type = 'person';
+        $visitLog->target_id = $id;
+        $visitLog->user_id = Yii::$app->user->isGuest ? null : Yii::$app->user->id;
+        $visitLog->visited_at = time();
+        $visitLog->save();
 
         // 处理留言提交
         $newMessage = new WarMessage();
