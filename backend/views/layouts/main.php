@@ -96,18 +96,18 @@ $this->registerCssFile('@web/css/admin-common.css');
     <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-header" style="background: linear-gradient(135deg, #8B2500 0%, #6B4423 50%, #4A5568 100%); color: #fff; border-radius: 5px 5px 0 0;">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #fff; opacity: 0.8;">
+          <div class="modal-header help-modal-header">
+            <button type="button" class="close help-modal-close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
             <h4 class="modal-title" id="helpModalLabel">
               <span class="fa fa-question-circle"></span> 帮助中心
             </h4>
           </div>
-          <div class="modal-body" id="helpModalBody" style="padding: 0;">
-            <div style="text-align: center; padding: 40px;">
+          <div class="modal-body help-modal-body" id="helpModalBody">
+            <div class="help-modal-loading">
               <span class="fa fa-spinner fa-spin fa-2x"></span>
-              <p style="margin-top: 10px; color: #64748b;">加载中...</p>
+              <p>加载中...</p>
             </div>
           </div>
           <div class="modal-footer">
@@ -465,7 +465,7 @@ $this->registerCssFile('@web/css/admin-common.css');
       // Help Modal - 加载帮助内容
       $('#helpModal').on('show.bs.modal', function() {
         var $body = $('#helpModalBody');
-        $body.html('<div style="text-align: center; padding: 40px;"><span class="fa fa-spinner fa-spin fa-2x"></span><p style="margin-top: 10px; color: #64748b;">加载中...</p></div>');
+        $body.html('<div class="help-modal-loading"><span class="fa fa-spinner fa-spin fa-2x"></span><p>加载中...</p></div>');
         $.ajax({
           url: '<?= Url::to(['site/help']) ?>',
           type: 'GET',
@@ -473,7 +473,7 @@ $this->registerCssFile('@web/css/admin-common.css');
             $body.html(html);
           },
           error: function() {
-            $body.html('<div style="text-align: center; padding: 40px; color: #ef4444;"><span class="fa fa-exclamation-triangle fa-2x"></span><p style="margin-top: 10px;">加载失败，请稍后重试</p></div>');
+            $body.html('<div class="help-modal-error"><span class="fa fa-exclamation-triangle fa-2x"></span><p>加载失败，请稍后重试</p></div>');
           }
         });
       });
@@ -583,6 +583,47 @@ $this->registerCssFile('@web/css/admin-common.css');
   background: #F5F1E8 !important;
   min-height: calc(100vh - 160px);
   padding: 20px !important;
+}
+
+/* 帮助模态框样式 */
+.help-modal-header {
+  background: linear-gradient(135deg, #8B2500 0%, #6B4423 50%, #4A5568 100%);
+  color: #fff;
+  border-radius: 5px 5px 0 0;
+}
+
+.help-modal-close {
+  color: #fff;
+  opacity: 0.8;
+}
+
+.help-modal-close:hover {
+  color: #fff;
+  opacity: 1;
+}
+
+.help-modal-body {
+  padding: 0;
+}
+
+.help-modal-loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.help-modal-loading p {
+  margin-top: 10px;
+  color: #64748b;
+}
+
+.help-modal-error {
+  text-align: center;
+  padding: 40px;
+  color: #ef4444;
+}
+
+.help-modal-error p {
+  margin-top: 10px;
 }
 
 </style>

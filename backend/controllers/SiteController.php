@@ -161,9 +161,10 @@ class SiteController extends Controller
             ->count();
         $newContent7Days = $newEvents7Days + $newPersons7Days;
 
-        // 访问趋势数据（按天）
+        // 访问趋势数据（按天） - 趋势天数
+        $trendDays = 7;
         $visitTrend = [];
-        for ($i = 6; $i >= 0; $i--) {
+        for ($i = $trendDays - 1; $i >= 0; $i--) {
             $dayStart = strtotime("-{$i} days 00:00:00");
             $dayEnd = strtotime("-{$i} days 23:59:59");
             $count = WarVisitLog::find()
@@ -178,7 +179,7 @@ class SiteController extends Controller
 
         // 留言趋势数据（按天，分状态）
         $messageTrend = [];
-        for ($i = 6; $i >= 0; $i--) {
+        for ($i = $trendDays - 1; $i >= 0; $i--) {
             $dayStart = strtotime("-{$i} days 00:00:00");
             $dayEnd = strtotime("-{$i} days 23:59:59");
             $pending = WarMessage::find()
@@ -227,7 +228,7 @@ class SiteController extends Controller
             ->innerJoinWith('coverImage')
             ->count();
 
-        // 热榜TOP5
+        // 热榜TOP5 - 使用批量查询避免N+1问题
         $topEvents = WarVisitLog::find()
             ->select(['target_id', 'COUNT(*) as visit_count'])
             ->andWhere(['target_type' => 'event'])
@@ -238,14 +239,18 @@ class SiteController extends Controller
             ->all();
         
         $topEventDetails = [];
-        foreach ($topEvents as $item) {
-            $event = WarEvent::findOne($item['target_id']);
-            if ($event) {
-                $topEventDetails[] = [
-                    'id' => $event->id,
-                    'title' => $event->title,
-                    'visits' => (int)$item['visit_count'],
-                ];
+        if (!empty($topEvents)) {
+            $eventIds = array_column($topEvents, 'target_id');
+            $events = WarEvent::find()->andWhere(['id' => $eventIds])->indexBy('id')->all();
+            $visitCounts = array_column($topEvents, 'visit_count', 'target_id');
+            foreach ($eventIds as $eventId) {
+                if (isset($events[$eventId])) {
+                    $topEventDetails[] = [
+                        'id' => $events[$eventId]->id,
+                        'title' => $events[$eventId]->title,
+                        'visits' => (int)$visitCounts[$eventId],
+                    ];
+                }
             }
         }
 
@@ -259,14 +264,18 @@ class SiteController extends Controller
             ->all();
 
         $topPersonDetails = [];
-        foreach ($topPersons as $item) {
-            $person = WarPerson::findOne($item['target_id']);
-            if ($person) {
-                $topPersonDetails[] = [
-                    'id' => $person->id,
-                    'name' => $person->name,
-                    'visits' => (int)$item['visit_count'],
-                ];
+        if (!empty($topPersons)) {
+            $personIds = array_column($topPersons, 'target_id');
+            $persons = WarPerson::find()->andWhere(['id' => $personIds])->indexBy('id')->all();
+            $visitCounts = array_column($topPersons, 'visit_count', 'target_id');
+            foreach ($personIds as $personId) {
+                if (isset($persons[$personId])) {
+                    $topPersonDetails[] = [
+                        'id' => $persons[$personId]->id,
+                        'name' => $persons[$personId]->name,
+                        'visits' => (int)$visitCounts[$personId],
+                    ];
+                }
             }
         }
 

@@ -362,8 +362,20 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
             },
             error: function() {
                 console.error('加载仪表板数据失败');
+                // 显示用户可见的错误提示
+                showLoadError();
             }
         });
+    }
+
+    function showLoadError() {
+        // 在KPI卡片中显示错误状态
+        $('.kpi-value').text('-');
+        // 在图表区域显示错误消息
+        var errorMsg = '<div class="chart-error" style="text-align:center;padding:40px;color:#ef4444;">' +
+            '<span class="glyphicon glyphicon-exclamation-sign" style="font-size:24px;"></span>' +
+            '<p style="margin-top:10px;">数据加载失败，请点击刷新重试</p></div>';
+        $('.chart-container').html(errorMsg);
     }
 
     function updateQualityBar(key, percent) {
@@ -476,25 +488,20 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
             return;
         }
 
-        var html = '';
+        // 使用 jQuery DOM 构建方式来防止 XSS
+        container.empty();
         items.forEach(function(item, index) {
             var title = type === 'events' ? item.title : item.name;
             var url = type === 'events' 
-                ? '<?= Url::to(['war-event/view']) ?>?id=' + item.id
-                : '<?= Url::to(['war-person/view']) ?>?id=' + item.id;
-            html += '<div class="top-item">' +
-                '<span class="top-rank">' + (index + 1) + '</span>' +
-                '<a href="' + url + '" class="top-title">' + escapeHtml(title) + '</a>' +
-                '<span class="top-visits">' + item.visits + '访问</span>' +
-                '</div>';
+                ? '<?= Url::to(['war-event/view']) ?>?id=' + encodeURIComponent(item.id)
+                : '<?= Url::to(['war-person/view']) ?>?id=' + encodeURIComponent(item.id);
+            
+            var $item = $('<div class="top-item"></div>');
+            $item.append($('<span class="top-rank"></span>').text(index + 1));
+            $item.append($('<a class="top-title"></a>').attr('href', url).text(title));
+            $item.append($('<span class="top-visits"></span>').text(item.visits + '访问'));
+            container.append($item);
         });
-        container.html(html);
-    }
-
-    function escapeHtml(text) {
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Tab切换
