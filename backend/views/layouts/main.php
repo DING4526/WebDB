@@ -325,6 +325,13 @@ $this->registerCssFile('@web/css/admin-common.css');
       </header>
       <!-- End: Topbar -->
 
+      <style>
+        #topbar.alt{ 
+          min-height:50px !important; 
+          padding:8px 15px 8px 30px !important; 
+        }
+      </style>
+
       <!-- Begin: Content -->
       <section id="content" class="table-layout animated fadeIn">
         <?= $content ?>
