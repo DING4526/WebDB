@@ -4,6 +4,66 @@ body {
 }
 
 
+
+
+/* 动态折线容器 - 修复：确保不填充三角形 */
+.event-line-path {
+    fill: none !important; /* 强制禁止填充，防止出现三角形 */
+    stroke: #d9534f; /* 红色 */
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    opacity: 0.9;
+    /* 动画通过 JS 控制，这里不再需要 animation */
+}
+
+/* 移除旧的 animate-draw 类定义 */
+/* .animate-draw { ... } 删除 */
+/* @keyframes drawLine { ... } 删除 */
+
+/* 事件文字样式 - 修复：去除模糊阴影，使用清晰描边 */
+.event-label-text {
+    font-size: 17px; /* 稍微再大一点点 */
+    font-family: "Microsoft YaHei", "SimHei", sans-serif; /* 确保微软雅黑在前 */
+    
+    /* 1. 纯黑字体 */
+    fill: #000000 !important; 
+    
+    /* 2. 字体加粗 */
+    font-weight: 900; 
+    
+    /* 3. 白色描边（确保在深色地图上可见） */
+    stroke: #ffffff;       /* 白色描边 */
+    stroke-width: 3px;   /* 加粗描边，增强对比度 */
+    stroke-linejoin: round; /* 圆角连接，防刺眼 */
+    stroke-linecap: round;
+    
+    /* 4. 关键：描边在下，填充在上 */
+    paint-order: stroke fill; 
+    
+    /* 5. 移除模糊阴影 */
+    /* text-shadow: 删除 */
+    
+    cursor: pointer;
+    
+    /* 保持你的动画逻辑 */
+    opacity: 0; 
+    transition: opacity 0.4s ease-out, fill 0.2s ease;
+}
+
+/* 悬停效果 */
+.event-label-text:hover {
+    fill: #d9534f !important; /* 悬停红色 */
+    stroke: #ffffff; /* 保持白边 */
+    stroke-width: 3px;
+    text-decoration: underline;
+}
+
+/* 移除 fadeIn 动画 */
+/* @keyframes fadeIn { ... } 删除 */
+
+
 .wrap {
     min-height: 100%;
     height: auto;
