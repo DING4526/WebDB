@@ -10,6 +10,7 @@ namespace frontend\controllers;
 
 use common\models\WarStage;
 use yii\web\Controller;
+use Yii;
 
 class TimelineController extends Controller
 {
@@ -29,32 +30,80 @@ class TimelineController extends Controller
     public function actionView($id)
     {
         $model = \common\models\WarEvent::find()
-            ->where(['id' => $id])
-            ->with(['people.coverImage', 'medias']) // 预加载关联数据
+            ->where(['id' => $id, 'status' => 1])
+            ->with(['people.coverImage', 'medias'])
             ->one();
 
         if (!$model) throw new \yii\web\NotFoundHttpException("事件未找到");
 
-        // 分类媒体文件：图片放一组，文章/文档放一组
+        // 记录访问日志
+        $log = new \common\models\WarVisitLog();
+        $log->target_type = 'event';
+        $log->target_id = (int)$id;
+        $log->visited_at = time();
+        
+        $log->user_id = \Yii::$app->user->id; 
+        
+        $log->save(false); 
+
+        // 统计总访问量
+        $visitCount = \common\models\WarVisitLog::find()
+            ->where(['target_type' => 'event', 'target_id' => $id])
+            ->count();
+
+        // 留言区
+        $newMessage = new \common\models\WarMessage();
+        if ($newMessage->load(\Yii::$app->request->post())) {
+            $newMessage->target_type = 'event';
+            $newMessage->target_id = $id;
+            $newMessage->status = 0; // 默认待审核
+            $newMessage->created_at = time();
+            $newMessage->updated_at = time();
+            if ($newMessage->save()) {
+                \Yii::$app->session->setFlash('success', '感言提交成功，请等待管理员审核。');
+                return $this->refresh('#comments'); 
+            }
+        }
+
+        // 统计数据
+        $visitCount = \common\models\WarVisitLog::find()->where(['target_type' => 'event', 'target_id' => $id])->count();
+        
+        // 获取已审核的留言列表
+        $comments = \common\models\WarMessage::find()
+            ->where(['target_type' => 'event', 'target_id' => $id, 'status' => 1])
+            ->orderBy('id DESC')
+            ->all();
+
+        // 媒资分类
         $images = [];
         $articles = [];
         foreach ($model->medias as $media) {
             if ($media->type === 'image') {
                 $images[] = $media;
-            } elseif ($media->type === 'article' || $media->type === 'link') {
+            } elseif (in_array($media->type, ['article', 'link', 'document'])) {
                 $articles[] = $media;
             }
         }
 
-        $messages = \common\models\WarMessage::find()
-            ->where(['target_type' => 'event', 'target_id' => $id, 'status' => 1])
-            ->all();
-
         return $this->render('view', [
             'model' => $model,
-            'images' => $images,     // 传给轮播图
-            'articles' => $articles, // 传给相关文章栏目
-            'messages' => $messages,
+            'images' => $images,
+            'articles' => $articles,
+            'comments' => $comments,      
+            'newMessage' => $newMessage,  
+            'visitCount' => $visitCount,
         ]);
+    }
+
+    protected function findApprovedMessages($event_id)
+    {
+        return \common\models\WarMessage::find()
+            ->where([
+                'target_type' => 'event', 
+                'target_id' => $event_id, 
+                'status' => 1
+            ])
+            ->orderBy('id DESC')
+            ->all();
     }
 }

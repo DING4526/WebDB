@@ -2,6 +2,7 @@
 
 /**
  * Ding 2310724
+ * liyu 2311591
  * 抗战媒资模型
  */
 
@@ -21,7 +22,7 @@ class WarMedia extends ActiveRecord
         return [
             [['type', 'path'], 'required'],
             [['event_id', 'person_id', 'uploaded_at'], 'integer'],
-            [['type'], 'string', 'max' => 20],
+            ['type', 'in', 'range' => ['image', 'document', 'article']], 
             [['path'], 'string', 'max' => 255],
             [['title'], 'string', 'max' => 200],
         ];

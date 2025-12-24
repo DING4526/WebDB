@@ -20,14 +20,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="event-detail-container" style="background: #fff; padding: 20px; border-radius: 8px;">
     <!-- 头部区域 -->
-    <div class="page-header">
-        <h1 style="color: #8b0000; font-weight: bold;">
+    <div class="page-header" style="margin: 10px 0 20px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+        <!-- 主标题-->
+        <h2 style="color: #8b0000; font-weight: bold; font-size: 24px; margin: 0;">
             <?= Html::encode($model->title) ?>
-            <small style="display: block; margin-top: 10px;">
-                <i class="glyphicon glyphicon-calendar"></i> <?= Html::encode($model->event_date) ?> 
-                | <i class="glyphicon glyphicon-map-marker"></i> <?= Html::encode($model->location ?: '地点不详') ?>
-            </small>
-        </h1>
+        </h2>
+        
+        <!-- 副标题 -->
+        <div style="margin-top: 8px; font-size: 13px; color: #666;">
+            <!-- 日期 -->
+            <span style="margin-right: 15px;">
+                <i class="glyphicon glyphicon-calendar" style="color: #999;"></i> 
+                <?= Html::encode($model->event_date) ?>
+            </span>
+            
+            <!-- 地点 -->
+            <span style="margin-right: 15px;">
+                <i class="glyphicon glyphicon-map-marker" style="color: #999;"></i> 
+                <?= Html::encode($model->location ?: '地点不详') ?>
+            </span>
+            
+            <!-- 访问量 -->
+            <span>
+                <i class="glyphicon glyphicon-eye-open" style="color: #999;"></i> 
+                访问量：<?= number_format($visitCount) ?> 次
+            </span>
+        </div>
     </div>
 
     <div class="row">
@@ -36,11 +54,12 @@ $this->params['breadcrumbs'][] = $this->title;
             
             <!-- 1. 多图轮播 -->
             <?php if (!empty($images)): ?>
-                <div id="event-carousel" class="carousel slide" data-ride="carousel" style="margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden;">
+                <div id="event-carousel" class="carousel slide" data-ride="carousel" style="margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; position: relative;">
+                    
                     <!-- 指示器 -->
-                    <ol class="carousel-indicators">
+                    <ol class="carousel-indicators" style="bottom: 5px; z-index: 20;">
                         <?php foreach ($images as $index => $img): ?>
-                            <li data-target="#event-carousel" data-slide-to="<?= $index ?>" class="<?= $index === 0 ? 'active' : '' ?>"></li>
+                            <li data-target="#event-carousel" data-slide-to="<?= $index ?>" class="<?= $index === 0 ? 'active' : '' ?>" style="border-color: #8b0000;"></li>
                         <?php endforeach; ?>
                     </ol>
 
@@ -50,8 +69,21 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="item <?= $index === 0 ? 'active' : '' ?>">
                                 <img src="<?= Url::to('@web/' . $img->path) ?>" alt="<?= Html::encode($img->title) ?>" style="width:100%; height:400px; object-fit:cover;">
                                 <?php if ($img->title): ?>
-                                    <div class="carousel-caption" style="background: rgba(0,0,0,0.5); border-radius: 10px; padding: 5px 15px;">
-                                        <h4><?= Html::encode($img->title) ?></h4>
+                                    <div class="carousel-caption" style="bottom: 35px; background: none; padding: 0; left: 0; right: 0; text-align: center;">
+                                        <h4 style="
+                                            display: inline-block; 
+                                            background: rgba(0,0,0,0.6); 
+                                            color: #fff; 
+                                            padding: 4px 12px; 
+                                            border-radius: 4px; 
+                                            font-size: 13px; /* 调小字体 */
+                                            margin: 0; 
+                                            font-weight: normal; 
+                                            letter-spacing: 0.5px;
+                                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                                        ">
+                                            <?= Html::encode($img->title) ?>
+                                        </h4>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -59,56 +91,93 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
 
                     <!-- 左右控制按钮 -->
-                    <a class="left carousel-control" href="#event-carousel" role="button" data-slide="prev">
-                        <span class="glyphicon glyphicon-chevron-left"></span>
+                    <a class="left carousel-control" href="#event-carousel" role="button" data-slide="prev" style="background-image: none; width: 8%;">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true" style="color: #fff; text-shadow: 0 0 8px rgba(0,0,0,0.6); position: absolute; top: 50%; transform: translateY(-50%); font-size: 24px;"></span>
                     </a>
-                    <a class="right carousel-control" href="#event-carousel" role="button" data-slide="next">
-                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    <a class="right carousel-control" href="#event-carousel" role="button" data-slide="next" style="background-image: none; width: 8%;">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true" style="color: #fff; text-shadow: 0 0 8px rgba(0,0,0,0.6); position: absolute; top: 50%; transform: translateY(-50%); font-size: 24px;"></span>
                     </a>
                 </div>
             <?php endif; ?>
 
-            <!-- 2. 正文内容 -->
+            <!-- 正文 -->
             <div class="article-body" style="font-size: 1.1em; line-height: 2; color: #333; text-align: justify; margin-bottom: 40px;">
                 <?= nl2br(Html::encode($model->content)) ?>
             </div>
 
-            <!-- 3. 留言展示区域 (放在 col-md-8 内部) -->
-            <div id="comments" style="margin-top: 60px; border-top: 1px dashed #eee; padding-top: 30px;">
-                <h3 style="border-left: 5px solid #8b0000; padding-left: 15px; margin-bottom: 25px; font-weight: bold;">
-                    社会各界感言
+            <!-- 缅怀感言区 -->
+            <div class="content-card" id="comments">
+                <h3 class="section-title">
+                    缅怀与致敬 
+                    <small class="pull-right" style="font-size: 14px; font-weight: normal; color: #999; margin-top: 5px;">
+                        已有 <?= count($comments) ?> 位同胞发表致敬感言
+                    </small>
                 </h3>
                 
-                <?php if (empty($messages)): ?>
-                    <p class="text-muted well">暂无留言，欢迎发表你的缅怀之情。</p>
-                <?php else: ?>
-                    <?php foreach ($messages as $msg): ?>
-                        <div class="media well" style="background: #fdfdfd; border: 1px solid #eee;">
-                            <div class="media-body">
-                                <h4 class="media-heading">
-                                    <strong style="color: #8b0000;"><?= Html::encode($msg->nickname) ?></strong>
-                                    <small class="pull-right text-muted">
-                                        <i class="glyphicon glyphicon-time"></i> <?= date('Y-m-d H:i', $msg->created_at) ?>
-                                    </small>
-                                </h4>
-                                <div style="margin-top: 10px; color: #555;">
-                                    <?= Html::encode($msg->content) ?>
+                <!-- 感言列表 -->
+                <div class="comments-list" style="margin-bottom: 30px; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                    <?php if (empty($comments)): ?>
+                        <div class="alert alert-info" style="background: #fcfcfc; color: #666; border-color: #eee;">
+                            <i class="glyphicon glyphicon-info-sign"></i> 暂无致敬感言。铭记历史，从你我开始。
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($comments as $comment): ?>
+                            <div class="comment-item" style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                                <!-- 头部：署名居左，时间居右 -->
+                                <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px;">
+                                    <span class="comment-user" style="font-weight: bold; color: #8b0000;">
+                                        <i class="glyphicon glyphicon-user"></i> <?= Html::encode($comment->nickname) ?>
+                                    </span>
+                                    <span class="comment-time" style="color: #999;">
+                                        <?= Yii::$app->formatter->asDatetime($comment->created_at) ?>
+                                    </span>
+                                </div>
+                                <!-- 内容：另起一行 -->
+                                <div class="comment-content" style="color: #333; line-height: 1.6; font-size: 14px; text-align: justify;">
+                                    <?= nl2br(Html::encode($comment->content)) ?>
                                 </div>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
 
-                <!-- 留言按钮 -->
-                <div class="text-center" style="margin: 40px 0;">
-                    <?= Html::a('<i class="glyphicon glyphicon-edit"></i> 我要发表缅怀留言', [
-                        'message/create', 
-                        'target_type' => 'event', 
-                        'target_id' => $model->id
-                    ], [
-                        'class' => 'btn btn-lg btn-danger',
-                        'style' => 'padding: 12px 50px; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 10px rgba(217, 83, 79, 0.3);'
-                    ]) ?>
+                <!-- 提交致敬表单 -->
+                <div class="comment-form" style="background: #fdfdfd; padding: 20px; border-radius: 8px; border: 1px solid #f0f0f0;">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; color: #333; font-weight: bold; font-size: 16px;">
+                        <i class="glyphicon glyphicon-edit"></i> 寄托哀思
+                    </h4>
+                    
+                    <?php $form = \yii\widgets\ActiveForm::begin([
+                        'action' => ['view', 'id' => $model->id, '#' => 'comments'],
+                    ]); ?>
+                    
+                    <div class="row">
+                        <div class="col-md-5">
+                            <?= $form->field($newMessage, 'nickname')->textInput([
+                                'maxlength' => true, 
+                                'placeholder' => '您的署名',
+                                'style' => 'border-radius: 4px; border: 1px solid #ddd; box-shadow: none;'
+                            ])->label(false) ?>
+                        </div>
+                    </div>
+                    
+                    <?= $form->field($newMessage, 'content')->textarea([
+                        'rows' => 3, 
+                        'placeholder' => '铭记这段历史，缅怀英勇先烈。请写下您的致敬感言或思考...',
+                        'style' => 'border-radius: 4px; border: 1px solid #ddd; resize: vertical; box-shadow: none;'
+                    ])->label(false) ?>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <?= Html::submitButton('<i class="glyphicon glyphicon-send"></i> 提交致敬感言', [
+                            'class' => 'btn btn-danger',
+                            'style' => 'padding: 8px 35px; border-radius: 20px; font-weight: bold; background-color: #8b0000; border: none;'
+                        ]) ?>
+                        <span class="text-muted small" style="margin-left: 15px;">
+                            * 您的感言将在审核后公开展示，以示敬意。
+                        </span>
+                    </div>
+                    
+                    <?php \yii\widgets\ActiveForm::end(); ?>
                 </div>
             </div>
         </div> 
@@ -151,26 +220,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
             
-            <!-- 2. 相关文章 -->
-            <div class="panel panel-default" style="border-top: 3px solid #333;">
-                <div class="panel-heading" style="background-color: #fff;">
-                    <h3 class="panel-title" style="font-weight: bold;">
-                        <i class="glyphicon glyphicon-book"></i> 相关研究文章
-                    </h3>
-                </div>
-                <div class="list-group">
-                    <?php if (empty($articles)): ?>
-                        <div class="list-group-item text-muted">暂无相关文献</div>
-                    <?php else: ?>
-                        <?php foreach ($articles as $article): ?>
-                            <a href="<?= Url::to($article->path) ?>" class="list-group-item" target="_blank">
-                                <i class="glyphicon glyphicon-file" style="color: #777;"></i> <?= Html::encode($article->title) ?>
-                                <span class="pull-right glyphicon glyphicon-new-window" style="font-size: 10px; color: #ccc;"></span>
-                            </a>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
-            </div>
+            <!-- 相关文章栏目 -->
+            <?php foreach ($articles as $article): ?>
+                <?php 
+                    // 如果是外部链接直接用，如果是本地路径则处理
+                    $filePath = $article->path;
+                    if (!preg_match('/^http/', $filePath)) {
+                        $frontendPath = Yii::getAlias('@frontend/web/' . $filePath);
+                        if (!file_exists($frontendPath)) {
+                            // 指向后台的 web 目录
+                            $filePath = '/advanced/backend/web/' . $filePath;
+                        } else {
+                            $filePath = Url::to('@web/' . $filePath);
+                        }
+                    }
+                ?>
+                <a href="<?= $filePath ?>" class="list-group-item" target="_blank">
+                    <i class="glyphicon glyphicon-file"></i> <?= Html::encode($article->title) ?>
+                </a>
+            <?php endforeach; ?>
 
             <!-- 3. 温馨提示 -->
             <div class="alert alert-warning small" style="border-radius: 0;">
@@ -180,3 +248,36 @@ $this->params['breadcrumbs'][] = $this->title;
         </div> 
     </div> 
 </div>
+
+<style>
+.carousel-indicators li {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid #8b0000;
+    width: 12px;
+    height: 12px;
+    margin: 0 5px;
+}
+.carousel-indicators .active {
+    background-color: #8b0000;
+    width: 14px;
+    height: 14px;
+    margin: 0 5px;
+}
+
+.carousel-control.left, .carousel-control.right {
+    background-image: none !important;
+    filter: none !important;
+}
+
+.carousel-control:hover span {
+    color: #8b0000 !important;
+    scale: 1.2;
+    transition: all 0.2s;
+}
+
+
+.carousel-caption h4 {
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+</style>
