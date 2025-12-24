@@ -15,6 +15,7 @@ use yii\widgets\Pjax;
 
 $this->title = '抗战人物管理';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/admin-common.css');
 $this->registerCssFile('@web/css/war-person.css');
 
 $totalCount = (int)$dataProvider->getTotalCount();
@@ -85,7 +86,7 @@ $totalCount = (int)$dataProvider->getTotalCount();
                   'template' => '{view} {update} {toggle-status} {delete}',
                   'buttons' => [
                       'view' => function ($url, $model) {
-                          return Html::a('查看', ['view', 'id' => $model->id], ['class' => 'btn btn-xs btn-ghost']);
+                          return Html::a('查看', ['view', 'id' => $model->id], ['class' => 'btn btn-xs btn-soft-ghost']);
                       },
                       'update' => function ($url, $model) {
                           return Html::a('编辑', ['update', 'id' => $model->id], ['class' => 'btn btn-xs btn-soft-primary']);

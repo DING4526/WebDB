@@ -30,6 +30,7 @@ $cur = Yii::$app->controller->id . '/' . Yii::$app->controller->action->id;
 $activeCtl = function($controllerId) {
   return Yii::$app->controller->id === $controllerId ? 'active' : '';
 };
+$this->registerCssFile('@web/css/admin-common.css');
 ?>
 
 <?php $this->beginPage() ?>
@@ -54,144 +55,6 @@ $activeCtl = function($controllerId) {
 </head>
 <body>
 <?php $this->beginBody() ?>
-
-
-  <!-- Start: Theme Preview Pane -->
-  <!-- <div id="skin-toolbox">
-    <div class="panel">
-      <div class="panel-heading">
-        <span class="panel-icon">
-          <i class="fa fa-gear text-primary"></i>
-        </span>
-        <span class="panel-title"> Theme Options</span>
-      </div>
-      <div class="panel-body pn">
-        <ul class="nav nav-list nav-list-sm pl15 pt10" role="tablist">
-          <li class="active">
-            <a href="#toolbox-header" role="tab" data-toggle="tab">Navbar</a>
-          </li>
-          <li>
-            <a href="#toolbox-sidebar" role="tab" data-toggle="tab">Sidebar</a>
-          </li>
-          <li>
-            <a href="#toolbox-settings" role="tab" data-toggle="tab">Misc</a>
-          </li>
-        </ul>
-        <div class="tab-content p20 ptn pb15">
-          <div role="tabpanel" class="tab-pane active" id="toolbox-header">
-            <form id="toolbox-header-skin">
-              <h4 class="mv20">Header Skins</h4>
-              <div class="skin-toolbox-swatches">
-                <div class="checkbox-custom checkbox-disabled fill mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin8" checked value="">
-                  <label for="headerSkin8">Light</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-primary mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin1" value="bg-primary">
-                  <label for="headerSkin1">Primary</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-info mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin3" value="bg-info">
-                  <label for="headerSkin3">Info</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-warning mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin4" value="bg-warning">
-                  <label for="headerSkin4">Warning</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-danger mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin5" value="bg-danger">
-                  <label for="headerSkin5">Danger</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-alert mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin6" value="bg-alert">
-                  <label for="headerSkin6">Alert</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-system mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin7" value="bg-system">
-                  <label for="headerSkin7">System</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-success mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin2" value="bg-success">
-                  <label for="headerSkin2">Success</label>
-                </div>
-                <div class="checkbox-custom fill mb5">
-                  <input type="radio" name="headerSkin" id="headerSkin9" value="bg-dark">
-                  <label for="headerSkin9">Dark</label>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div role="tabpanel" class="tab-pane" id="toolbox-sidebar">
-            <form id="toolbox-sidebar-skin">
-              <h4 class="mv20">Sidebar Skins</h4>
-              <div class="skin-toolbox-swatches">
-                <div class="checkbox-custom fill mb5">
-                  <input type="radio" name="sidebarSkin" checked id="sidebarSkin3" value="">
-                  <label for="sidebarSkin3">Dark</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-disabled mb5">
-                  <input type="radio" name="sidebarSkin" id="sidebarSkin1" value="sidebar-light">
-                  <label for="sidebarSkin1">Light</label>
-                </div>
-                <div class="checkbox-custom fill checkbox-light mb5">
-                  <input type="radio" name="sidebarSkin" id="sidebarSkin2" value="sidebar-light light">
-                  <label for="sidebarSkin2">Lighter</label>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div role="tabpanel" class="tab-pane" id="toolbox-settings">
-            <form id="toolbox-settings-misc">
-              <h4 class="mv20 mtn">Layout Options</h4>
-              <div class="form-group">
-                <div class="checkbox-custom fill mb5">
-                  <input type="checkbox" checked="" id="header-option">
-                  <label for="header-option">Fixed Header</label>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="checkbox-custom fill mb5">
-                  <input type="checkbox" checked="" id="sidebar-option">
-                  <label for="sidebar-option">Fixed Sidebar</label>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="checkbox-custom fill mb5">
-                  <input type="checkbox" id="breadcrumb-option">
-                  <label for="breadcrumb-option">Fixed Breadcrumbs</label>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="checkbox-custom fill mb5">
-                  <input type="checkbox" id="breadcrumb-hidden">
-                  <label for="breadcrumb-hidden">Hide Breadcrumbs</label>
-                </div>
-              </div>
-              <h4 class="mv20">Layout Options</h4>
-              <div class="form-group">
-                <div class="radio-custom mb5">
-                  <input type="radio" id="fullwidth-option" checked name="layout-option">
-                  <label for="fullwidth-option">Fullwidth Layout</label>
-                </div>
-              </div>
-              <div class="form-group mb20">
-                <div class="radio-custom radio-disabled mb5">
-                  <input type="radio" id="boxed-option" name="layout-option" disabled>
-                  <label for="boxed-option">Boxed Layout
-                    <b class="text-muted">(Coming Soon)</b>
-                  </label>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div class="form-group mn br-t p15">
-          <a href="#" id="clearLocalStorage" class="btn btn-primary btn-block pb10 pt10">Clear LocalStorage</a>
-        </div>
-      </div>
-    </div>
-  </div> -->
-  <!-- End: Theme Preview Pane -->
 
   <!-- Start: Main -->
   <div id="main">
@@ -219,43 +82,6 @@ $activeCtl = function($controllerId) {
               <span class="fa fa-power-off pr5"></span> 登出 </a>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="menu-divider hidden-xs">
-          <i class="fa fa-circle"></i>
-        </li>
-        <li class="dropdown menu-merge">
-          <a href="#" class="dropdown-toggle fw600 p15" data-toggle="dropdown">
-          	<img src="../statics/assets/img/avatars/1.jpg" alt="avatar" class="mw30 br64">
-          	<span class="hidden-xs pl15"> 
-                <?= Yii::$app->user->isGuest ? '游客' : (Yii::$app->user->getUser()->username ?? '') ?>
-            </span>
-            <span class="caret caret-tp hidden-xs"></span>
-          </a>
-          
-          <ul class="dropdown-menu list-group dropdown-persist w250" role="menu">
-
-            <li class="dropdown-header clearfix">
-              <div class="pull-left ml10">
-                <div class="text-muted">当前身份</div>
-                <div><strong>
-                  <?php if (Yii::$app->user->isGuest): ?>
-                    游客 (guest)
-                  <?php else: ?>
-                    <?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
-                  <?php endif; ?>
-                </strong></div>
-              </div>
-
-              <!-- <div class="pull-right mr10 text-right">
-                <div class="text-muted">可访问范围</div>
-                <div class="label label-primary">作业/任务</div>
-              </div> -->
-            </li>
-   
-          </ul>
-        </li>
-      
-      </ul>
       
       
     </header>
@@ -277,9 +103,6 @@ $activeCtl = function($controllerId) {
                 <img src="../statics/assets/img/avatars/3.jpg" class="img-responsive">
               </a>
               <div class="media-body">
-                <div class="media-links">
-                   <a href="#" class="sidebar-menu-toggle">用户菜单-</a> <a href="<?php echo Url::to(['site/logout']) ?>" data-method="post">登出 </a>
-                </div>
                 <div class="media-author">
                     <?= Yii::$app->user->isGuest ? '游客' : (Yii::$app->user->getUser()->username ?? '') ?>
                 </div>
@@ -357,7 +180,6 @@ $activeCtl = function($controllerId) {
               <a href="<?= Url::to(['taskboard/index']) ?>">
                 <span class="glyphicon glyphicon-check"></span>
                 <span class="sidebar-title">任务分工板</span>
-                <span class="label label-sm label-success ml10">NEW</span>
               </a>
             </li>
           <?php endif; ?>
@@ -376,7 +198,6 @@ $activeCtl = function($controllerId) {
               <a href="<?= Url::to(['team-member-apply/index']) ?>">
                 <span class="glyphicon glyphicon-check"></span>
                 <span class="sidebar-title">成员申请审批</span>
-                <span class="label label-sm label-primary ml10">root</span>
               </a>
             </li>
           <?php endif; ?>
@@ -409,56 +230,27 @@ $activeCtl = function($controllerId) {
             </a>
           </li>
 
-          <!-- 2) 项目数据管理：点击展开 -->
+          <!-- 2) 项目数据管理：扁平化菜单 -->
           <?php if ($isRoot || $isMember): ?>
-          <li class="<?= $isWarManageActive ? 'active' : '' ?>">
-            <a class="accordion-toggle <?= $isWarManageActive ? '' : 'collapsed' ?>"
-              data-toggle="collapse"
-              href="#menu-war-manage"
-              aria-expanded="<?= $isWarManageActive ? 'true' : 'false' ?>">
-              <span class="glyphicon glyphicon-folder-open"></span>
-              <span class="sidebar-title">项目数据管理</span>
-              <span class="caret"></span>
+          <li class="<?= $activeCtl('war-event') ?>">
+            <a href="<?= Url::to(['war-event/index']) ?>">
+              <span class="glyphicon glyphicon-time"></span>
+              <span class="sidebar-title">抗战事件管理</span>
             </a>
-
-            <ul id="menu-war-manage" class="nav sub-nav collapse <?= $isWarManageActive ? 'in' : '' ?>">
-              <!-- 核心 CRUD -->
-              <li class="<?= $activeCtl('war-event') ?>">
-                <a href="<?= Url::to(['war-event/index']) ?>">
-                  <span class="glyphicon glyphicon-time"></span>
-                  抗战事件
-                </a>
-              </li>
-              <li class="<?= $activeCtl('war-person') ?>">
-                <a href="<?= Url::to(['war-person/index']) ?>">
-                  <span class="glyphicon glyphicon-education"></span>
-                  抗战人物
-                </a>
-              </li>
-              <li class="<?= $activeCtl('war-message') ?>">
-                <a href="<?= Url::to(['war-message/index']) ?>">
-                  <span class="glyphicon glyphicon-comment"></span>
-                  留言审核
-                </a>
-              </li>
-            </ul>
+          </li>
+          <li class="<?= $activeCtl('war-person') ?>">
+            <a href="<?= Url::to(['war-person/index']) ?>">
+              <span class="glyphicon glyphicon-education"></span>
+              <span class="sidebar-title">抗战人物管理</span>
+            </a>
+          </li>
+          <li class="<?= $activeCtl('war-message') ?>">
+            <a href="<?= Url::to(['war-message/index']) ?>">
+              <span class="glyphicon glyphicon-comment"></span>
+              <span class="sidebar-title">留言审核</span>
+            </a>
           </li>
           <?php endif; ?>
-
-          <!-- 状态（可留可删） -->
-          <li class="sidebar-label pt25 pb10">治理进度</li>
-          <li class="sidebar-stat">
-            <a href="#" class="fs11">
-              <span class="fa fa-inbox text-info"></span>
-              <span class="sidebar-title text-muted">后台信息梳理</span>
-              <span class="pull-right mr20 text-muted">70%</span>
-              <div class="progress progress-bar-xs mh20 mb10">
-                <div class="progress-bar progress-bar-info" role="progressbar" style="width: 70%">
-                  <span class="sr-only">70% Complete</span>
-                </div>
-              </div>
-            </a>
-          </li>
 
         </ul>
         <!-- End: Sidebar Menu -->
@@ -530,24 +322,6 @@ $activeCtl = function($controllerId) {
             'links' => $this->params['breadcrumbs'] ?? [],
           ]) ?>
         </div>
-        <div class="topbar-right">
-          <!-- <div class="ib topbar-dropdown">
-            <label for="topbar-multiple" class="control-label pr10 fs11 text-muted">Reporting Period</label>
-            <select id="topbar-multiple" class="hidden">
-              <optgroup label="Filter By:">
-                <option value="1-1">Last 30 Days</option>
-                <option value="1-2" selected="selected">Last 60 Days</option>
-                <option value="1-3">Last Year</option>
-              </optgroup>
-            </select>
-          </div> -->
-          <div class="ml15 ib va-m" id="toggle_sidemenu_r">
-            <a href="#" class="pl5">
-              <i class="fa fa-sign-in fs22 text-primary"></i>
-              <span class="badge badge-hero badge-danger"></span>
-            </a>
-          </div>
-        </div>
       </header>
       <!-- End: Topbar -->
 
@@ -559,197 +333,205 @@ $activeCtl = function($controllerId) {
       <!-- End: Content -->
 
     </section>
-
-    <!-- Start: Right Sidebar -->
-    <aside id="sidebar_right" class="nano affix">
-
-      <!-- Start: Sidebar Right Content -->
-      <div class="sidebar-right-content nano-content">
-
-        <div class="tab-block sidebar-block br-n">
-          <ul class="nav nav-tabs tabs-border nav-justified hidden">
-            <li class="active">
-              <a href="#sidebar-right-tab1" data-toggle="tab">Tab 1</a>
-            </li>
-            <li>
-              <a href="#sidebar-right-tab2" data-toggle="tab">Tab 2</a>
-            </li>
-            <li>
-              <a href="#sidebar-right-tab3" data-toggle="tab">Tab 3</a>
-            </li>
-          </ul>
-          <div class="tab-content br-n">
-            <div id="sidebar-right-tab1" class="tab-pane active">
-
-              <h5 class="title-divider text-muted mb20"> Server Statistics
-                <span class="pull-right"> 2013
-                  <i class="fa fa-caret-down ml5"></i>
-                </span>
-              </h5>
-              <div class="progress mh5">
-                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 44%">
-                  <span class="fs11">DB Request</span>
-                </div>
-              </div>
-
-
-              <h5 class="title-divider text-muted mt30 mb10">Traffic Margins</h5>
-              <div class="row">
-                <div class="col-xs-5">
-                  <h3 class="text-primary mn pl5">132</h3>
-                </div>
-                <div class="col-xs-7 text-right">
-                  <h3 class="text-success-dark mn">
-                    <i class="fa fa-caret-up"></i> 13.2% </h3>
-                </div>
-              </div>
-
-            </div>
-            <div id="sidebar-right-tab2" class="tab-pane"></div>
-            <div id="sidebar-right-tab3" class="tab-pane"></div>
-          </div>
-          <!-- end: .tab-content -->
-        </div>
-      </div>
-    </aside>
-    <!-- End: Right Sidebar -->
+    <!-- End: Content-Wrapper -->
 
   </div>
   <!-- End: Main -->
 
-  <!-- Admin Dock Quick Compose Message -->
- <!--  <div class="quick-compose-form">
-    <form id="">
-      <input type="email" class="form-control" id="inputEmail" placeholder="Email">
-      <input type="text" class="form-control" id="inputSubject" placeholder="Subject">
-      <div class="summernote-quick">Compose your message here...</div>
-    </form>
-  </div>
- -->
+  <!-- BEGIN: PAGE SCRIPTS -->
+  <script type="text/javascript">
+    <?php $this->beginBlock('js_end') ?>
+    jQuery(document).ready(function() {
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+      "use strict";
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
-</footer>
+      // Init Theme Core
+      Core.init();
 
- 
- <script type="text/javascript">
- <?php $this->beginBlock('js_end') ?>
-  jQuery(document).ready(function() {
+      // Init Demo JS
+      Demo.init();
 
-    "use strict";
+      var msgListing = $('#message-table > tbody > tr > td');
+      var msgCheckbox = $('#message-table > tbody > tr input[type=checkbox]');
 
-    // Init Theme Core
-    Core.init();
-
-    // Init Demo JS
-    Demo.init();
-
-    var msgListing = $('#message-table > tbody > tr > td');
-    var msgCheckbox = $('#message-table > tbody > tr input[type=checkbox]');
-
-    // on message table checkbox click, toggle highlighted class
-    msgCheckbox.on('click', function() {
-      $(this).parents('tr').toggleClass('highlight');
-    });
-
-    // on message table row click, redirect page. Unless target was a checkbox
-    msgListing.not(":first-child").on('click', function(e) {
-
-      // stop event bubble if clicked item is not a checkbox
-      e.stopPropagation();
-      e.preventDefault();
-
-      // Redirect to message compose page if clicked item is not a checkbox
-      window.location = "pages_compose.html";
-    });
-
-    // On button click display quick compose message form
-    $('#quick-compose').on('click', function() {
-
-      // Admin Dock Plugin
-      $('.quick-compose-form').dockmodal({
-        minimizedWidth: 260,
-        width: 470,
-        height: 480,
-        title: 'Compose Message',
-        initialState: "docked",
-        buttons: [{
-          html: "Send",
-          buttonClass: "btn btn-primary btn-sm",
-          click: function(e, dialog) {
-            // do something when the button is clicked
-            dialog.dockmodal("close");
-
-            // after dialog closes fire a success notification
-            setTimeout(function() {
-              msgCallback();
-            }, 500);
-          }
-        }]
+      // on message table checkbox click, toggle highlighted class
+      msgCheckbox.on('click', function() {
+        $(this).parents('tr').toggleClass('highlight');
       });
+
+      // on message table row click, redirect page. Unless target was a checkbox
+      msgListing.not(":first-child").on('click', function(e) {
+
+        // stop event bubble if clicked item is not a checkbox
+        e.stopPropagation();
+        e.preventDefault();
+
+        // Redirect to message compose page if clicked item is not a checkbox
+        window.location = "pages_compose.html";
+      });
+
+      // On button click display quick compose message form
+      $('#quick-compose').on('click', function() {
+
+        // Admin Dock Plugin
+        $('.quick-compose-form').dockmodal({
+          minimizedWidth: 260,
+          width: 470,
+          height: 480,
+          title: 'Compose Message',
+          initialState: "docked",
+          buttons: [{
+            html: "Send",
+            buttonClass: "btn btn-primary btn-sm",
+            click: function(e, dialog) {
+              // do something when the button is clicked
+              dialog.dockmodal("close");
+
+              // after dialog closes fire a success notification
+              setTimeout(function() {
+                msgCallback();
+              }, 500);
+            }
+          }]
+        });
+      });
+
+      // example email compose success notification
+      function msgCallback() {
+        (new PNotify({
+          title: 'Message Success!',
+          text: 'Your message has been <b>Sent.</b>',
+          hide: false,
+          type: 'success',
+          addclass: "mt50",
+          buttons: {
+            closer: false,
+            sticker: false
+          },
+          history: {
+            history: false
+          }
+        }));
+      };
+
+      // Init Summernote
+      $('.summernote-quick').summernote({
+        height: 275, //set editable area's height
+        focus: false, //set focus editable area after Initialize summernote
+        toolbar: [
+          ['style', ['bold', 'italic', 'underline', ]],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['height', ['height']],
+        ]
+      });
+
     });
-
-    // example email compose success notification
-    function msgCallback() {
-      (new PNotify({
-        title: 'Message Success!',
-        text: 'Your message has been <b>Sent.</b>',
-        hide: false,
-        type: 'success',
-        addclass: "mt50",
-        buttons: {
-          closer: false,
-          sticker: false
-        },
-        history: {
-          history: false
-        }
-      }));
-    };
-
-    // Init Summernote
-    $('.summernote-quick').summernote({
-      height: 275, //set editable area's height
-      focus: false, //set focus editable area after Initialize summernote
-      toolbar: [
-        ['style', ['bold', 'italic', 'underline', ]],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['height', ['height']],
-      ]
-    });
-
-  });
-  <?php $this->endBlock() ?>
+    <?php $this->endBlock() ?>
   </script>
   <?php $this->registerJs($this->blocks['js_end'], yii\web\View::POS_LOAD) ?>
-  
   <!-- END: PAGE SCRIPTS -->
+
 <?php $this->endBody() ?>
 </body>
 
 <style>
-/* 侧边栏选中项：背景色 + 左侧高亮条 */
+/* ===== 侧边栏现代化样式增强 ===== */
+
+/* 侧边栏选中项：渐变背景 + 左侧高亮条 */
 #sidebar_left .sidebar-menu > li.active > a {
-  background: rgba(255,255,255,0.10) !important; /* 深色侧边栏上更明显 */
+  background: linear-gradient(90deg, rgba(139,37,0,0.15) 0%, rgba(107,68,35,0.08) 100%) !important;
   color: #fff !important;
-  border-left: 4px solid #4aa3ff;  /* 你可以换成主题色 */
-  padding-left: 5px;             /* 配合左边border */
+  border-left: 4px solid #A52A2A;
+  padding-left: 5px;
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
+  box-shadow: 0 4px 12px rgba(139,37,0,0.15);
 }
 
-/* 选中项图标也亮一点 */
+/* 选中项图标增强 */
 #sidebar_left .sidebar-menu > li.active > a .glyphicon,
 #sidebar_left .sidebar-menu > li.active > a .fa {
+  color: #CD853F !important;
+  font-weight: 900;
+}
+
+/* hover 效果优化 */
+#sidebar_left .sidebar-menu > li > a:hover {
+  background: rgba(255,255,255,0.08);
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
+  transition: all 0.2s ease;
+}
+
+/* 侧边栏标签现代化 */
+.sidebar-label {
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 11px !important;
+  color: rgba(255,255,255,0.5) !important;
+}
+
+/* 子菜单样式优化 */
+#sidebar_left .sidebar-menu .sub-nav > li.active > a {
+  background: rgba(139,37,0,0.12) !important;
+  border-left: 3px solid #A52A2A;
+  padding-left: 28px;
   color: #fff !important;
 }
 
-/* hover 也顺滑些（可选） */
-#sidebar_left .sidebar-menu > li > a:hover {
+#sidebar_left .sidebar-menu .sub-nav > li > a:hover {
   background: rgba(255,255,255,0.06);
+  padding-left: 28px;
 }
+
+/* 徽章优化 */
+.sidebar-menu .label {
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-weight: 900;
+  font-size: 10px;
+}
+
+/* 面包屑现代化 */
+.breadcrumb {
+  background: transparent !important;
+  padding: 8px 0 !important;
+  margin: 0 !important;
+}
+
+.breadcrumb > li + li:before {
+  content: "›" !important;
+  padding: 0 8px;
+  color: #8B7355;
+  font-size: 16px;
+}
+
+.breadcrumb > li {
+  font-weight: 700;
+}
+
+.breadcrumb > li > a {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.breadcrumb > li > a:hover {
+  color: #B8860B;
+}
+
+.breadcrumb > .active {
+  color: #0f172a;
+  font-weight: 900;
+}
+
+/* 内容区域优化 */
+#content {
+  background: #F5F1E8 !important;
+  min-height: calc(100vh - 160px);
+  padding: 20px !important;
+}
+
 </style>
 
 </html>
