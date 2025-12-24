@@ -231,8 +231,11 @@ class SiteController extends Controller
 
         // 内容质量概览
         $totalEvents = (int)$eventCount;
-        $eventsWithCover = WarEvent::find()
-            ->innerJoinWith('coverImage')
+        $eventsWithCover = (int) WarMedia::find()
+            ->select('event_id')
+            ->distinct()
+            ->where(['type' => 'image'])
+            ->andWhere(['not', ['event_id' => null]])
             ->count();
         $eventsWithSummary = WarEvent::find()
             ->andWhere(['not', ['summary' => null]])
@@ -248,8 +251,11 @@ class SiteController extends Controller
             ->andWhere(['not', ['intro' => null]])
             ->andWhere(['!=', 'intro', ''])
             ->count();
-        $personsWithCover = WarPerson::find()
-            ->innerJoinWith('coverImage')
+        $personsWithCover = (int) WarMedia::find()
+            ->select('person_id')
+            ->distinct()
+            ->where(['type' => 'image'])
+            ->andWhere(['not', ['person_id' => null]])
             ->count();
 
         // 热榜TOP5 - 使用批量查询避免N+1问题

@@ -219,21 +219,35 @@
     margin-top: 8px;
 }
 
+/* 让第二屏两列卡片在桌面端等高对齐（不改动移动端栈叠） */
+@media (min-width: 992px) {
+    .second-screen { display: flex; align-items: stretch; }
+    .second-screen > .col-md-6 { float: none; display: flex; }
+    .second-screen > .col-md-6 .adm-card { display: flex; flex-direction: column; width: 100%; }
+    .second-screen > .col-md-6 .adm-card .adm-card-body#top-list-container { 
+        flex: 1; padding: 6px 16px;
+    }
+}
+
+.adm-card-head#quality-overview {
+    min-height: 60px;
+}
+
 /* ===== 内容质量 ===== */
 .quality-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px; /* 稍微宽松一点 */
 }
 
 .quality-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 18px;
 }
 
 .quality-label {
-    width: 120px;
+    width: 100px;
     font-weight: 700;
     color: #334155;
     font-size: 13px;
@@ -242,9 +256,9 @@
 
 .quality-bar-wrap {
     flex: 1;
-    height: 10px;
+    height: 14px; /* 更饱满的进度条高度 */
     background: #e2e8f0;
-    border-radius: 5px;
+    border-radius: 6px;
     overflow: hidden;
 }
 
@@ -263,34 +277,38 @@
     font-size: 13px;
 }
 
-.quality-link {
-    font-size: 12px;
-    color: #8B2500;
-    font-weight: 700;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
 .quality-link:hover {
     text-decoration: underline;
 }
 
+.quality-link.btn-soft-primary {
+    padding: 3px 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(139, 37, 0, 0.288);
+    background: rgba(139, 37, 0, 0.08);
+    transition: background 0.2s ease;
+    font-size: 12px;
+    color: #551701;
+    text-decoration: none;
+    white-space: nowrap;
+    font-weight: 700;
+}
 /* ===== 热榜 TOP5 ===== */
 .top-tabs {
     display: flex;
-    gap: 6px;
+    gap: 3px;
 }
 
 .top-list {
-    min-height: 200px;
+    min-height: 160px; /* 略微压缩整体高度 */
 }
 
 .top-item {
     display: flex;
     align-items: center;
-    padding: 12px 0;
+    padding: 7px 0; /* 更紧凑 */
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    gap: 12px;
+    gap: 14px;
 }
 
 .top-item:last-child {
@@ -298,13 +316,13 @@
 }
 
 .top-rank {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
+    width: 22px;   /* 缩小图标尺寸 */
+    height: 22px;
+    border-radius: 6px;
     background: linear-gradient(135deg, #8B2500 0%, #6B4423 100%);
     color: #fff;
     font-weight: 900;
-    font-size: 14px;
+    font-size: 12px; /* 更紧凑的数字字号 */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -321,6 +339,16 @@
 
 .top-item:nth-child(3) .top-rank {
     background: linear-gradient(135deg, #cd7c32 0%, #a0522d 100%);
+}
+
+/* 除金银铜外不显示外框（仅数字，无底色） */
+.top-item:nth-child(n+4) .top-rank {
+    background: none;
+    color: #64748b;
+    width: 22px;
+    height: auto;
+    border-radius: 0;
+    padding: 0;
 }
 
 .top-title {

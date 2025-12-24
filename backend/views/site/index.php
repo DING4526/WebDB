@@ -221,10 +221,10 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
         <div class="col-md-6">
             <!-- 内容质量概览（覆盖率）-->
             <div class="adm-card">
-                <div class="adm-card-head">
+                <div class="adm-card-head" id="quality-overview">
                     <h3 class="adm-card-title">内容质量概览</h3>
                 </div>
-                <div class="adm-card-body">
+                <div class="adm-card-body" id="quality-overview">
                     <div class="quality-list">
                         <div class="quality-item">
                             <span class="quality-label">事件有封面</span>
@@ -233,7 +233,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                             </div>
                             <span class="quality-percent" id="quality-event-cover-pct">--%</span>
                             <?php if ($isRoot || $isMember): ?>
-                                <a href="<?= Url::to(['war-event/index']) ?>" class="quality-link">去补齐</a>
+                                <a href="<?= Url::to(['war-event/index']) ?>" class="btn btn-xs btn-soft-primary quality-link">去补充</a>
                             <?php endif; ?>
                         </div>
                         <div class="quality-item">
@@ -243,7 +243,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                             </div>
                             <span class="quality-percent" id="quality-event-summary-pct">--%</span>
                             <?php if ($isRoot || $isMember): ?>
-                                <a href="<?= Url::to(['war-event/index']) ?>" class="quality-link">去补齐</a>
+                                <a href="<?= Url::to(['war-event/index']) ?>" class="btn btn-xs btn-soft-primary quality-link">去补充</a>
                             <?php endif; ?>
                         </div>
                         <div class="quality-item">
@@ -253,7 +253,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                             </div>
                             <span class="quality-percent" id="quality-event-person-pct">--%</span>
                             <?php if ($isRoot || $isMember): ?>
-                                <a href="<?= Url::to(['war-event/index']) ?>" class="quality-link">去补齐</a>
+                                <a href="<?= Url::to(['war-event/index']) ?>" class="btn btn-xs btn-soft-primary quality-link">去补充</a>
                             <?php endif; ?>
                         </div>
                         <div class="quality-item">
@@ -263,7 +263,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                             </div>
                             <span class="quality-percent" id="quality-person-intro-pct">--%</span>
                             <?php if ($isRoot || $isMember): ?>
-                                <a href="<?= Url::to(['war-person/index']) ?>" class="quality-link">去补齐</a>
+                                <a href="<?= Url::to(['war-person/index']) ?>" class="btn btn-xs btn-soft-primary quality-link">去补充</a>
                             <?php endif; ?>
                         </div>
                         <div class="quality-item">
@@ -273,7 +273,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                             </div>
                             <span class="quality-percent" id="quality-person-cover-pct">--%</span>
                             <?php if ($isRoot || $isMember): ?>
-                                <a href="<?= Url::to(['war-person/index']) ?>" class="quality-link">去补齐</a>
+                                <a href="<?= Url::to(['war-person/index']) ?>" class="btn btn-xs btn-soft-primary quality-link">去补充</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -284,7 +284,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
         <div class="col-md-6">
             <!-- 热榜 TOP5（Tab）-->
             <div class="adm-card">
-                <div class="adm-card-head">
+                <div class="adm-card-head" id="top-list-section">
                     <h3 class="adm-card-title">热榜 TOP5</h3>
                     <div class="top-tabs">
                       <div class="adm-actions-col">
@@ -293,7 +293,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                       </div>
                     </div>
                 </div>
-                <div class="adm-card-body">
+                <div class="adm-card-body" id="top-list-container">
                     <div class="top-list" id="top-events-list">
                         <div class="top-empty">暂无数据</div>
                     </div>
@@ -480,8 +480,12 @@ $js = <<<'JS'
 
     $(document).on('click', '.top-tabs button', function() {
         var tab = $(this).data('tab');
-        $('.top-tabs button').removeClass('active').addClass('btn-soft-ghost');
-        $(this).addClass('active').removeClass('btn-soft-ghost').addClass('btn-soft-primary');
+        var $btns = $('.top-tabs button');
+        // 先统一重置：去除 active 与主色，全部设为幽灵样式
+        $btns.removeClass('active btn-soft-primary').addClass('btn-soft-ghost');
+        // 当前按钮设为主色与激活
+        $(this).addClass('active btn-soft-primary').removeClass('btn-soft-ghost');
+        // 切换内容
         $('.top-list').hide();
         $('#top-' + tab + '-list').show();
     });
