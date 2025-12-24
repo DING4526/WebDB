@@ -139,6 +139,92 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+
+
+
+    // --- 修改：旗子左右边缘固定，中间波浪飘扬 ---
+    function drawFlag(svgDoc, x, y) {
+        var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('transform', `translate(${x}, ${y}) scale(1.8)`);
+        
+        // 1. 绘制旗杆
+        var pole = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        pole.setAttribute('x1', '0');
+        pole.setAttribute('y1', '0');
+        pole.setAttribute('x2', '0');
+        pole.setAttribute('y2', '-26');
+        pole.setAttribute('stroke', '#000000');
+        pole.setAttribute('stroke-width', '1.33');
+        pole.setAttribute('stroke-linecap', 'round');
+        pole.style.pointerEvents = 'none';
+        pole.style.filter = 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))';
+        
+        // 2. 绘制旗面 - 左右边缘固定，中间波浪
+        var flag = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        flag.setAttribute('fill', '#FF3333');
+        flag.setAttribute('stroke', '#CC0000');
+        flag.setAttribute('stroke-width', '0.5');
+        flag.style.pointerEvents = 'none';
+        flag.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))';
+        
+        var animationStartTime = Date.now();
+        var flagWidth = 16;
+        var flagHeight = 11;
+        
+        function animate() {
+            var elapsed = (Date.now() - animationStartTime) / 1000;
+            var progress = elapsed % 2;
+            
+            var segments = 16; // 增加分段数使波浪更平滑
+            var d = 'M 0,-26 '; // 起点：左上角（固定）
+            
+            // 绘制上边缘
+            for (var i = 0; i <= segments; i++) {
+                var t = i / segments; // 归一化位置 0~1
+                var xPos = t * flagWidth;
+                
+                // 波浪幅度：左右两端为0，中间最大
+                // 使用 sin(πt) 让两端平滑过渡到0
+                var edgeFactor = Math.sin(t * Math.PI);
+                var phase = progress * Math.PI * 2;
+                var amplitude = 1.5;
+                var frequency = 2;
+                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
+                
+                var yPos = -26 + yOffset;
+                d += `L ${xPos},${yPos} `;
+            }
+            
+            // 右边缘（固定直线）
+            d += `L ${flagWidth},${-26 + flagHeight} `;
+            
+            // 绘制下边缘（从右向左）
+            for (var j = segments; j >= 0; j--) {
+                var t = j / segments;
+                var xPos = t * flagWidth;
+                
+                var edgeFactor = Math.sin(t * Math.PI);
+                var phase = progress * Math.PI * 2;
+                var amplitude = 1.5;
+                var frequency = 2;
+                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
+                
+                var yPos = -26 + flagHeight + yOffset;
+                d += `L ${xPos},${yPos} `;
+            }
+            
+            d += 'Z'; // 闭合路径
+            
+            flag.setAttribute('d', d);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        g.appendChild(pole);
+        g.appendChild(flag);
+        svgDoc.documentElement.appendChild(g);
+    }
+
     // --- 初始化地图 ---
     function initMap(svgDoc) {
         // 1. 预处理：解析中心点坐标
@@ -215,6 +301,48 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // 只有有事件的省份才能点击
                     if (events && events.length > 0) {
+
+                            paths.forEach(function (path) {
+                                var mapEngName = path.getAttribute('name');
+                                if (!mapEngName) return;
+                                var mapChineseName = provinceMap[mapEngName];
+                                if (!mapChineseName) return;
+
+                                var events = getEventsForMapName(mapChineseName, activeData);
+
+                                // 只有有事件的省份才能点击
+                                if (events && events.length > 0) {
+                                    path.style.cursor = 'pointer'; // 改为手型
+
+                                    // --- 修改开始：计算中心点并绘制旗子 ---
+                                    var center = provinceCenters[mapEngName] || provinceCenters[mapChineseName];
+                                    
+                                    // 如果没有预设中心点，计算 BBox 中心
+                                    if (!center) {
+                                        var bbox = path.getBBox();
+                                        center = {
+                                            x: bbox.x + bbox.width / 2,
+                                            y: bbox.y + bbox.height / 2
+                                        };
+                                        // 缓存一下，避免下次点击重复计算
+                                        provinceCenters[mapChineseName] = center; 
+                                    }
+
+                                    // ★在此处调用绘制旗子函数★
+                                    drawFlag(svgDoc, center.x, center.y);
+                                    // --- 修改结束 ---
+
+                                    // 点击触发折线绘制
+                                    path.addEventListener('click', function (e) {
+                                        e.stopPropagation();
+                                        // 注意：这里重新获取 center 变量即可，上面已经计算并缓存过了
+                                        // var center = ... (这里原代码可以复用上面的 center，不用重复写了)
+                                        
+                                        console.log('点击:', mapChineseName, '中心:', center, '事件数:', events.length);
+                                        drawEventLines(svgDoc, center.x, center.y, events, mapEngName);
+                                    });
+                                }
+                            });
                         path.style.cursor = 'pointer'; // 改为手型
 
                         // 点击触发折线绘制

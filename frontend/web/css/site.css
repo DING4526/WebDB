@@ -97,6 +97,52 @@ body {
     font-style: italic;
 }
 
+
+
+/* --- 修改：地图红色旗子样式 - 方形飘扬版 --- */
+.map-flag-icon {
+    fill: #FF3333; /* 亮红色填充 */
+    stroke: #CC0000; /* 深红色描边 */
+    stroke-width: 0.5px;
+    
+    /* 添加阴影效果 */
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+    
+    /* 关键：禁止旗子响应鼠标事件 */
+    pointer-events: none; 
+    
+    /* 飘扬动画：模拟风吹效果 */
+    animation: flag-flutter 2s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: left center; /* 左侧固定在旗杆上 */
+}
+
+.map-flag-pole {
+    stroke: #000000; /* 黑色旗杆 */
+    stroke-width: 2px; /* 旗杆粗细 */
+    stroke-linecap: round;
+    pointer-events: none;
+    
+    /* 旗杆阴影 */
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.4));
+}
+
+/* 旗子飘扬动画 - 模拟波浪效果 */
+@keyframes flag-flutter {
+    0%, 100% { 
+        transform: skewX(0deg) scaleX(1);
+    }
+    25% { 
+        transform: skewX(-3deg) scaleX(0.98);
+    }
+    50% { 
+        transform: skewX(2deg) scaleX(1.02);
+    }
+    75% { 
+        transform: skewX(-2deg) scaleX(0.99);
+    }
+}
+
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     position: relative;
