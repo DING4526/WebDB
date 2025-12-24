@@ -15,8 +15,6 @@ use yii\web\Response;
 
 class EventController extends Controller
 {
-    // ...existing code...
-
     /**
      * 列表页及地图数据接口
      * @param string|null $location 按地点筛选
@@ -24,13 +22,13 @@ class EventController extends Controller
      */
     public function actionIndex($location = null, $action = null)
     {
-        // 1. AJAX 接口：返回所有有数据的地点及其事件列表
+        // 1. AJAX 接口：返回所有有数据的地点及其完整事件信息
         if ($action === 'get-active-locations') {
             Yii::$app->response->format = Response::FORMAT_JSON;
             
-            // 修改：查询 id, title, location，以便前端生成链接
+            // 修改：查询完整的事件信息，包括日期、摘要、内容等
             $events = WarEvent::find()
-                ->select(['id', 'title', 'location'])
+                ->select(['id', 'title', 'location', 'event_date', 'summary', 'content'])
                 ->where(['status' => 1])
                 ->andWhere(['not', ['location' => null]])
                 ->andWhere(['!=', 'location', ''])
@@ -47,7 +45,11 @@ class EventController extends Controller
                 }
                 $result[$loc][] = [
                     'id' => $event['id'],
-                    'title' => $event['title']
+                    'title' => $event['title'],
+                    'event_date' => $event['event_date'],
+                    'location' => $event['location'],
+                    'summary' => $event['summary'] ?: '暂无摘要',
+                    'content' => $event['content'] ?: '暂无详情'
                 ];
             }
             
