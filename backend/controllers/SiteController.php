@@ -128,6 +128,7 @@ class SiteController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $teamId = Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null;
+        $visitMode = Yii::$app->request->get('visitMode', 'day');
 
         // 基础统计
         $memberCount = TeamMember::find()
@@ -161,20 +162,43 @@ class SiteController extends Controller
             ->count();
         $newContent7Days = $newEvents7Days + $newPersons7Days;
 
-        // 访问趋势数据（按天） - 趋势天数
+        // 访问趋势数据
         $trendDays = 7;
         $visitTrend = [];
-        for ($i = $trendDays - 1; $i >= 0; $i--) {
-            $dayStart = strtotime("-{$i} days 00:00:00");
-            $dayEnd = strtotime("-{$i} days 23:59:59");
-            $count = WarVisitLog::find()
-                ->andWhere(['>=', 'visited_at', $dayStart])
-                ->andWhere(['<=', 'visited_at', $dayEnd])
-                ->count();
-            $visitTrend[] = [
-                'date' => date('m-d', $dayStart),
-                'count' => (int)$count,
-            ];
+        if ($visitMode === 'hour') {
+            // 最近24小时（按整点对齐）
+            $trendHours = 24;
+            $endHourStart = strtotime(date('Y-m-d H:00:00')); // 当前整点
+            for ($i = $trendHours - 1; $i >= 0; $i--) {
+                $hourStart = $endHourStart - ($i * 3600);
+                $hourEnd = $hourStart + 3599;
+
+                $count = WarVisitLog::find()
+                    ->andWhere(['>=', 'visited_at', $hourStart])
+                    ->andWhere(['<=', 'visited_at', $hourEnd])
+                    ->count();
+
+                $visitTrend[] = [
+                    'date' => date('m-d H:00', $hourStart),  // 跨天也清晰
+                    'count' => (int)$count,
+                ];
+            }
+        } else {
+            // 最近7天（按天）
+            for ($i = $trendDays - 1; $i >= 0; $i--) {
+                $dayStart = strtotime("-{$i} days 00:00:00");
+                $dayEnd = strtotime("-{$i} days 23:59:59");
+
+                $count = WarVisitLog::find()
+                    ->andWhere(['>=', 'visited_at', $dayStart])
+                    ->andWhere(['<=', 'visited_at', $dayEnd])
+                    ->count();
+
+                $visitTrend[] = [
+                    'date' => date('m-d', $dayStart),
+                    'count' => (int)$count,
+                ];
+            }
         }
 
         // 留言趋势数据（按天，分状态）

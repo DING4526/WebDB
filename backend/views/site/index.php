@@ -85,7 +85,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
             <div class="kpi-content">
                 <div class="kpi-value" id="kpi-content-total">-</div>
                 <div class="kpi-label">内容总量</div>
-                <div class="kpi-sub" id="kpi-content-detail">事/人/媒</div>
+                <!-- <div class="kpi-sub" id="kpi-content-detail">事/人/媒</div> -->
             </div>
             <a href="<?= Url::to(['project-show/index']) ?>" class="kpi-link">查看</a>
         </div>
@@ -113,7 +113,10 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <div class="adm-card-head">
                     <h3 class="adm-card-title">访问趋势</h3>
                     <div class="chart-toggle">
+                      <div class="adm-actions-col">
                         <button type="button" class="btn btn-xs btn-soft-ghost active" data-mode="day">按天</button>
+                        <button type="button" class="btn btn-xs btn-soft-ghost" data-mode="hour">按小时</button>
+                      </div>
                     </div>
                 </div>
                 <div class="adm-card-body">
@@ -128,7 +131,9 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <div class="adm-card-head">
                     <h3 class="adm-card-title">留言趋势</h3>
                     <?php if ($isRoot || $isMember): ?>
+                      <div class="adm-actions-col">
                         <a href="<?= Url::to(['war-message/index']) ?>" class="btn btn-xs btn-soft-primary">查看详情</a>
+                      </div>
                     <?php endif; ?>
                 </div>
                 <div class="adm-card-body">
@@ -288,8 +293,10 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <div class="adm-card-head">
                     <h3 class="adm-card-title">热榜 TOP5</h3>
                     <div class="top-tabs">
+                      <div class="adm-actions-col">
                         <button type="button" class="btn btn-xs btn-soft-primary active" data-tab="events">事件</button>
                         <button type="button" class="btn btn-xs btn-soft-ghost" data-tab="persons">人物</button>
+                      </div>
                     </div>
                 </div>
                 <div class="adm-card-body">
@@ -305,241 +312,6 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
     </div>
 </div>
 
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-<script>
-(function() {
-    var visitChart = null;
-    var messageChart = null;
-
-    function loadDashboardData() {
-        $.ajax({
-            url: '<?= Url::to(['site/dashboard-data']) ?>',
-            type: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                // KPI卡片
-                $('#kpi-members').text(data.memberCount);
-                $('#kpi-pending-apply').text(data.pendingApplyCount);
-                $('#kpi-pending-message').text(data.pendingMessageCount);
-                
-                var total = data.eventCount + data.personCount + data.mediaCount;
-                $('#kpi-content-total').text(total);
-                $('#kpi-content-detail').text(data.eventCount + '事/' + data.personCount + '人/' + data.mediaCount + '媒');
-                
-                $('#kpi-visits-7d').text(data.visits7Days.toLocaleString());
-                $('#kpi-new-7d').text(data.newContent7Days);
-
-                // To-do
-                $('#todo-apply').text(data.pendingApplyCount);
-                $('#todo-message').text(data.pendingMessageCount);
-                
-                var qualityIssues = 0;
-                if (data.quality.eventCover < 100) qualityIssues++;
-                if (data.quality.eventSummary < 100) qualityIssues++;
-                if (data.quality.eventPerson < 100) qualityIssues++;
-                if (data.quality.personIntro < 100) qualityIssues++;
-                if (data.quality.personCover < 100) qualityIssues++;
-                $('#todo-quality').text(qualityIssues > 0 ? qualityIssues + '项' : '✓');
-
-                // 内容质量
-                updateQualityBar('event-cover', data.quality.eventCover);
-                updateQualityBar('event-summary', data.quality.eventSummary);
-                updateQualityBar('event-person', data.quality.eventPerson);
-                updateQualityBar('person-intro', data.quality.personIntro);
-                updateQualityBar('person-cover', data.quality.personCover);
-
-                // 访问趋势图
-                renderVisitChart(data.visitTrend);
-
-                // 留言趋势图
-                renderMessageChart(data.messageTrend);
-
-                // 热榜
-                renderTopList('events', data.topEvents);
-                renderTopList('persons', data.topPersons);
-            },
-            error: function() {
-                console.error('加载仪表板数据失败');
-                // 显示用户可见的错误提示
-                showLoadError();
-            }
-        });
-    }
-
-    function showLoadError() {
-        // 在KPI卡片中显示错误状态
-        $('.kpi-value').text('-');
-        // 在图表区域显示错误消息
-        var errorMsg = '<div class="chart-error" style="text-align:center;padding:40px;color:#ef4444;">' +
-            '<span class="glyphicon glyphicon-exclamation-sign" style="font-size:24px;"></span>' +
-            '<p style="margin-top:10px;">数据加载失败，请点击刷新重试</p></div>';
-        $('.chart-container').html(errorMsg);
-    }
-
-    function updateQualityBar(key, percent) {
-        $('#quality-' + key).css('width', percent + '%');
-        $('#quality-' + key + '-pct').text(percent + '%');
-        
-        var bar = $('#quality-' + key);
-        if (percent >= 80) {
-            bar.css('background', '#22c55e');
-        } else if (percent >= 50) {
-            bar.css('background', '#f59e0b');
-        } else {
-            bar.css('background', '#ef4444');
-        }
-    }
-
-    function renderVisitChart(trend) {
-        var ctx = document.getElementById('visitTrendChart').getContext('2d');
-        var labels = trend.map(function(item) { return item.date; });
-        var values = trend.map(function(item) { return item.count; });
-
-        if (visitChart) {
-            visitChart.destroy();
-        }
-
-        visitChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '访问量',
-                    data: values,
-                    borderColor: '#8B2500',
-                    backgroundColor: 'rgba(139, 37, 0, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#8B2500'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
-                    }
-                }
-            }
-        });
-    }
-
-    function renderMessageChart(trend) {
-        var ctx = document.getElementById('messageTrendChart').getContext('2d');
-        var labels = trend.map(function(item) { return item.date; });
-        var pending = trend.map(function(item) { return item.pending; });
-        var approved = trend.map(function(item) { return item.approved; });
-        var rejected = trend.map(function(item) { return item.rejected; });
-
-        if (messageChart) {
-            messageChart.destroy();
-        }
-
-        messageChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: '待审核',
-                        data: pending,
-                        backgroundColor: '#f59e0b'
-                    },
-                    {
-                        label: '通过',
-                        data: approved,
-                        backgroundColor: '#22c55e'
-                    },
-                    {
-                        label: '拒绝',
-                        data: rejected,
-                        backgroundColor: '#ef4444'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    x: { stacked: true },
-                    y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
-                }
-            }
-        });
-    }
-
-    function renderTopList(type, items) {
-        var container = $('#top-' + type + '-list');
-        if (!items || items.length === 0) {
-            container.html('<div class="top-empty">暂无数据</div>');
-            return;
-        }
-
-        // 使用 jQuery DOM 构建方式来防止 XSS
-        container.empty();
-        items.forEach(function(item, index) {
-            var title = type === 'events' ? item.title : item.name;
-            var url = type === 'events' 
-                ? '<?= Url::to(['war-event/view']) ?>?id=' + encodeURIComponent(item.id)
-                : '<?= Url::to(['war-person/view']) ?>?id=' + encodeURIComponent(item.id);
-            
-            var $item = $('<div class="top-item"></div>');
-            $item.append($('<span class="top-rank"></span>').text(index + 1));
-            $item.append($('<a class="top-title"></a>').attr('href', url).text(title));
-            $item.append($('<span class="top-visits"></span>').text(item.visits + '访问'));
-            container.append($item);
-        });
-    }
-
-    // Tab切换
-    $(document).on('click', '.top-tabs button', function() {
-        var tab = $(this).data('tab');
-        $('.top-tabs button').removeClass('active').addClass('btn-soft-ghost');
-        $(this).addClass('active').removeClass('btn-soft-ghost').addClass('btn-soft-primary');
-        $('.top-list').hide();
-        $('#top-' + tab + '-list').show();
-    });
-
-    // 刷新按钮
-    $('#refreshDashboard').on('click', function() {
-        var btn = $(this);
-        btn.prop('disabled', true);
-        btn.find('.glyphicon').addClass('spin');
-        loadDashboardData();
-        setTimeout(function() {
-            btn.prop('disabled', false);
-            btn.find('.glyphicon').removeClass('spin');
-        }, 1000);
-    });
-
-    // 滚动链接
-    $(document).on('click', '.scroll-to', function(e) {
-        e.preventDefault();
-        var target = $(this).attr('href');
-        $('html, body').animate({
-            scrollTop: $(target).offset().top - 100
-        }, 500);
-    });
-
-    // 初始加载
-    $(document).ready(function() {
-        loadDashboardData();
-    });
-})();
-</script>
 
 <style>
 @keyframes spin {
@@ -550,3 +322,218 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
     animation: spin 1s linear infinite;
 }
 </style>
+
+
+<?php
+use yii\web\View;
+\yii\web\JqueryAsset::register($this);
+
+$this->registerJsFile('https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js', [
+    'position' => View::POS_END,
+]);
+
+$dashboardUrl = Url::to(['site/dashboard-data']);
+$eventViewBase = Url::to(['war-event/view']);   // 后面拼 ?id=
+$personViewBase = Url::to(['war-person/view']); // 后面拼 ?id=
+
+$js = <<<'JS'
+(function() {
+    var visitChart = null;
+    var messageChart = null;
+    var visitMode = 'hour';  // 默认按小时
+
+    // 这些变量由 PHP 注入（下面会替换）
+    var DASHBOARD_URL = '__DASHBOARD_URL__';
+    var EVENT_VIEW_BASE = '__EVENT_VIEW_BASE__';
+    var PERSON_VIEW_BASE = '__PERSON_VIEW_BASE__';
+
+    function loadDashboardData(mode) {
+        mode = mode || visitMode;
+        $.ajax({
+            url: DASHBOARD_URL,
+            type: 'GET',
+            data: { visitMode: mode },
+            dataType: 'json',
+            success: function(data) {
+                $('#kpi-members').text(data.memberCount);
+                $('#kpi-pending-apply').text(data.pendingApplyCount);
+                $('#kpi-pending-message').text(data.pendingMessageCount);
+
+                var total = data.eventCount + data.personCount + data.mediaCount;
+                $('#kpi-content-total').text(total);
+                $('#kpi-content-detail').text(data.eventCount + '事/' + data.personCount + '人/' + data.mediaCount + '媒');
+
+                $('#kpi-visits-7d').text((data.visits7Days || 0).toLocaleString());
+                $('#kpi-new-7d').text(data.newContent7Days);
+
+                $('#todo-apply').text(data.pendingApplyCount);
+                $('#todo-message').text(data.pendingMessageCount);
+
+                var qualityIssues = 0;
+                if (data.quality.eventCover < 100) qualityIssues++;
+                if (data.quality.eventSummary < 100) qualityIssues++;
+                if (data.quality.eventPerson < 100) qualityIssues++;
+                if (data.quality.personIntro < 100) qualityIssues++;
+                if (data.quality.personCover < 100) qualityIssues++;
+                $('#todo-quality').text(qualityIssues > 0 ? qualityIssues + '项' : '✓');
+
+                updateQualityBar('event-cover', data.quality.eventCover);
+                updateQualityBar('event-summary', data.quality.eventSummary);
+                updateQualityBar('event-person', data.quality.eventPerson);
+                updateQualityBar('person-intro', data.quality.personIntro);
+                updateQualityBar('person-cover', data.quality.personCover);
+
+                renderVisitChart(data.visitTrend || []);
+                renderMessageChart(data.messageTrend || []);
+                renderTopList('events', data.topEvents || []);
+                renderTopList('persons', data.topPersons || []);
+            },
+            error: function(xhr) {
+                console.error('加载失败', xhr.status, xhr.responseText);
+                showLoadError();
+            }
+        });
+    }
+
+    function showLoadError() {
+        $('.kpi-value').text('-');
+        var errorMsg = '<div class="chart-error" style="text-align:center;padding:40px;color:#ef4444;">' +
+            '<span class="glyphicon glyphicon-exclamation-sign" style="font-size:24px;"></span>' +
+            '<p style="margin-top:10px;">数据加载失败，请点击刷新重试</p></div>';
+        $('.chart-container').html(errorMsg);
+    }
+
+    function updateQualityBar(key, percent) {
+        percent = percent || 0;
+        $('#quality-' + key).css('width', percent + '%');
+        $('#quality-' + key + '-pct').text(percent + '%');
+
+        var bar = $('#quality-' + key);
+        if (percent >= 80) bar.css('background', '#22c55e');
+        else if (percent >= 50) bar.css('background', '#f59e0b');
+        else bar.css('background', '#ef4444');
+    }
+
+    function renderVisitChart(trend) {
+        var canvas = document.getElementById('visitTrendChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        var ctx = canvas.getContext('2d');
+        var labels = trend.map(function(item) { return item.date; });
+        var values = trend.map(function(item) { return item.count; });
+
+        if (visitChart) visitChart.destroy();
+
+        visitChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: [{ label: '访问量', data: values, fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
+              scales: { 
+                x: { ticks: { autoSkip: true, maxTicksLimit: 12 } },
+                y: { beginAtZero: true } 
+              } 
+            }
+        });
+    }
+
+    function renderMessageChart(trend) {
+        var canvas = document.getElementById('messageTrendChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        var ctx = canvas.getContext('2d');
+        var labels = trend.map(function(item) { return item.date; });
+
+        var pending = trend.map(function(item) { return item.pending; });
+        var approved = trend.map(function(item) { return item.approved; });
+        var rejected = trend.map(function(item) { return item.rejected; });
+
+        if (messageChart) messageChart.destroy();
+
+        messageChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [
+                { label: '待审核', data: pending },
+                { label: '通过', data: approved },
+                { label: '拒绝', data: rejected }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, 
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+        });
+    }
+
+    function renderTopList(type, items) {
+        var container = $('#top-' + type + '-list');
+        if (!items || items.length === 0) {
+            container.html('<div class="top-empty">暂无数据</div>');
+            return;
+        }
+
+        container.empty();
+        items.forEach(function(item, index) {
+            var title = type === 'events' ? item.title : item.name;
+            var base = type === 'events' ? EVENT_VIEW_BASE : PERSON_VIEW_BASE;
+            var url = base + '?id=' + encodeURIComponent(item.id);
+
+            var $row = $('<div class="top-item"></div>');
+            $row.append($('<span class="top-rank"></span>').text(index + 1));
+            $row.append($('<a class="top-title"></a>').attr('href', url).text(title));
+            $row.append($('<span class="top-visits"></span>').text(item.visits + '访问'));
+            container.append($row);
+        });
+    }
+
+    $(document).on('click', '.top-tabs button', function() {
+        var tab = $(this).data('tab');
+        $('.top-tabs button').removeClass('active').addClass('btn-soft-ghost');
+        $(this).addClass('active').removeClass('btn-soft-ghost').addClass('btn-soft-primary');
+        $('.top-list').hide();
+        $('#top-' + tab + '-list').show();
+    });
+
+    $('#refreshDashboard').on('click', function() {
+        var btn = $(this);
+        btn.prop('disabled', true);
+        btn.find('.glyphicon').addClass('spin');
+        loadDashboardData(visitMode);
+        setTimeout(function() {
+            btn.prop('disabled', false);
+            btn.find('.glyphicon').removeClass('spin');
+        }, 1000);
+    });
+
+    $(document).on('click', '.chart-toggle button', function() {
+        var mode = $(this).data('mode');
+        if (mode === visitMode) return;
+
+        visitMode = mode;
+
+        // UI 状态切换
+        $('.chart-toggle button')
+            .removeClass('active btn-soft-primary')
+            .addClass('btn-soft-ghost');
+
+        $(this)
+            .addClass('active btn-soft-primary')
+            .removeClass('btn-soft-ghost');
+
+        // 重新加载（只要访问趋势变化，其他也顺便刷新）
+        loadDashboardData(visitMode);
+    });
+
+    $(document).ready(function() {
+        loadDashboardData();
+    });
+})();
+JS;
+
+// 把占位符替换成真实 URL（用 addslashes 防止引号问题）
+$js = str_replace(
+    ['__DASHBOARD_URL__', '__EVENT_VIEW_BASE__', '__PERSON_VIEW_BASE__'],
+    [addslashes($dashboardUrl), addslashes($eventViewBase), addslashes($personViewBase)],
+    $js
+);
+
+$this->registerJs($js, View::POS_END);
+?>
+
+
