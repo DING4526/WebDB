@@ -10,6 +10,7 @@ namespace frontend\controllers;
 
 use common\models\WarStage;
 use yii\web\Controller;
+use Yii;
 
 class TimelineController extends Controller
 {
@@ -29,20 +30,34 @@ class TimelineController extends Controller
     public function actionView($id)
     {
         $model = \common\models\WarEvent::find()
-            ->where(['id' => $id])
+            ->where(['id' => $id, 'status' => 1])
             ->with(['people.coverImage', 'medias'])
             ->one();
 
         if (!$model) throw new \yii\web\NotFoundHttpException("事件未找到");
 
+        // 记录访问日志
+        $log = new \common\models\WarVisitLog();
+        $log->target_type = 'event';
+        $log->target_id = (int)$id;
+        $log->visited_at = time();
+        
+        $log->user_id = \Yii::$app->user->id; 
+        
+        $log->save(false); 
+
+        // 统计总访问量
+        $visitCount = \common\models\WarVisitLog::find()
+            ->where(['target_type' => 'event', 'target_id' => $id])
+            ->count();
+
+        // 媒资分类
         $images = [];
         $articles = [];
-        
         foreach ($model->medias as $media) {
             if ($media->type === 'image') {
                 $images[] = $media;
-            } 
-            elseif ($media->type === 'article' || $media->type === 'link' || $media->type === 'document') {
+            } elseif (in_array($media->type, ['article', 'link', 'document'])) {
                 $articles[] = $media;
             }
         }
@@ -51,7 +66,8 @@ class TimelineController extends Controller
             'model' => $model,
             'images' => $images,
             'articles' => $articles,
-            'messages' => $this->findApprovedMessages($id),
+            'messages' => $this->findApprovedMessages($id), 
+            'visitCount' => $visitCount,
         ]);
     }
 

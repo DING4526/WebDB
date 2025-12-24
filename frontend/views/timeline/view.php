@@ -28,13 +28,22 @@ $this->params['breadcrumbs'][] = $this->title;
         
         <!-- 副标题 -->
         <div style="margin-top: 8px; font-size: 13px; color: #666;">
+            <!-- 日期 -->
             <span style="margin-right: 15px;">
                 <i class="glyphicon glyphicon-calendar" style="color: #999;"></i> 
                 <?= Html::encode($model->event_date) ?>
             </span>
-            <span>
+            
+            <!-- 地点 -->
+            <span style="margin-right: 15px;">
                 <i class="glyphicon glyphicon-map-marker" style="color: #999;"></i> 
                 <?= Html::encode($model->location ?: '地点不详') ?>
+            </span>
+            
+            <!-- 访问量 -->
+            <span>
+                <i class="glyphicon glyphicon-eye-open" style="color: #999;"></i> 
+                访问量：<?= number_format($visitCount) ?> 次
             </span>
         </div>
     </div>
