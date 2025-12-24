@@ -153,28 +153,22 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <div class="adm-card-body">
                     <ul class="todo-list">
                         <?php if ($isRoot): ?>
-                            <li class="todo-item">
+                            <li class="todo-item todo-clickable" data-href="<?= Url::to(['team-member-apply/index']) ?>">
                                 <span class="todo-label">成员申请待审批</span>
                                 <span class="todo-count" id="todo-apply">-</span>
-                                <a href="<?= Url::to(['team-member-apply/index']) ?>" class="todo-link">
-                                    <span class="glyphicon glyphicon-chevron-right"></span>
-                                </a>
+                                <span class="todo-arrow"><span class="glyphicon glyphicon-chevron-right"></span></span>
                             </li>
                         <?php endif; ?>
                         <?php if ($isRoot || $isMember): ?>
-                            <li class="todo-item">
+                            <li class="todo-item todo-clickable" data-href="<?= Url::to(['war-message/index']) ?>">
                                 <span class="todo-label">留言待审核</span>
                                 <span class="todo-count" id="todo-message">-</span>
-                                <a href="<?= Url::to(['war-message/index']) ?>" class="todo-link">
-                                    <span class="glyphicon glyphicon-chevron-right"></span>
-                                </a>
+                                <span class="todo-arrow"><span class="glyphicon glyphicon-chevron-right"></span></span>
                             </li>
-                            <li class="todo-item">
+                            <li class="todo-item todo-clickable" data-href="#quality-section">
                                 <span class="todo-label">内容待完善</span>
                                 <span class="todo-count" id="todo-quality">-</span>
-                                <a href="#quality-section" class="todo-link scroll-to">
-                                    <span class="glyphicon glyphicon-chevron-right"></span>
-                                </a>
+                                <span class="todo-arrow"><span class="glyphicon glyphicon-chevron-right"></span></span>
                             </li>
                         <?php endif; ?>
                     </ul>
@@ -321,6 +315,8 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
 .spin {
     animation: spin 1s linear infinite;
 }
+.todo-item.todo-clickable { cursor: pointer; }
+.todo-item.todo-clickable:hover { background: rgba(0,0,0,0.03); }
 </style>
 
 
@@ -472,7 +468,7 @@ $js = <<<'JS'
         items.forEach(function(item, index) {
             var title = type === 'events' ? item.title : item.name;
             var base = type === 'events' ? EVENT_VIEW_BASE : PERSON_VIEW_BASE;
-            var url = base + '?id=' + encodeURIComponent(item.id);
+            var url = base + '&id=' + encodeURIComponent(item.id);
 
             var $row = $('<div class="top-item"></div>');
             $row.append($('<span class="top-rank"></span>').text(index + 1));
@@ -501,27 +497,33 @@ $js = <<<'JS'
         }, 1000);
     });
 
-    $(document).on('click', '.chart-toggle button', function() {
-        var mode = $(this).data('mode');
-        if (mode === visitMode) return;
-
+    function setVisitMode(mode) {
         visitMode = mode;
 
-        // UI 状态切换
         $('.chart-toggle button')
             .removeClass('active btn-soft-primary')
             .addClass('btn-soft-ghost');
 
-        $(this)
+        $('.chart-toggle button[data-mode="' + mode + '"]')
             .addClass('active btn-soft-primary')
             .removeClass('btn-soft-ghost');
+    }
 
-        // 重新加载（只要访问趋势变化，其他也顺便刷新）
+    $(document).on('click', '.todo-item.todo-clickable', function() {
+        var href = $(this).data('href');
+        if (href) window.location.href = href;
+    });
+
+    $(document).on('click', '.chart-toggle button', function() {
+        var mode = $(this).data('mode');
+        if (mode === visitMode) return;
+        setVisitMode(mode);
         loadDashboardData(visitMode);
     });
 
     $(document).ready(function() {
-        loadDashboardData();
+        setVisitMode(visitMode);   // ✅ 先把 UI 状态对齐
+        loadDashboardData(visitMode);
     });
 })();
 JS;

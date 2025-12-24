@@ -179,7 +179,7 @@ class SiteController extends Controller
                     ->count();
 
                 $visitTrend[] = [
-                    'date' => date('m-d H:00', $hourStart),  // 跨天也清晰
+                    'date' => date('H:i', $hourStart),  // 跨天也清晰
                     'count' => (int)$count,
                 ];
             }
