@@ -42,7 +42,7 @@ class PersonController extends Controller
     {
         $model = WarPerson::find()
             ->where(['id' => $id, 'status' => 1])
-            ->with(['events'])
+            ->with(['events', 'medias'])
             ->one();
 
         if (!$model) {
@@ -56,6 +56,16 @@ class PersonController extends Controller
         $visitLog->user_id = Yii::$app->user->isGuest ? null : Yii::$app->user->id;
         $visitLog->visited_at = time();
         $visitLog->save();
+
+        // 提取相关文章
+        $articles = [];
+        if ($model->medias) {
+            foreach ($model->medias as $media) {
+                if ($media->type === 'article' || $media->type === 'link') {
+                    $articles[] = $media;
+                }
+            }
+        }
 
         // 处理留言提交
         $newMessage = new WarMessage();
@@ -89,6 +99,7 @@ class PersonController extends Controller
             'model' => $model,
             'newMessage' => $newMessage,
             'comments' => $comments,
+            'articles' => $articles,
         ], $sidebarData));
     }
 

@@ -164,6 +164,28 @@ $this->registerCss("
                     <p class="text-muted">暂无简介</p>
                 <?php endif; ?>
             </div>
+
+            <!-- 相关文章 -->
+            <div class="content-card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 15px 20px; border-bottom: 1px solid #eee; background-color: #fff;">
+                    <h3 class="section-title" style="margin: 0; font-size: 18px; border-left: 4px solid #a94442; padding-left: 10px;">
+                        相关文章
+                    </h3>
+                </div>
+                <div class="list-group" style="margin-bottom: 0;">
+                    <?php if (empty($articles)): ?>
+                        <div class="list-group-item text-muted" style="border: none; padding: 20px; text-align: center;">暂无相关文献</div>
+                    <?php else: ?>
+                        <?php foreach ($articles as $article): ?>
+                            <a href="<?= \yii\helpers\Url::to($article->path) ?>" target="_blank" class="list-group-item" style="border: none; border-bottom: 1px solid #f0f0f0; color: #555; padding: 12px 20px;">
+                                <i class="glyphicon glyphicon-book" style="color: #a94442; margin-right: 5px;"></i> 
+                                <?= Html::encode($article->title) ?>
+                                <i class="glyphicon glyphicon-new-window pull-right" style="color: #ccc; font-size: 12px; margin-top: 2px;"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
 
         <!-- 右侧：生平与事件 -->
@@ -207,6 +229,8 @@ $this->registerCss("
                     </ul>
                 <?php endif; ?>
             </div>
+
+
 
             <!-- 留言区 -->
             <div class="content-card" id="comments">
