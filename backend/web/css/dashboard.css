@@ -1,0 +1,447 @@
+/* ==========================================================================
+   dashboard.css
+   后台仪表板专用样式
+   ========================================================================== */
+
+/* ===== 全局样式 ===== */
+.dashboard-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ===== KPI 卡片区 ===== */
+.kpi-cards-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.kpi-card {
+    flex: 1;
+    min-width: 150px;
+    max-width: 200px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8B2500 0%, #6B4423 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+}
+
+.kpi-icon-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.kpi-icon-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.kpi-icon-success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.kpi-icon-primary {
+    background: linear-gradient(135deg, #8B2500 0%, #6B4423 100%);
+}
+
+.kpi-icon-new {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+}
+
+.kpi-content {
+    text-align: center;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.kpi-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.kpi-sub {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.kpi-link {
+    font-size: 12px;
+    color: #8B2500;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(139, 37, 0, 0.08);
+    transition: background 0.2s ease;
+}
+
+.kpi-link:hover {
+    background: rgba(139, 37, 0, 0.15);
+    color: #8B2500;
+    text-decoration: none;
+}
+
+/* ===== 主工作区 ===== */
+.main-workspace {
+    margin-top: 0;
+}
+
+.main-workspace .adm-card {
+    margin-bottom: 16px;
+}
+
+/* ===== 图表容器 ===== */
+.chart-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+.chart-toggle {
+    display: flex;
+    gap: 6px;
+}
+
+/* ===== To-do 列表 ===== */
+.todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.todo-item:last-child {
+    border-bottom: none;
+}
+
+.todo-label {
+    flex: 1;
+    font-weight: 700;
+    color: #334155;
+}
+
+.todo-count {
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: 10px;
+}
+
+.todo-link {
+    color: #64748b;
+    transition: color 0.2s ease;
+}
+
+.todo-link:hover {
+    color: #8B2500;
+}
+
+/* ===== 快捷入口 ===== */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 10px;
+    background: #f8fafc;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    text-decoration: none;
+    color: #334155;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    gap: 8px;
+}
+
+.quick-action-btn:hover {
+    background: rgba(139, 37, 0, 0.08);
+    border-color: rgba(139, 37, 0, 0.15);
+    color: #8B2500;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.quick-action-btn .glyphicon {
+    font-size: 20px;
+    color: #8B2500;
+}
+
+/* ===== 第二屏 ===== */
+.second-screen {
+    margin-top: 8px;
+}
+
+/* 让第二屏两列卡片在桌面端等高对齐（不改动移动端栈叠） */
+@media (min-width: 992px) {
+    .second-screen { display: flex; align-items: stretch; }
+    .second-screen > .col-md-6 { float: none; display: flex; }
+    .second-screen > .col-md-6 .adm-card { display: flex; flex-direction: column; width: 100%; }
+    .second-screen > .col-md-6 .adm-card .adm-card-body#top-list-container { 
+        flex: 1; padding: 6px 16px;
+    }
+}
+
+.adm-card-head#quality-overview {
+    min-height: 60px;
+}
+
+/* ===== 内容质量 ===== */
+.quality-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 稍微宽松一点 */
+}
+
+.quality-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.quality-label {
+    width: 100px;
+    font-weight: 700;
+    color: #334155;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.quality-bar-wrap {
+    flex: 1;
+    height: 14px; /* 更饱满的进度条高度 */
+    background: #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.quality-bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.5s ease, background 0.3s ease;
+    background: #22c55e;
+}
+
+.quality-percent {
+    width: 45px;
+    text-align: right;
+    font-weight: 800;
+    color: #111827;
+    font-size: 13px;
+}
+
+.quality-link:hover {
+    text-decoration: underline;
+}
+
+.quality-link.btn-soft-primary {
+    padding: 3px 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(139, 37, 0, 0.288);
+    background: rgba(139, 37, 0, 0.08);
+    transition: background 0.2s ease;
+    font-size: 12px;
+    color: #551701;
+    text-decoration: none;
+    white-space: nowrap;
+    font-weight: 700;
+}
+/* ===== 热榜 TOP5 ===== */
+.top-tabs {
+    display: flex;
+    gap: 3px;
+}
+
+.top-list {
+    min-height: 160px; /* 略微压缩整体高度 */
+}
+
+.top-item {
+    display: flex;
+    align-items: center;
+    padding: 7px 0; /* 更紧凑 */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    gap: 14px;
+}
+
+.top-item:last-child {
+    border-bottom: none;
+}
+
+.top-rank {
+    width: 22px;   /* 缩小图标尺寸 */
+    height: 22px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #8B2500 0%, #6B4423 100%);
+    color: #fff;
+    font-weight: 900;
+    font-size: 12px; /* 更紧凑的数字字号 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.top-item:nth-child(1) .top-rank {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.top-item:nth-child(2) .top-rank {
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+}
+
+.top-item:nth-child(3) .top-rank {
+    background: linear-gradient(135deg, #cd7c32 0%, #a0522d 100%);
+}
+
+/* 除金银铜外不显示外框（仅数字，无底色） */
+.top-item:nth-child(n+4) .top-rank {
+    background: none;
+    color: #64748b;
+    width: 22px;
+    height: auto;
+    border-radius: 0;
+    padding: 0;
+}
+
+.top-title {
+    flex: 1;
+    font-weight: 700;
+    color: #111827;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.top-title:hover {
+    color: #8B2500;
+    text-decoration: underline;
+}
+
+.top-visits {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.top-empty {
+    text-align: center;
+    color: #94a3b8;
+    padding: 40px 0;
+    font-weight: 700;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 992px) {
+    .kpi-cards-row {
+        gap: 10px;
+    }
+    
+    .kpi-card {
+        min-width: 130px;
+        padding: 12px;
+    }
+    
+    .kpi-value {
+        font-size: 24px;
+    }
+    
+    .quick-actions {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-cards-row {
+        flex-wrap: wrap;
+    }
+    
+    .kpi-card {
+        flex: 1 1 calc(50% - 10px);
+        max-width: none;
+    }
+    
+    .quality-item {
+        flex-wrap: wrap;
+    }
+    
+    .quality-label {
+        width: 100%;
+    }
+    
+    .quality-bar-wrap {
+        order: 1;
+        flex: 1;
+    }
+    
+    .quality-percent {
+        order: 2;
+    }
+    
+    .quality-link {
+        order: 3;
+    }
+    
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .kpi-card {
+        flex: 1 1 100%;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}

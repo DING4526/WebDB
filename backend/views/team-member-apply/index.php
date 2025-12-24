@@ -89,8 +89,19 @@ $totalCount = (int)$dataProvider->getTotalCount();
               [
                   'class' => 'yii\grid\ActionColumn',
                   'header' => '操作',
-                  'template' => '{approve} {reject}',
+                  'template' => '{reason} {approve} {reject}',
                   'buttons' => [
+                      'reason' => function ($url, $model) {
+                            $reason = trim((string)$model->reason);
+                            if ($reason === '') return '';
+
+                            return Html::a('查看', 'javascript:;', [
+                                'class' => 'btn btn-xs btn-soft-ghost',
+                                'title' => '查看申请原因',
+                                'onclick' => "alert(" . json_encode($reason, JSON_UNESCAPED_UNICODE) . "); return false;",
+                            ]);
+                       },
+
                       'approve' => function ($url, $model) {
                           if ($model->status != TeamMemberApply::STATUS_PENDING) {
                               return '';

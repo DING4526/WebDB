@@ -30,6 +30,8 @@ $stageList = $stageList ?? [];
 $personOptions = $personOptions ?? [];
 $mediaList = $mediaList ?? [];
 $relationMap = $relationMap ?? [];
+$relationForm = $relationForm ?? null;
+$mediaForm    = $mediaForm ?? null;
 
 $imageList = array_filter($mediaList, fn($m) => $m->type === 'image');
 $docList   = array_filter($mediaList, fn($m) => $m->type === 'document');
@@ -69,10 +71,15 @@ $subText = $isCreate
       <?php if (!$isCreate): ?>
         <?= Html::button('人物关联与媒资', ['class' => 'btn btn-soft-danger we3-btn', 'id' => 'we3-open-drawer']) ?>
 
-        <?= Html::button($initialEdit ? '退出编辑' : '进入编辑', [
-          'class' => 'btn ' . ($initialEdit ? 'btn-soft-warning' : 'btn-soft-success') . ' we3-btn',
-          'id' => 'we3-toggle-edit',
-        ]) ?>
+        <?php if ($initialEdit): ?>
+          <?= Html::a('退出编辑', ['view', 'id' => $model->id], [
+            'class' => 'btn btn-soft-warning we3-btn we3-keep-state',
+          ]) ?>
+        <?php else: ?>
+          <?= Html::a('进入编辑', ['update', 'id' => $model->id], [
+            'class' => 'btn btn-soft-success we3-btn we3-keep-state',
+          ]) ?>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
   </div>
@@ -188,7 +195,7 @@ $subText = $isCreate
         ]) ?>
 
         <?php if (!$isCreate): ?>
-          <?= Html::button('取消编辑', ['class' => 'btn btn-soft-ghost we3-btn', 'id' => 'we3-cancel-edit']) ?>
+          <?= Html::a('取消编辑', ['view', 'id' => $model->id], ['class' => 'btn btn-soft-ghost we3-btn we3-keep-state']) ?>
         <?php else: ?>
           <?= Html::a('取消', ['index'], ['class' => 'btn btn-soft-ghost we3-btn']) ?>
         <?php endif; ?>

@@ -77,8 +77,8 @@ $this->registerCssFile('@web/css/admin-common.css');
       </div>
 
       <div class="form-group" style="margin-top:20px;">
-        <?= Html::submitButton('提交申请', ['class' => 'btn btn-success']) ?>
-        <?= Html::a('返回首页', ['site/index'], ['class' => 'btn btn-default']) ?>
+        <?= Html::submitButton('提交申请', ['class' => 'btn btn-soft-danger']) ?>
+        <?= Html::a('返回首页', ['site/index'], ['class' => 'btn btn-soft-ghost']) ?>
       </div>
 
       <?php ActiveForm::end(); ?>
