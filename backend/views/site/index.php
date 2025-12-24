@@ -8,6 +8,7 @@ use common\models\TeamMember;
 
 $this->title = '团队后台主页';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/admin-common.css');
 
 $currentUser = Yii::$app->user->getUser();
 $isRoot = $currentUser && $currentUser->isRoot();
@@ -40,102 +41,105 @@ $roleMatrix = [
     ],
     [
         'name' => '游客（guest）',
-        'color' => 'default',
+        'color' => 'ghost',
         'abilities' => ['仅浏览首页', '无法访问后台'],
     ],
 ];
 
 $applySteps = [
-    '提交成员信息' => '通过“成员管理”录入或发起申请；暂未上线自助申请，可由管理员代填。',
+    '提交成员信息' => '通过"成员管理"录入或发起申请；暂未上线自助申请，可由管理员代填。',
     '管理员审批' => 'root / 管理员确认信息后设为启用状态，必要时分配角色。',
     '通知与初始权限' => '审批通过后即可访问作业与任务模块；高级操作需管理员调整角色。',
-];
-
-$contentPipelines = [
-    [
-        'title' => '团队作业',
-        'path' => 'data/team',
-        'route' => ['teamwork/index'],
-        'items' => ['需求/设计/实现文档', '数据库文件、PPT 等'],
-    ],
-    [
-        'title' => '个人作业',
-        'path' => 'data/personal/{学号或姓名}/',
-        'route' => ['personalwork/index'],
-        'items' => ['个人提交的作业文件', '按成员独立目录放置'],
-    ],
 ];
 
 $teamInfo = Yii::$app->teamProvider->getTeam();
 ?>
 
 <div class="site-index">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="panel panel-info panel-border top">
-        <div class="panel-heading">
-          <span class="panel-title"><i class="glyphicon glyphicon-dashboard"></i> 后台概览</span>
-        </div>
-        <div class="panel-body" style="padding:18px 22px;">
-          <div class="row">
-            <div class="col-sm-4">
-              <p class="text-muted mb5">当前身份：</p>
-              <p class="lead" style="margin:0;">
-                <?php if (Yii::$app->user->isGuest): ?>
-                  游客（仅浏览）
-                <?php else: ?>
-                  <?= Html::encode(Yii::$app->user->getUser()->username ?? '') ?> · 角色：<?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
-                <?php endif; ?>
-              </p>
-              <?php if ($memberRecord && $memberRecord->student_no): ?>
-                <div class="text-muted">学号：<?= Html::encode($memberRecord->student_no) ?></div>
-              <?php elseif ($isMember): ?>
-                <div class="text-warning">学号未登记，请补充。</div>
-              <?php endif; ?>
-              <?php if ($isMember): ?>
-                <div style="margin-top:6px;">
-                  <a class="btn btn-default btn-xs" href="<?= Url::to(['team-member/my']) ?>">更新学号</a>
-                </div>
-              <?php endif; ?>
-            </div>
-            <div class="col-sm-4">
-              <p class="text-muted mb5">团队信息：</p>
-              <?php if (!empty($teamInfo)): ?>
-                <div><strong><?= Html::encode($teamInfo->name) ?></strong></div>
-                <div class="text-muted">主题：<?= Html::encode($teamInfo->topic) ?></div>
-              <?php else: ?>
-                <div class="text-muted">尚未创建团队</div>
-              <?php endif; ?>
-            </div>
-            <div class="col-sm-4 text-right">
-              <?php if ($isRoot): ?>
-                <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
-                <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/index']) ?>">审批成员申请</a>
-                <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
-              <?php elseif($isMember): ?>
-                <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
-                <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
-              <?php else: ?>
-                <a class="btn btn-warning btn-xs" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
-                <a class="btn btn-info btn-xs" href="<?= Url::to(['team-member-apply/create']) ?>">申请成为团队成员</a>
-                <a class="btn btn-success btn-xs" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
-              <?php endif; ?>                
-            </div>
+  
+  <div class="adm-hero">
+    <div class="adm-hero-inner">
+      <div>
+        <h2><?= Html::encode($this->title) ?></h2>
+        <div class="desc">管理团队信息、成员权限、作业文件与项目数据</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="adm-card">
+    <div class="adm-card-head">
+      <h3 class="adm-card-title">后台概览</h3>
+    </div>
+    <div class="adm-card-body">
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="adm-section">
+            <div class="adm-section-title">当前身份</div>
+            <?php if (Yii::$app->user->isGuest): ?>
+              <div>游客（仅浏览）</div>
+            <?php else: ?>
+              <div style="font-weight:900;font-size:16px;margin-bottom:6px;">
+                <?= Html::encode(Yii::$app->user->getUser()->username ?? '') ?>
+              </div>
+              <div class="adm-muted">
+                角色：<?= Html::encode(Yii::$app->user->getUser()->role ?? 'member') ?>
+              </div>
+            <?php endif; ?>
+            <?php if ($memberRecord && $memberRecord->student_no): ?>
+              <div class="adm-muted" style="margin-top:4px;">
+                学号：<?= Html::encode($memberRecord->student_no) ?>
+              </div>
+            <?php elseif ($isMember): ?>
+              <div style="color:#f59e0b;margin-top:4px;">学号未登记，请补充。</div>
+            <?php endif; ?>
+            <?php if ($isMember): ?>
+              <div class="adm-actions-col" style="margin-top:8px;">
+                <a class="btn btn-xs btn-soft-primary" href="<?= Url::to(['team-member/my']) ?>">更新学号</a>
+              </div>
+            <?php endif; ?>
           </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="adm-section">
+            <div class="adm-section-title">团队信息</div>
+            <?php if (!empty($teamInfo)): ?>
+              <div style="font-weight:900;margin-bottom:4px;">
+                <?= Html::encode($teamInfo->name) ?>
+              </div>
+              <div class="adm-muted">主题：<?= Html::encode($teamInfo->topic) ?></div>
+            <?php else: ?>
+              <div class="adm-muted">尚未创建团队</div>
+            <?php endif; ?>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <!-- <div class="adm-section">
+            <div class="adm-section-title">快速操作</div>
+            <?php if ($isRoot): ?>
+              <a class="btn btn-xs btn-soft-warning" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+              <a class="btn btn-xs btn-soft-primary" href="<?= Url::to(['team-member-apply/index']) ?>">审批成员申请</a>
+              <a class="btn btn-xs btn-soft-success" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
+            <?php elseif($isMember): ?>
+              <a class="btn btn-xs btn-soft-warning" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+              <a class="btn btn-xs btn-soft-success" href="<?= Url::to(['taskboard/index']) ?>">查看任务分工板</a>
+            <?php else: ?>
+              <a class="btn btn-xs btn-soft-warning" href="<?= Url::to(['team/index']) ?>">查看团队信息</a>
+              <a class="btn btn-xs btn-soft-primary" href="<?= Url::to(['team-member-apply/create']) ?>">申请成为团队成员</a>
+            <?php endif; ?>                
+          </div> -->
         </div>
       </div>
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" style="margin-top:14px;">
     <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-lock"></span>
-          角色与权限模型
+      <div class="adm-card">
+        <div class="adm-card-head">
+          <h3 class="adm-card-title">角色与权限模型</h3>
         </div>
-        <div class="panel-body p15">
-          <p class="text-muted mb10">用角色而非登录态区分能力范围，后续可接入 RBAC。</p>
+        <div class="adm-card-body">
+          <p class="adm-hint" style="margin-bottom:12px;">用角色而非登录态区分能力范围，后续可接入 RBAC。</p>
           <div class="table-responsive">
             <table class="table table-condensed">
               <thead>
@@ -148,41 +152,48 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <?php foreach ($roleMatrix as $role): ?>
                   <tr>
                     <td>
-                      <span class="label label-<?= $role['color'] ?>"><?= Html::encode($role['name']) ?></span>
+                      <span class="adm-badge adm-badge-<?= 
+                         $role['color'] === 'danger' ? 'pending' : 
+                        ($role['color'] === 'primary' ? 'active' : 
+                        ($role['color'] === 'info' ? 'info' : 'inactive')) ?>">
+                        <?= Html::encode($role['name']) ?>
+                      </span>
                     </td>
-                    <td><?= Html::encode(implode(' / ', $role['abilities'])) ?></td>
+                    <td class="adm-muted"><?= Html::encode(implode(' / ', $role['abilities'])) ?></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
             </table>
           </div>
-          <!-- <div class="alert alert-warning" style="margin-bottom: 0;">
-            当前系统仅基于“是否登录”区分身份，以上为规划基线，后续逐步接入。
-          </div> -->
         </div>
       </div>
     </div>
 
     <div class="col-md-6">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <span class="glyphicon glyphicon-user"></span>
-          成员注册/管理链路
+      <div class="adm-card">
+        <div class="adm-card-head">
+          <h3 class="adm-card-title">成员注册/管理链路</h3>
         </div>
-        <div class="panel-body p15">
-          <p class="text-muted mb10">优先打通“申请 → 审批 → 角色分配”闭环。</p>
-          <ol class="mb15" style="padding-left: 18px;">
+        <div class="adm-card-body">
+          <p class="adm-hint" style="margin-bottom:12px;">优先打通"申请 → 审批 → 角色分配"闭环。</p>
+          <ol style="padding-left: 18px;margin-bottom:16px;">
             <?php foreach ($applySteps as $step => $desc): ?>
               <li style="margin-bottom: 8px;">
                 <strong><?= Html::encode($step) ?>：</strong>
-                <?= Html::encode($desc) ?>
+                <span class="adm-muted"><?= Html::encode($desc) ?></span>
               </li>
             <?php endforeach; ?>
           </ol>
-          <div class="well well-sm" style="margin-bottom: 0;">
-            管理员入口：
-            <a href="<?= Url::to(['team-member-apply/index']) ?>">成员申请审批</a>
-            <span class="text-muted">（root 可审批并授予 member）</span>
+          <div class="adm-section" style="margin-bottom:0;">
+            <?php if ($isRoot): ?>
+              管理员入口：
+              <a href="<?= Url::to(['team-member-apply/index']) ?>">成员申请审批</a>
+              <span class="adm-muted">（root 可审批并授予 member）</span>
+            <?php elseif (!$isMember): ?>
+              申请入口：
+              <a href="<?= Url::to(['team-member-apply/create']) ?>">提交成员申请</a>
+              <span class="adm-muted">（申请后等待管理员审批）</span>
+            <?php endif; ?>
           </div>
         </div>
       </div>

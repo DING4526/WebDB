@@ -8,6 +8,9 @@ use yii\helpers\Url;
 
 $this->title = '个人作业';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('@web/css/admin-common.css');
+$this->registerCssFile('@web/css/upload-modern.css');
+$this->registerJsFile('@web/js/upload-modern.js');
 
 // 选中目录：root 可通过 ?folder=xxx 切换；普通用户默认自己的 $currentStudentNo
 $selectedFolder = Yii::$app->request->get('folder');
@@ -23,86 +26,71 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
 
 <div class="pw-page">
 
-  <div class="pw-header">
-    <div>
-      <h2 class="pw-title"><?= Html::encode($this->title) ?></h2>
-      <div class="pw-subtitle text-muted">按学号（或姓名）目录归档个人作业，支持下载与权限删除</div>
-    </div>
-    <div class="pw-actions">
-      <?php if (!empty($canUpload)): ?>
-        <a class="btn btn-primary" href="#uploadBox">
-          <span class="glyphicon glyphicon-upload"></span> 上传个人作业
-        </a>
-      <?php endif; ?>
+  <div class="adm-hero">
+    <div class="adm-hero-inner">
+      <div>
+        <h2><?= Html::encode($this->title) ?></h2>
+        <div class="desc">按学号（或姓名）目录归档个人作业，支持下载与权限删除</div>
+      </div>
+      <div class="adm-actions">
+        <?php if (!empty($canUpload)): ?>
+          <a class="btn btn-primary" href="#uploadBox">
+            上传个人作业
+          </a>
+        <?php endif; ?>
+        <?= Html::a('刷新', ['index'], ['class' => 'btn btn-default']) ?>
+      </div>
     </div>
   </div>
 
   <!-- 统计卡 -->
-  <div class="row pw-cards">
-    <div class="col-sm-4">
-      <div class="panel panel-default pw-card">
-        <div class="panel-body">
-          <div class="pw-kpi"><?= Html::encode($memberCount) ?></div>
-          <div class="text-muted">成员目录</div>
-        </div>
-      </div>
+  <div class="adm-stats" style="margin-top: 14px;">
+    <div class="adm-stat-card">
+      <div class="adm-stat-value"><?= Html::encode($memberCount) ?></div>
+      <div class="adm-stat-label">成员目录</div>
     </div>
-    <div class="col-sm-4">
-      <div class="panel panel-default pw-card">
-        <div class="panel-body">
-          <div class="pw-kpi"><?= Html::encode($fileCount) ?></div>
-          <div class="text-muted">作业文件</div>
-        </div>
-      </div>
+    <div class="adm-stat-card">
+      <div class="adm-stat-value"><?= Html::encode($fileCount) ?></div>
+      <div class="adm-stat-label">作业文件</div>
     </div>
-    <div class="col-sm-4">
-      <div class="panel panel-default pw-card">
-        <div class="panel-body">
-          <div class="pw-badges">
-            <span class="label label-success">本地存储</span>
-            <span class="label label-success">目录扫描</span>
-            <span class="label label-success">统一下载</span>
-          </div>
-          <div class="pw-tip text-muted">路径：<code>data/personal/学号/</code></div>
-        </div>
+    <div class="adm-stat-card">
+      <div class="adm-stat-value">
+        <span class="adm-badge adm-badge-active">本地存储</span>
+        <span class="adm-badge adm-badge-active">目录扫描</span>
       </div>
+      <div class="adm-stat-label">路径：<code>data/personal/学号/</code></div>
     </div>
   </div>
 
   <?php if (!empty($canUpload)): ?>
-    <!-- 上传区（更干净） -->
-    <div id="uploadBox" class="panel panel-info pw-upload">
-      <div class="panel-heading">
-        <span class="glyphicon glyphicon-cloud-upload"></span> 上传个人作业
+    <!-- 上传区 -->
+    <div id="uploadBox" class="adm-card">
+      <div class="adm-card-head">
+        <h3 class="adm-card-title">上传个人作业</h3>
       </div>
-      <div class="panel-body">
+      <div class="adm-card-body adm-form">
         <?php if (empty($currentStudentNo) && empty($isRoot)): ?>
           <div class="alert alert-warning" style="margin:0;">
             请先在首页补充学号后再上传。
           </div>
         <?php else: ?>
-          <?= Html::beginForm(['personalwork/upload'], 'post', ['enctype' => 'multipart/form-data']) ?>
-            <div class="row">
-              <div class="col-sm-4">
-                <label class="control-label">学号目录</label>
-                <?php if (!empty($isRoot)): ?>
-                  <?= Html::textInput('student_no', $selectedFolder ?: $currentStudentNo, [
-                    'class' => 'form-control',
-                    'placeholder' => '如：2310xxxx',
-                  ]) ?>
-                <?php else: ?>
-                  <?= Html::hiddenInput('student_no', $currentStudentNo) ?>
-                  <div class="form-control" style="background:#f9fafb;"><?= Html::encode($currentStudentNo) ?></div>
-                <?php endif; ?>
+          <?= Html::beginForm(['personalwork/upload'], 'post', ['enctype' => 'multipart/form-data', 'id' => 'uploadForm']) ?>
+            <?= Html::hiddenInput('student_no', $currentStudentNo) ?>
+            <div class="pw-upload-modern">
+              <div class="pw-upload-hint">
+                <span class="pw-upload-icon">🎓</span>
+                <div>
+                  <div class="pw-upload-hint-title">上传到：<?= Html::encode($currentStudentNo) ?></div>
+                  <div class="pw-upload-hint-desc">支持 pdf / docx / ppt / zip 等格式</div>
+                </div>
               </div>
-              <div class="col-sm-5">
-                <label class="control-label">选择文件</label>
-                <input type="file" name="file" required class="form-control">
-                <!-- <div class="help-block pw-help">建议命名：<code>作业类型_姓名(学号).pdf</code></div> -->
-              </div>
-              <div class="col-sm-3">
-                <label class="control-label" style="visibility:hidden;">提交</label>
-                <?= Html::submitButton('上传', ['class' => 'btn btn-primary btn-block']) ?>
+              
+              <div class="pw-upload-action">
+                <input type="file" name="file" required id="fileInput" style="display:none;">
+                <button type="button" class="btn-upload-trigger" id="fileTrigger">
+                  <span class="glyphicon glyphicon-cloud-upload"></span>
+                  <span id="fileName">选择文件并上传</span>
+                </button>
               </div>
             </div>
           <?= Html::endForm() ?>
@@ -112,7 +100,7 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
   <?php endif; ?>
 
   <?php if (empty($members)): ?>
-    <div class="alert alert-warning pw-empty">
+    <div class="alert alert-warning" style="border-radius:18px; margin-top:14px;">
       <strong>目录为空：</strong>请按 <code>data/personal/学号(或姓名)/</code> 放置个人作业文件。
     </div>
   <?php else: ?>
@@ -120,15 +108,15 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
     <div class="row">
       <!-- 左栏：成员目录 -->
       <div class="col-md-4">
-        <div class="panel panel-default pw-side">
-          <div class="panel-heading">
-            <span class="glyphicon glyphicon-list"></span> 成员目录
+        <div class="adm-card">
+          <div class="adm-card-head">
+            <h3 class="adm-card-title">成员目录</h3>
           </div>
-          <div class="panel-body">
-            <input id="pwSearch" type="text" class="form-control" placeholder="搜索学号/姓名目录…">
-            <div class="pw-sidehint text-muted">点击目录查看文件</div>
+          <div class="adm-card-body">
+            <input id="pwSearch" type="text" class="form-control" placeholder="搜索学号/姓名目录…" style="margin-bottom:12px;">
+            <div class="adm-hint" style="margin-bottom:10px;">点击目录查看文件</div>
 
-            <div class="list-group pw-list" id="pwFolderList">
+            <div class="list-group pw-list" id="pwFolderList" style="max-height:520px; overflow:auto;">
               <?php foreach ($members as $m): ?>
                 <?php
                   $active = (!empty($selectedFolder) && $selectedFolder === $m['folder']);
@@ -136,9 +124,10 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
                 ?>
                 <a class="list-group-item <?= $active ? 'active' : '' ?>"
                    href="<?= Url::to(['personalwork/index', 'folder' => $m['folder']]) ?>"
-                   data-folder="<?= Html::encode($m['folder']) ?>">
+                   data-folder="<?= Html::encode($m['folder']) ?>"
+                   style="border-radius:12px; margin-bottom:6px; border:1px solid rgba(0,0,0,.08);">
                   <span class="glyphicon glyphicon-user"></span>
-                  <span class="pw-folder"><?= Html::encode($m['folder']) ?></span>
+                  <span style="margin-left:6px; font-weight:700;"><?= Html::encode($m['folder']) ?></span>
                   <span class="badge"><?= $count ?></span>
                 </a>
               <?php endforeach; ?>
@@ -149,28 +138,29 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
 
       <!-- 右栏：文件表格 -->
       <div class="col-md-8">
-        <div class="panel panel-default pw-main">
-          <div class="panel-heading">
-            <span class="glyphicon glyphicon-folder-open"></span>
-            <?php if (!empty($selectedFolder)): ?>
-              当前目录：<strong><?= Html::encode($selectedFolder) ?></strong>
-            <?php else: ?>
-              文件列表
-            <?php endif; ?>
+        <div class="adm-card">
+          <div class="adm-card-head">
+            <h3 class="adm-card-title">
+              <?php if (!empty($selectedFolder)): ?>
+                当前目录：<strong><?= Html::encode($selectedFolder) ?></strong>
+              <?php else: ?>
+                文件列表
+              <?php endif; ?>
+            </h3>
           </div>
 
-          <div class="panel-body" style="padding:0;">
+          <div class="adm-grid" style="padding:0;">
             <?php if (empty($selectedFolder)): ?>
-              <div class="pw-placeholder">
+              <div style="padding:24px; color:#6b7280;">
                 请从左侧选择一个成员目录查看文件。
               </div>
             <?php elseif (empty($selectedFiles)): ?>
-              <div class="pw-placeholder">
+              <div style="padding:24px; color:#6b7280;">
                 该目录暂无文件。
               </div>
             <?php else: ?>
               <div class="table-responsive">
-                <table class="table table-hover pw-table">
+                <table class="table table-hover">
                   <thead>
                     <tr>
                       <th style="width:60%;">文件名</th>
@@ -181,25 +171,24 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
                   <tbody>
                   <?php foreach ($selectedFiles as $f): ?>
                     <tr>
-                      <td class="pw-filecell">
-                        <span class="glyphicon glyphicon-file text-info"></span>
-                        <a class="pw-filename"
-                           href="<?= Url::to(['download/file', 'type' => 'personal', 'path' => $selectedFolder.'/'.$f['name']]) ?>">
-                          <?= Html::encode($f['name']) ?>
-                        </a>
+                      <td style="font-weight:700;">
+                  <span class="glyphicon glyphicon-file text-primary" style="margin-right:8px; margin-left:4px;"></span>
+                  <span class="adm-hint" style="font-size:12px; margin-top:4px;">
+                    <?= Html::encode($f['name']) ?>
+                  </span>
                       </td>
-                      <td class="text-muted">
+                      <td class="adm-muted">
                         <span class="glyphicon glyphicon-time"></span>
                         <?= date('Y-m-d H:i', $f['mtime']) ?>
                       </td>
-                      <td class="text-right">
-                        <a class="btn btn-xs btn-default"
+                      <td class="text-right adm-actions-col">
+                        <a class="btn btn-xs btn-soft-ghost"
                            href="<?= Url::to(['download/file', 'type' => 'personal', 'path' => $selectedFolder.'/'.$f['name']]) ?>">
                           下载
                         </a>
                         <?php if (!empty($isRoot) || (!empty($currentStudentNo) && $currentStudentNo === $selectedFolder)): ?>
                           <?= Html::a('删除', ['personalwork/delete', 'folder' => $selectedFolder, 'name' => $f['name']], [
-                            'class' => 'btn btn-xs btn-danger',
+                            'class' => 'btn btn-xs btn-soft-danger',
                             'data-method' => 'post',
                             'data-confirm' => '确定删除该文件？',
                           ]) ?>
@@ -237,39 +226,3 @@ $selectedFiles = (!empty($selectedFolder) && isset($memberMap[$selectedFolder]))
   });
 })();
 </script>
-
-<style>
-/* 页面整体 */
-.pw-page { padding: 8px 6px; }
-.pw-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 12px; }
-.pw-title { margin:0; font-weight:800; }
-.pw-subtitle { margin-top:6px; }
-.pw-actions { margin-bottom: 4px; }
-
-/* 统计卡 */
-.pw-cards { margin-bottom: 12px; }
-.pw-card { border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.05); border: 1px solid #eef1f5; }
-.pw-kpi { font-size: 34px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
-.pw-badges .label { margin-right: 6px; display:inline-block; margin-bottom: 6px; }
-.pw-tip { margin-top: 6px; }
-
-/* 上传 */
-.pw-upload { border-radius: 10px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
-.pw-help { margin-top: 6px; margin-bottom: 0; }
-
-/* 左侧栏 */
-.pw-side { border-radius: 10px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,.05); border: 1px solid #eef1f5; }
-.pw-list { margin-top: 10px; max-height: 520px; overflow:auto; }
-.pw-sidehint { margin-top: 8px; font-size: 12px; }
-.pw-folder { margin-left: 6px; }
-
-/* 右侧 */
-.pw-main { border-radius: 10px; overflow:hidden; box-shadow: 0 2px 10px rgba(0,0,0,.05); border: 1px solid #eef1f5; }
-.pw-table thead th { background:#f7f9fb; border-bottom: 1px solid #e9edf3; }
-.pw-filecell .glyphicon { margin-right: 8px; }
-.pw-filename { font-weight: 600; }
-.pw-placeholder { padding: 24px; color:#6b7280; }
-
-/* 空态 */
-.pw-empty { border-radius: 10px; }
-</style>

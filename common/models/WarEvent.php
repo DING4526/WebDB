@@ -74,4 +74,11 @@ class WarEvent extends ActiveRecord
     {
         return $this->hasMany(WarMedia::class, ['event_id' => 'id']);
     }
+
+    public function getCoverImage()
+    {
+        return $this->hasOne(WarMedia::class, ['event_id' => 'id'])
+            ->andWhere(['type' => 'image'])
+            ->orderBy(['uploaded_at' => SORT_ASC, 'id' => SORT_ASC]); // 第一张
+    }
 }
