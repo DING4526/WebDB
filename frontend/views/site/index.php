@@ -53,7 +53,7 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
                     <span id="modal-summary"></span>
                 </div>
             </div>
-            <div class="event-content" id="modal-content"></div>
+            <!-- <div class="event-content" id="modal-content"></div> -->
         </div>
     </div>
 </div>

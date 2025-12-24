@@ -243,7 +243,7 @@ a.desc:after {
     transform: translate(-50%, -50%) !important; /* 居中修正 */
     
     width: 600px;
-    max-height: 85vh;
+    max-height: 50vh;
     /* 修改：极淡的白色背景 + 强毛玻璃 */
     background: rgba(255, 255, 255, 0.05); 
     backdrop-filter: blur(30px);
@@ -463,8 +463,14 @@ a.desc:after {
 
 /* 新增：地图立体感和金色描边样式 */
 #china-map-object {
-    filter: drop-shadow(-20px 20px 40px rgba(0, 0, 0, 0.6))
-            drop-shadow(-5px 5px 15px rgba(0, 0, 0, 0.3));
+    /* 移除默认的阴影效果，让地图保持平整 */
+    filter: none;
+}
+
+/* 新增：确保地图整体阴影不被覆盖 */
+#china-map-object {
+    /* 保留地图立体感 */
+    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.8));
 }
 
 /* 响应式调整 */

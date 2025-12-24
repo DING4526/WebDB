@@ -28,7 +28,7 @@ class EventController extends Controller
             
             // 修改：查询完整的事件信息，包括日期、摘要、内容等
             $events = WarEvent::find()
-                ->select(['id', 'title', 'location', 'event_date', 'summary', 'content'])
+                ->select(['id', 'title', 'location', 'event_date', 'summary'])
                 ->where(['status' => 1])
                 ->andWhere(['not', ['location' => null]])
                 ->andWhere(['!=', 'location', ''])
@@ -48,8 +48,7 @@ class EventController extends Controller
                     'title' => $event['title'],
                     'event_date' => $event['event_date'],
                     'location' => $event['location'],
-                    'summary' => $event['summary'] ?: '暂无摘要',
-                    'content' => $event['content'] ?: '暂无详情'
+                    'summary' => $event['summary'] ?: '暂无摘要'
                 ];
             }
             

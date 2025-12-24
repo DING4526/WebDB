@@ -14,11 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
         for (var i = 0; i < scripts.length; i++) {
             var src = scripts[i].src;
             if (src && src.indexOf('/js/china-map.js') > -1) {
-                // 从 script src 中提取基础路径
                 return src.substring(0, src.indexOf('/js/china-map.js'));
             }
         }
-        // 降级方案：直接返回空字符串，依赖相对路径
         return '';
     })();
     
@@ -40,7 +38,23 @@ document.addEventListener('DOMContentLoaded', function () {
         "Macao SAR": "澳门特别行政区"
     };
 
+    // 省份ID到中文名称的映射 - 修复：补全缺失的省份
+    var provinceIdMap = {
+        'CNSN': '陕西省', 'CNSH': '上海市', 'CNCQ': '重庆市', 'CNZJ': '浙江省',
+        'CNJX': '江西省', 'CNSC': '四川省', 'CNHB': '湖北省', 'CNHN': '湖南省',
+        'CNGD': '广东省', 'CNFJ': '福建省', 'CNAH': '安徽省', 'CNJS': '江苏省',
+        'CNSD': '山东省', 'CNHE': '河北省', 'CNHA': '河南省', 'CNSX': '山西省',
+        'CNLN': '辽宁省', 'CNJL': '吉林省', 'CNHL': '黑龙江省', 'CNGS': '甘肃省',
+        'CNQH': '青海省', 'CNYN': '云南省', 'CNGZ': '贵州省', 'CNGX': '广西壮族自治区',
+        'CNXJ': '新疆维吾尔自治区', 'CNXZ': '西藏自治区', 'CNBJ': '北京市',
+        'CNTJ': '天津市', 'CNNM': '内蒙古自治区', 'CNHI': '海南省', 'CNNX': '宁夏回族自治区',
+        'CNTW': '台湾省', // 新增台湾
+        'CNHK': '香港特别行政区', // 新增香港
+        'CNMO': '澳门特别行政区'  // 新增澳门
+    };
+
     var provinceCenters = {};
+    var provinceLabel = null;
 
     function getEventsForMapName(mapName, data) {
         for (var dbName in data) {
@@ -119,6 +133,66 @@ document.addEventListener('DOMContentLoaded', function () {
         g.appendChild(pole);
         g.appendChild(flag);
         svgDoc.documentElement.appendChild(g);
+    }
+
+    // 创建省份名称显示标签
+    function createProvinceLabel(svgDoc) {
+        provinceLabel = svgDoc.getElementById('province-label');
+        if (!provinceLabel) {
+            provinceLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+            provinceLabel.setAttribute('id', 'province-label');
+            provinceLabel.style.fontSize = '24px';
+            provinceLabel.style.fontFamily = '"SimHei", "Microsoft YaHei", sans-serif';
+            provinceLabel.style.fontWeight = 'bold';
+            provinceLabel.style.fill = '#FFD700';
+            provinceLabel.style.stroke = '#000000';
+            provinceLabel.style.strokeWidth = '1.5px';
+            provinceLabel.style.paintOrder = 'stroke fill';
+            provinceLabel.style.pointerEvents = 'none';
+            provinceLabel.style.opacity = '0';
+            provinceLabel.style.transition = 'opacity 0.3s ease';
+            provinceLabel.style.textAnchor = 'middle';
+            svgDoc.documentElement.appendChild(provinceLabel);
+        }
+        return provinceLabel;
+    }
+
+    // 获取省份标签点的坐标 - 增强：添加调试日志
+    function getProvinceLabelPosition(svgDoc, provinceId) {
+        var labelPoint = svgDoc.querySelector('#label_points circle[id="' + provinceId + '"]');
+        if (labelPoint) {
+            var pos = {
+                x: parseFloat(labelPoint.getAttribute('cx')),
+                y: parseFloat(labelPoint.getAttribute('cy'))
+            };
+            console.log('[ChinaMap] 找到标签点:', provinceId, pos);
+            return pos;
+        } else {
+            console.warn('[ChinaMap] 未找到标签点:', provinceId);
+        }
+        return null;
+    }
+
+    // 显示省份名称
+    function showProvinceLabel(svgDoc, provinceId) {
+        var provinceName = provinceIdMap[provinceId];
+        if (!provinceName) return;
+        
+        var position = getProvinceLabelPosition(svgDoc, provinceId);
+        if (!position) return;
+        
+        var label = createProvinceLabel(svgDoc);
+        label.textContent = provinceName;
+        label.setAttribute('x', position.x);
+        label.setAttribute('y', position.y - 10);
+        label.style.opacity = '1';
+    }
+
+    // 隐藏省份名称
+    function hideProvinceLabel() {
+        if (provinceLabel) {
+            provinceLabel.style.opacity = '0';
+        }
     }
 
     // --- 修改：显示事件详情弹窗(修复图片路径) ---
@@ -211,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modal-date').textContent = dateStr;
         document.getElementById('modal-location').textContent = event.location || '未知';
         document.getElementById('modal-summary').textContent = event.summary || '暂无摘要';
-        document.getElementById('modal-content').textContent = event.content || '暂无详情';
+        // document.getElementById('modal-content').textContent = event.content || '暂无详情';
     }
 
     function initMap(svgDoc) {
@@ -238,21 +312,48 @@ document.addEventListener('DOMContentLoaded', function () {
         var pointsGroup = svgDoc.getElementById('points');
         if (pointsGroup) pointsGroup.style.display = 'none';
 
+        // 添加金色描边样式（保留地图整体阴影）
+        addMapStyling(svgDoc);
+
         var paths = svgDoc.querySelectorAll('#features path');
         
         paths.forEach(function(path) {
             var originalFill = path.getAttribute('fill') || '';
-            path.style.transition = 'fill 0.3s ease, opacity 0.3s ease';
-            path.style.cursor = 'default';
-
+            var provinceId = path.getAttribute('id');
+            
+            // 调试：打印省份ID
+            if (provinceId) {
+                console.log('[ChinaMap] 省份路径:', provinceId, provinceIdMap[provinceId] || '未映射');
+            }
+            
+            // 确保初始状态正确
+            path.style.transition = 'fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease';
+            
+            // 悬浮效果
             path.addEventListener('mouseenter', function () {
                 this.style.fill = '#d9534f';
+                this.style.stroke = '#FFA500';
+                this.style.strokeWidth = '2';
                 this.style.opacity = '0.9';
+                this.style.transform = 'translateY(-3px)';
+                this.style.filter = 'drop-shadow(0 5px 10px rgba(0,0,0,0.5))';
+                
+                // 显示省份名称
+                if (provinceId) {
+                    showProvinceLabel(svgDoc, provinceId);
+                }
             });
 
             path.addEventListener('mouseleave', function () {
                 this.style.fill = originalFill;
+                this.style.stroke = '#FFD700';
+                this.style.strokeWidth = '1.5';
                 this.style.opacity = '1';
+                this.style.transform = 'translateY(0)';
+                this.style.filter = 'none';
+                
+                // 隐藏省份名称
+                hideProvinceLabel();
             });
         });
         
@@ -307,6 +408,44 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => console.error(err));
     }
 
+    // 添加金色描边样式（保留地图整体阴影）
+    function addMapStyling(svgDoc) {
+        var svg = svgDoc.documentElement;
+        
+        var defs = svgDoc.querySelector('defs') || svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        if (!svgDoc.querySelector('defs')) {
+            svg.insertBefore(defs, svg.firstChild);
+        }
+
+        var style = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'style');
+        style.textContent = `
+            /* 保留地图整体阴影立体感 */
+            #features {
+                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            }
+
+            /* 默认状态：金色描边 */
+            #features path {
+                stroke: #FFD700;
+                stroke-width: 1.5;
+                stroke-linejoin: round;
+                stroke-linecap: round;
+            }
+
+            #label_points circle {
+                fill: none;
+                stroke: none;
+            }
+
+            #points circle {
+                fill: #d9534f;
+                stroke: #fff;
+                stroke-width: 2;
+            }
+        `;
+        defs.appendChild(style);
+    }
+
     var obj = document.getElementById('china-map-object');
     if (obj) {
         if (obj.contentDocument && obj.contentDocument.readyState === 'complete' && obj.contentDocument.querySelector('svg')) {
@@ -320,99 +459,4 @@ document.addEventListener('DOMContentLoaded', function () {
         var inlineSvg = document.querySelector('#china-map-wrapper svg');
         if (inlineSvg) initMap(document);
     }
-
-    (function() {
-        'use strict';
-
-        var svgDoc = null;
-        var eventsData = [];
-
-        // 等待 SVG 加载完成
-        var mapObject = document.getElementById('china-map-object');
-        if (!mapObject) return;
-
-        mapObject.addEventListener('load', function() {
-            svgDoc = mapObject.contentDocument;
-            if (!svgDoc) return;
-
-            // 新增：为 SVG 添加金色描边样式
-            addMapStyling();
-
-            // 原有代码：加载事件数据
-            loadEventsData();
-        });
-
-        // 新增函数：为地图添加金色描边样式
-        function addMapStyling() {
-            var svg = svgDoc.documentElement;
-            
-            // 创建或获取 <defs> 标签
-            var defs = svgDoc.querySelector('defs') || svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
-            if (!svgDoc.querySelector('defs')) {
-                svg.insertBefore(defs, svg.firstChild);
-            }
-
-            // 创建样式标签
-            var style = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'style');
-            style.textContent = `
-                /* 省市路径的金色描边 - 保持原有的红色填充 */
-                #features path {
-                    stroke: #FFD700 !important; /* 金色描边 */
-                    stroke-width: 1.5 !important; /* 描边粗细 */
-                    stroke-linejoin: round !important;
-                    stroke-linecap: round !important;
-                    /* 移除 fill 属性，保留 SVG 原有的填充色 */
-                    transition: fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease;
-                }
-
-                /* 悬停效果 - 保持深红色不变 */
-                #features path:hover {
-                    fill: #d9534f !important; /* 悬停时深红色 */
-                    stroke: #FFA500 !important; /* 悬停时更深的金色 */
-                    stroke-width: 2 !important;
-                    opacity: 0.9;
-                    cursor: pointer;
-                }
-
-                /* 标签点保持原样 */
-                #label_points circle {
-                    fill: none;
-                    stroke: none;
-                }
-
-                /* 事件点保持原样 */
-                #points circle {
-                    fill: #d9534f;
-                    stroke: #fff;
-                    stroke-width: 2;
-                }
-            `;
-            defs.appendChild(style);
-        }
-
-        function loadEventsData() {
-            if (!window._EVENT_INDEX_URL) {
-                console.error('事件列表 URL 未定义');
-                return;
-            }
-
-            fetch(window._EVENT_INDEX_URL, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(function(response) {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(function(data) {
-                eventsData = data;
-                initMap();
-            })
-            .catch(function(error) {
-                console.error('加载事件数据失败:', error);
-            });
-        }
-
-    })();
 });
