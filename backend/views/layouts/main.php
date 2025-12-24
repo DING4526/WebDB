@@ -63,7 +63,7 @@ $this->registerCssFile('@web/css/admin-common.css');
     <header class="navbar navbar-fixed-top navbar-shadow">
       <div class="navbar-branding">
         <a class="navbar-brand" href="<?= Url::to(['site/index']) ?>">
-          <b>管理</b>后台
+          <b>团队主页</b>
         </a>
         <span id="toggle_sidemenu_l" class="ad ad-lines"></span>
       </div>
