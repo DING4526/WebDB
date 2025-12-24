@@ -51,12 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // --- 注释掉折线绘制功能 ---
-    /*
-    function drawEventLines(svgDoc, centerX, centerY, events, mapEngName) {
-        // ...折线绘制代码已注释...
-    }
-    */
 
     function drawFlag(svgDoc, x, y) {
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -326,4 +320,99 @@ document.addEventListener('DOMContentLoaded', function () {
         var inlineSvg = document.querySelector('#china-map-wrapper svg');
         if (inlineSvg) initMap(document);
     }
+
+    (function() {
+        'use strict';
+
+        var svgDoc = null;
+        var eventsData = [];
+
+        // 等待 SVG 加载完成
+        var mapObject = document.getElementById('china-map-object');
+        if (!mapObject) return;
+
+        mapObject.addEventListener('load', function() {
+            svgDoc = mapObject.contentDocument;
+            if (!svgDoc) return;
+
+            // 新增：为 SVG 添加金色描边样式
+            addMapStyling();
+
+            // 原有代码：加载事件数据
+            loadEventsData();
+        });
+
+        // 新增函数：为地图添加金色描边样式
+        function addMapStyling() {
+            var svg = svgDoc.documentElement;
+            
+            // 创建或获取 <defs> 标签
+            var defs = svgDoc.querySelector('defs') || svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            if (!svgDoc.querySelector('defs')) {
+                svg.insertBefore(defs, svg.firstChild);
+            }
+
+            // 创建样式标签
+            var style = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = `
+                /* 省市路径的金色描边 - 保持原有的红色填充 */
+                #features path {
+                    stroke: #FFD700 !important; /* 金色描边 */
+                    stroke-width: 1.5 !important; /* 描边粗细 */
+                    stroke-linejoin: round !important;
+                    stroke-linecap: round !important;
+                    /* 移除 fill 属性，保留 SVG 原有的填充色 */
+                    transition: fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease;
+                }
+
+                /* 悬停效果 - 保持深红色不变 */
+                #features path:hover {
+                    fill: #d9534f !important; /* 悬停时深红色 */
+                    stroke: #FFA500 !important; /* 悬停时更深的金色 */
+                    stroke-width: 2 !important;
+                    opacity: 0.9;
+                    cursor: pointer;
+                }
+
+                /* 标签点保持原样 */
+                #label_points circle {
+                    fill: none;
+                    stroke: none;
+                }
+
+                /* 事件点保持原样 */
+                #points circle {
+                    fill: #d9534f;
+                    stroke: #fff;
+                    stroke-width: 2;
+                }
+            `;
+            defs.appendChild(style);
+        }
+
+        function loadEventsData() {
+            if (!window._EVENT_INDEX_URL) {
+                console.error('事件列表 URL 未定义');
+                return;
+            }
+
+            fetch(window._EVENT_INDEX_URL, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(function(data) {
+                eventsData = data;
+                initMap();
+            })
+            .catch(function(error) {
+                console.error('加载事件数据失败:', error);
+            });
+        }
+
+    })();
 });

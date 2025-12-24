@@ -5,14 +5,15 @@ use yii\helpers\Html;
 $this->title = '烽火记忆 · 抗战胜利80周年';
 ?>
 <div class="site-index">
-    <div class="jumbotron text-center bg-transparent">
-        <h1 class="display-4">烽火记忆 · 抗战胜利80周年</h1>
-        <p class="lead">以时间作证，以数据铭记 —— 1931–1945 </p>
+    <!-- 标题区域：文字带阴影确保在背景上可见 -->
+    <div class="jumbotron text-center" style="background:transparent; border:none;">
+        <h1 class="display-4" style="color:#fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">烽火记忆 · 抗战胜利80周年</h1>
+        <p class="lead" style="color:#fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">以时间作证，以数据铭记 —— 1931–1945 </p>
     </div>
 
     <div class="body-content">
-        <!-- 地图容器 -->
-        <div id="china-map-wrapper" style="max-width:1000px; margin:0 auto; border: 1px solid #eee; padding: 10px;">
+        <!-- 地图容器：完全透明，SVG 直接显示在背景图片上 -->
+        <div id="china-map-wrapper" style="max-width:1000px; margin:0 auto; background:transparent; border:none; padding:10px;">
             <!-- 使用 object 标签加载 SVG -->
             <object id="china-map-object" type="image/svg+xml" data="<?= \yii\helpers\BaseUrl::base(true) . '/images/china-map.svg' ?>" style="width:100%; height:900px; display:block;">
                 您的浏览器不支持 SVG，请升级浏览器。
