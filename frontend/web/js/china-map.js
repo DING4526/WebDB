@@ -1,14 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('[ChinaMap] 极简折线交互版 - 已加载');
+    console.log('[ChinaMap] 极简交互版 - 已加载');
 
-    var mapObj = document.getElementById('china-map-object');
-    if (mapObj) {
-        mapObj.style.height = '900px';
-    }
+    // var mapObj = document.getElementById('china-map-object');
+    // if (mapObj) {
+    //     mapObj.style.height = '900px';
+    // }
 
     var baseUrl = window._EVENT_INDEX_URL || '/event/index';
+
     
-    // --- 新增：获取图片基础路径 ---
+    // 获取图片基础路径
     var imageBasePath = (function() {
         var scripts = document.getElementsByTagName('script');
         for (var i = 0; i < scripts.length; i++) {
@@ -19,8 +20,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return '';
     })();
-    
-    console.log('[ChinaMap] 图片基础路径:', imageBasePath);
 
     // 省份中英文映射
     var provinceMap = {
@@ -48,9 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'CNQH': '青海省', 'CNYN': '云南省', 'CNGZ': '贵州省', 'CNGX': '广西壮族自治区',
         'CNXJ': '新疆维吾尔自治区', 'CNXZ': '西藏自治区', 'CNBJ': '北京市',
         'CNTJ': '天津市', 'CNNM': '内蒙古自治区', 'CNHI': '海南省', 'CNNX': '宁夏回族自治区',
-        'CNTW': '台湾省',
-        'CNHK': '香港特别行政区',
-        'CNMO': '澳门特别行政区'
+        'CNTW': '台湾省', 'CNHK': '香港特别行政区', 'CNMO': '澳门特别行政区'
     };
 
     var provinceCenters = {};
@@ -65,77 +62,316 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-
-    function drawFlag(svgDoc, x, y) {
+    // --- 绘制三层同心圆点 (带交互效果) ---
+    function drawCircleMarker(svgDoc, x, y, onClickCallback) {
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('transform', `translate(${x}, ${y}) scale(1.8)`);
+        g.setAttribute('transform', `translate(${x}, ${y})`);
+        g.style.cursor = 'pointer'; // 允许点击，鼠标变手型
         
-        var pole = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        pole.setAttribute('x1', '0');
-        pole.setAttribute('y1', '0');
-        pole.setAttribute('x2', '0');
-        pole.setAttribute('y2', '-26');
-        pole.setAttribute('stroke', '#000000');
-        pole.setAttribute('stroke-width', '1.33');
-        pole.setAttribute('stroke-linecap', 'round');
-        pole.style.pointerEvents = 'none';
-        pole.style.filter = 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))';
-        
-        var flag = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        flag.setAttribute('fill', '#FF3333');
-        flag.setAttribute('stroke', '#CC0000');
-        flag.setAttribute('stroke-width', '0.5');
-        flag.style.pointerEvents = 'none';
-        flag.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))';
-        
-        var animationStartTime = Date.now();
-        var flagWidth = 16;
-        var flagHeight = 11;
-        
-        function animate() {
-            var elapsed = (Date.now() - animationStartTime) / 1000;
-            var progress = elapsed % 2;
-            var segments = 16;
-            var d = 'M 0,-26 ';
-            
-            for (var i = 0; i <= segments; i++) {
-                var t = i / segments;
-                var xPos = t * flagWidth;
-                var edgeFactor = Math.sin(t * Math.PI);
-                var phase = progress * Math.PI * 2;
-                var amplitude = 1.5;
-                var frequency = 2;
-                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
-                var yPos = -26 + yOffset;
-                d += `L ${xPos},${yPos} `;
-            }
-            
-            d += `L ${flagWidth},${-26 + flagHeight} `;
-            
-            for (var j = segments; j >= 0; j--) {
-                var t = j / segments;
-                var xPos = t * flagWidth;
-                var edgeFactor = Math.sin(t * Math.PI);
-                var phase = progress * Math.PI * 2;
-                var amplitude = 1.5;
-                var frequency = 2;
-                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
-                var yPos = -26 + flagHeight + yOffset;
-                d += `L ${xPos},${yPos} `;
-            }
-            
-            d += 'Z';
-            flag.setAttribute('d', d);
-            requestAnimationFrame(animate);
-        }
-        animate();
+        // 定义过渡动画样式
+        var transitionStyle = 'r 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.3s ease, opacity 0.3s ease';
 
-        g.appendChild(pole);
-        g.appendChild(flag);
+        // 最外层圆：半径最大，透明度最高
+        var outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outerCircle.setAttribute('cx', '0');
+        outerCircle.setAttribute('cy', '0');
+        outerCircle.setAttribute('r', '12'); // 基础半径的4倍
+        outerCircle.setAttribute('fill', '#FFD700');
+        outerCircle.setAttribute('opacity', '0.25'); // 最透明但不是百分百
+        outerCircle.style.filter = 'blur(1px)';
+        outerCircle.style.transition = transitionStyle;
+        
+        // 中间层圆：半径中等，中等透明度
+        var middleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        middleCircle.setAttribute('cx', '0');
+        middleCircle.setAttribute('cy', '0');
+        middleCircle.setAttribute('r', '6'); // 基础半径的2倍
+        middleCircle.setAttribute('fill', '#FFD700');
+        middleCircle.setAttribute('opacity', '0.5'); // 中等透明度
+        middleCircle.style.transition = transitionStyle;
+        
+        // 最内层圆：半径最小，透明度最低（即最不透明）
+        var innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        innerCircle.setAttribute('cx', '0');
+        innerCircle.setAttribute('cy', '0');
+        innerCircle.setAttribute('r', '3'); // 基础半径
+        innerCircle.setAttribute('fill', '#FFD700');
+        innerCircle.setAttribute('opacity', '1'); // 完全不透明
+        innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(255, 215, 0, 0.8))';
+        innerCircle.style.transition = transitionStyle;
+        
+        // 添加圆点（从外到内）
+        g.appendChild(outerCircle);
+        g.appendChild(middleCircle);
+        g.appendChild(innerCircle);
+        
+        // --- 交互事件监听 ---
+        g.addEventListener('mouseenter', function() {
+            // 悬浮：变大，中心变红
+            innerCircle.setAttribute('r', '6');
+            innerCircle.setAttribute('fill', '#FF3333'); 
+            middleCircle.setAttribute('r', '10');
+            middleCircle.setAttribute('opacity', '0.7');
+            outerCircle.setAttribute('r', '16');
+            outerCircle.setAttribute('opacity', '0.4');
+        });
+
+        g.addEventListener('mouseleave', function() {
+            // 恢复原状
+            innerCircle.setAttribute('r', '3');
+            innerCircle.setAttribute('fill', '#FFD700');
+            middleCircle.setAttribute('r', '6');
+            middleCircle.setAttribute('opacity', '0.5');
+            outerCircle.setAttribute('r', '12');
+            outerCircle.setAttribute('opacity', '0.25');
+        });
+
+        g.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // 点击反馈动画 (轻微收缩再恢复)
+            innerCircle.setAttribute('r', '4'); 
+            setTimeout(() => {
+                innerCircle.setAttribute('r', '6'); // 回到悬浮状态
+            }, 100);
+
+            if (onClickCallback) onClickCallback(e);
+        });
+
         svgDoc.documentElement.appendChild(g);
     }
 
-    // 创建省份名称显示标签
+    // --- 新增：绘制事件连接线和矩形 ---
+    function clearConnectors(svgDoc) {
+        var layer = svgDoc.getElementById('connector-layer');
+        if (layer) layer.remove();
+    }
+
+    function drawEventConnectors(svgDoc, centerX, centerY, events) {
+        clearConnectors(svgDoc);
+        
+        var gLayer = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        gLayer.setAttribute('id', 'connector-layer');
+        
+        // 1. 获取SVG视口边界
+        var svgRoot = svgDoc.documentElement;
+        var svgBounds = {
+            minX: 0,
+            minY: 0,
+            maxX: 1000,
+            maxY: 800
+        };
+        
+        // 从 viewBox 获取实际边界
+        if (svgRoot.viewBox && svgRoot.viewBox.baseVal && svgRoot.viewBox.baseVal.width > 0) {
+            var vb = svgRoot.viewBox.baseVal;
+            svgBounds.minX = vb.x;
+            svgBounds.minY = vb.y;
+            svgBounds.maxX = vb.x + vb.width;
+            svgBounds.maxY = vb.y + vb.height;
+        } else {
+            // 从 width/height 属性获取
+            var w = parseFloat(svgRoot.getAttribute('width'));
+            var h = parseFloat(svgRoot.getAttribute('height'));
+            if (!isNaN(w) && !isNaN(h)) {
+                svgBounds.maxX = w;
+                svgBounds.maxY = h;
+            }
+        }
+        
+        // 添加安全边距
+        var padding = 25;
+        svgBounds.minX += padding;
+        svgBounds.minY += padding;
+        svgBounds.maxX -= padding;
+        svgBounds.maxY -= padding;
+        
+        // 计算地图中心
+        var mapCX = (svgBounds.minX + svgBounds.maxX) / 2;
+        var mapCY = (svgBounds.minY + svgBounds.maxY) / 2;
+
+        // 计算从地图中心指向省份中心的向量角度
+        var vecX = centerX - mapCX;
+        var vecY = centerY - mapCY;
+        var baseAngle = Math.atan2(vecY, vecX);
+
+        // 2. 配置参数
+        var baseRadius = 120;
+        var fanAngle = Math.PI / 2.5; 
+        if (events.length > 5) fanAngle = Math.PI / 1.8;
+        if (events.length > 10) fanAngle = Math.PI / 1.2;
+        
+        var placedRects = [];
+
+        events.forEach(function(ev, index) {
+            var angle;
+            if (events.length === 1) {
+                angle = baseAngle;
+            } else {
+                var step = fanAngle / (events.length - 1);
+                var start = baseAngle - (fanAngle / 2);
+                angle = start + step * index;
+            }
+            
+            var fontSize = 16;
+            var textStr = ev.title || '未命名事件';
+            var textLen = 0;
+            for(var i=0; i<textStr.length; i++) {
+                textLen += (textStr.charCodeAt(i) > 255 ? 1 : 0.6);
+            }
+            var rectWidth = textLen * fontSize + 20; 
+            var rectHeight = 30;
+
+            var currentRadius = baseRadius;
+            var endX, endY, rectX, rectY;
+            var isRightSide = Math.cos(angle) >= 0;
+            var maxAttempts = 8;
+            
+            for (var attempt = 0; attempt < maxAttempts; attempt++) {
+                endX = centerX + currentRadius * Math.cos(angle);
+                endY = centerY + currentRadius * Math.sin(angle);
+                
+                rectX = isRightSide ? endX : (endX - rectWidth);
+                rectY = endY - rectHeight;
+
+                // **边界检测和修正**
+                var needsAdjustment = false;
+                
+                // 水平边界检测
+                if (rectX < svgBounds.minX) {
+                    rectX = svgBounds.minX;
+                    needsAdjustment = true;
+                } else if (rectX + rectWidth > svgBounds.maxX) {
+                    rectX = svgBounds.maxX - rectWidth;
+                    needsAdjustment = true;
+                }
+                
+                // 垂直边界检测
+                if (rectY < svgBounds.minY) {
+                    rectY = svgBounds.minY;
+                    needsAdjustment = true;
+                } else if (rectY + rectHeight > svgBounds.maxY) {
+                    rectY = svgBounds.maxY - rectHeight;
+                    needsAdjustment = true;
+                }
+
+                // 碰撞检测
+                var collision = false;
+                var collisionPadding = 4;
+                
+                for (var k = 0; k < placedRects.length; k++) {
+                    var p = placedRects[k];
+                    if (rectX < p.x + p.w + collisionPadding &&
+                        rectX + rectWidth + collisionPadding > p.x &&
+                        rectY < p.y + p.h + collisionPadding &&
+                        rectY + rectHeight + collisionPadding > p.y) {
+                        collision = true;
+                        break;
+                    }
+                }
+
+                if (!collision) {
+                    break;
+                } else {
+                    currentRadius += (rectHeight + 10);
+                }
+            }
+            
+            // 如果修正后的位置仍然有问题，尝试智能调整文字方向
+            if (rectX + rectWidth > svgBounds.maxX || rectX < svgBounds.minX) {
+                isRightSide = !isRightSide;
+                rectX = isRightSide ? endX : (endX - rectWidth);
+                // 再次边界修正
+                if (rectX < svgBounds.minX) rectX = svgBounds.minX;
+                if (rectX + rectWidth > svgBounds.maxX) rectX = svgBounds.maxX - rectWidth;
+            }
+            
+            placedRects.push({x: rectX, y: rectY, w: rectWidth, h: rectHeight});
+            
+            // 创建单个事件组
+            var itemG = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+            itemG.style.cursor = 'pointer';
+            itemG.style.transition = 'opacity 0.3s';
+            
+            // 点击事件：打开详情弹窗
+            itemG.onclick = function(e) {
+                e.stopPropagation(); // 阻止冒泡，防止触发地图点击清除
+                showEventModal(ev);
+            };
+            
+            // 1. 金黄色直线
+            var line = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', centerX);
+            line.setAttribute('y1', centerY);
+            line.setAttribute('x2', endX);
+            line.setAttribute('y2', endY);
+            line.setAttribute('stroke', '#FFD700');
+            line.setAttribute('stroke-width', '2');
+            line.setAttribute('stroke-linecap', 'round');
+            
+            // 2. 连接处的圆形
+            var circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', endX);
+            circle.setAttribute('cy', endY);
+            circle.setAttribute('r', '4');
+            circle.setAttribute('fill', '#FFD700');
+            
+            // 3. 矩形和文字 - 使用修正后的位置
+            var textX = rectX + 10; // 统一使用左对齐，避免文字方向问题
+            var textY = rectY + (rectHeight / 2) + (fontSize / 3); // 垂直居中
+            
+            var rect = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', rectX);
+            rect.setAttribute('y', rectY); 
+            rect.setAttribute('width', rectWidth);
+            rect.setAttribute('height', rectHeight);
+            rect.setAttribute('fill', '#FFD700');
+            rect.setAttribute('rx', '4');
+            rect.style.filter = 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))';
+            
+            var text = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', textX);
+            text.setAttribute('y', textY); 
+            text.setAttribute('fill', '#FF0000');
+            text.setAttribute('font-size', fontSize + 'px');
+            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('font-family', '"Microsoft YaHei", sans-serif');
+            text.style.pointerEvents = 'none';
+            text.textContent = textStr;
+            
+            // 组装
+            itemG.appendChild(line);
+            itemG.appendChild(rect);
+            itemG.appendChild(circle);
+            itemG.appendChild(text);
+            
+            // 悬停效果
+            itemG.addEventListener('mouseenter', function() {
+                rect.setAttribute('fill', '#FFF'); // 变白高亮
+                line.setAttribute('stroke', '#FFF');
+                circle.setAttribute('fill', '#FFF');
+                // 悬停时将元素移到最上层
+                gLayer.appendChild(itemG);
+            });
+            itemG.addEventListener('mouseleave', function() {
+                rect.setAttribute('fill', '#FFD700'); // 恢复金黄
+                line.setAttribute('stroke', '#FFD700');
+                circle.setAttribute('fill', '#FFD700');
+            });
+
+            gLayer.appendChild(itemG);
+        });
+        
+        // 添加入场动画
+        gLayer.style.opacity = '0';
+        svgDoc.documentElement.appendChild(gLayer);
+        // 强制重绘
+        requestAnimationFrame(function() {
+            gLayer.style.transition = 'opacity 0.3s ease';
+            gLayer.style.opacity = '1';
+        });
+    }
+
+    // --- 省份标签逻辑 ---
     function createProvinceLabel(svgDoc) {
         provinceLabel = svgDoc.getElementById('province-label');
         if (!provinceLabel) {
@@ -157,27 +393,22 @@ document.addEventListener('DOMContentLoaded', function () {
         return provinceLabel;
     }
 
-    // 获取省份标签点的坐标
     function getProvinceLabelPosition(svgDoc, provinceId) {
         var labelPoint = svgDoc.querySelector('#label_points circle[id="' + provinceId + '"]');
         if (labelPoint) {
-            var pos = {
+            return {
                 x: parseFloat(labelPoint.getAttribute('cx')),
                 y: parseFloat(labelPoint.getAttribute('cy'))
             };
-            return pos;
         }
         return null;
     }
 
-    // 显示省份名称
     function showProvinceLabel(svgDoc, provinceId) {
         var provinceName = provinceIdMap[provinceId];
         if (!provinceName) return;
-        
         var position = getProvinceLabelPosition(svgDoc, provinceId);
         if (!position) return;
-        
         var label = createProvinceLabel(svgDoc);
         label.textContent = provinceName;
         label.setAttribute('x', position.x);
@@ -185,110 +416,48 @@ document.addEventListener('DOMContentLoaded', function () {
         label.style.opacity = '1';
     }
 
-    // 隐藏省份名称
     function hideProvinceLabel() {
-        if (provinceLabel) {
-            provinceLabel.style.opacity = '0';
-        }
+        if (provinceLabel) provinceLabel.style.opacity = '0';
     }
 
-    // --- 修改：显示事件详情弹窗(修复图片路径) ---
-    var currentSwiper = null;
-    var currentEvents = [];
-
-    function showEventModal(events, initialIndex) {
-        if (typeof Swiper === 'undefined') {
-            console.error('[ChinaMap] Swiper 库尚未加载');
-            return;
-        }
-
+    // --- 修改：显示单个事件详情弹窗 (移除 Swiper) ---
+    function showEventModal(event) {
         var modal = document.getElementById('event-detail-modal');
-        currentEvents = events;
-
-        if (currentSwiper) {
-            currentSwiper.destroy(true, true);
+        
+        // 1. 处理图片路径
+        var imageUrl = '';
+        if (event.image_path) {
+            if (event.image_path.indexOf('http') === 0) {
+                imageUrl = event.image_path;
+            } else {
+                var base = window._BASE_WEB_URL || '';
+                if (base.slice(-1) === '/') base = base.slice(0, -1);
+                var path = event.image_path.replace(/\\/g, '/');
+                if (path.indexOf('/') !== 0) {
+                    path = (path.indexOf('uploads') === -1) ? '/uploads/' + path : '/' + path;
+                }
+                imageUrl = base + path;
+            }
+        } else {
+            // 纯色占位图
+            imageUrl = 'data:image/svg+xml;base64,' + btoa(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="300" height="210" viewBox="0 0 300 210">
+                    <rect width="300" height="210" fill="#4a5568"/>
+                    <text x="50%" y="45%" fill="#e2e8f0" font-size="16" font-family="Arial" text-anchor="middle" dominant-baseline="middle">暂无图片</text>
+                    <text x="50%" y="60%" fill="#cbd5e0" font-size="12" font-family="Arial" text-anchor="middle" dominant-baseline="middle">${event.title || '未知事件'}</text>
+                </svg>
+            `);
         }
 
-        var swiperWrapper = document.getElementById('modal-swiper-wrapper');
-        swiperWrapper.innerHTML = '';
+        // 2. 更新 DOM
+        var imgElem = document.getElementById('modal-image');
+        if (imgElem) imgElem.src = imageUrl;
+        
+        var imgTitleElem = document.getElementById('modal-image-title');
+        if (imgTitleElem) imgTitleElem.textContent = event.title || '';
 
-        events.forEach(function(ev) {
-            var slide = document.createElement('div');
-            slide.className = 'swiper-slide';
-
-            // --- 修复：统一图片路径处理逻辑 ---
-            var imageUrl = '';
-            
-            if (ev.image_path) {
-                // 如果是完整URL (http开头)
-                if (ev.image_path.indexOf('http') === 0) {
-                    imageUrl = ev.image_path;
-                } else {
-                    // 构建本地路径
-                    var base = window._BASE_WEB_URL || '';
-                    if (base.slice(-1) === '/') base = base.slice(0, -1);
-                    
-                    // 修复：处理 Windows 路径反斜杠
-                    var path = ev.image_path.replace(/\\/g, '/');
-                    
-                    // 确保路径以 / 开头
-                    if (path.indexOf('/') !== 0) {
-                        // 如果路径不包含 uploads，尝试添加
-                        if (path.indexOf('uploads') === -1) {
-                            path = '/uploads/' + path;
-                        } else {
-                            path = '/' + path;
-                        }
-                    }
-                    
-                    imageUrl = base + path;
-                }
-            } else {
-                // --- 关键修复：数据库无图片时，使用纯色占位图而非文件 ---
-                // 使用 data URI 生成灰色占位图，避免 404 错误
-                imageUrl = 'data:image/svg+xml;base64,' + btoa(`
-                    <svg xmlns="http://www.w3.org/2000/svg" width="300" height="210" viewBox="0 0 300 210">
-                        <rect width="300" height="210" fill="#4a5568"/>
-                        <text x="50%" y="45%" fill="#e2e8f0" font-size="16" font-family="Arial" text-anchor="middle" dominant-baseline="middle">暂无图片</text>
-                        <text x="50%" y="60%" fill="#cbd5e0" font-size="12" font-family="Arial" text-anchor="middle" dominant-baseline="middle">${ev.title || '未知事件'}</text>
-                    </svg>
-                `);
-            }
-            
-            console.log('[ChinaMap] 事件:', ev.title, '加载图片:', imageUrl.substring(0, 100) + '...');
-
-            // 移除 onerror 处理，因为 data URI 不会失败
-            slide.innerHTML = `
-                <img src="${imageUrl}" alt="${ev.title || ''}">
-                <div class="overlay">
-                    <h2>${ev.title || '未知事件'}</h2>
-                </div>
-            `;
-            swiperWrapper.appendChild(slide);
-        });
-
-        // 初始化 Swiper
-        setTimeout(function() {
-            currentSwiper = new Swiper('#event-detail-modal .swiper', {
-                effect: 'cards',
-                grabCursor: true,
-                initialSlide: initialIndex || 0,
-                loop: events.length > 1,
-                pagination: {
-                    el: '#event-detail-modal .swiper-pagination',
-                    clickable: true
-                },
-                on: {
-                    slideChange: function() {
-                        var realIndex = this.realIndex;
-                        updateModalInfo(currentEvents[realIndex]);
-                    }
-                }
-            });
-
-            updateModalInfo(events[initialIndex || 0]);
-            modal.classList.add('show');
-        }, 100);
+        updateModalInfo(event);
+        modal.classList.add('show');
     }
 
     function updateModalInfo(event) {
@@ -308,14 +477,13 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         var dateStr = event.event_date || '未知';
-        if (dateStr && dateStr.length > 10) {
-            dateStr = dateStr.substring(0, 10);
-        }
+        if (dateStr && dateStr.length > 10) dateStr = dateStr.substring(0, 10);
         document.getElementById('modal-date').textContent = dateStr;
         document.getElementById('modal-location').textContent = event.location || '未知';
         document.getElementById('modal-summary').textContent = event.summary || '暂无摘要';
     }
 
+    // --- 初始化地图 ---
     function initMap(svgDoc) {
         var labelPoints = svgDoc.getElementById('label_points');
         if (labelPoints) {
@@ -324,11 +492,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 var pName = c.getAttribute('class') || c.getAttribute('id');
                 var cx = parseFloat(c.getAttribute('cx'));
                 var cy = parseFloat(c.getAttribute('cy'));
-                
                 if (pName && !isNaN(cx)) {
                     pName = pName.trim();
                     provinceCenters[pName] = { x: cx, y: cy };
-                    
                     if (provinceMap[pName]) {
                         provinceCenters[provinceMap[pName]] = { x: cx, y: cy };
                     }
@@ -340,7 +506,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var pointsGroup = svgDoc.getElementById('points');
         if (pointsGroup) pointsGroup.style.display = 'none';
 
-        // 添加金色描边样式
         addMapStyling(svgDoc);
 
         var paths = svgDoc.querySelectorAll('#features path');
@@ -351,7 +516,6 @@ document.addEventListener('DOMContentLoaded', function () {
             
             path.style.transition = 'fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease';
             
-            // 悬浮效果
             path.addEventListener('mouseenter', function () {
                 this.style.fill = '#d9534f';
                 this.style.stroke = '#FFA500';
@@ -359,11 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.style.opacity = '0.9';
                 this.style.transform = 'translateY(-3px)';
                 this.style.filter = 'drop-shadow(0 5px 10px rgba(0,0,0,0.5))';
-                
-                // 显示省份名称
-                if (provinceId) {
-                    showProvinceLabel(svgDoc, provinceId);
-                }
+                if (provinceId) showProvinceLabel(svgDoc, provinceId);
             });
 
             path.addEventListener('mouseleave', function () {
@@ -373,16 +533,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.style.opacity = '1';
                 this.style.transform = 'translateY(0)';
                 this.style.filter = 'none';
-                
-                // 隐藏省份名称
                 hideProvinceLabel();
             });
         });
         
+        // 全局点击监听：点击空白处清除连接线
         svgDoc.addEventListener('click', function(e) {
-            if (e.target.tagName !== 'path' && e.target.tagName !== 'text') {
-                var oldLayer = svgDoc.getElementById('interaction-layer');
-                if (oldLayer) oldLayer.remove();
+            var target = e.target;
+            // 检查点击是否在连接线层内部
+            var isConnector = false;
+            var parent = target;
+            while(parent && parent !== svgDoc) {
+                if (parent.id === 'connector-layer' || (parent.getAttribute && parent.getAttribute('id') === 'connector-layer')) {
+                    isConnector = true;
+                    break;
+                }
+                parent = parent.parentNode;
+            }
+            
+            // 如果点击的不是省份块，也不是连接线上的元素，则清除连接线
+            if (target.tagName !== 'path' && !isConnector) {
+                clearConnectors(svgDoc);
             }
         });
 
@@ -391,9 +562,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch(fetchUrl)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
             })
             .then(activeData => {
@@ -412,22 +581,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         path.style.cursor = 'pointer';
 
                         var center = provinceCenters[mapEngName] || provinceCenters[mapChineseName];
-                        
                         if (!center) {
                             var bbox = path.getBBox();
-                            center = {
-                                x: bbox.x + bbox.width / 2,
-                                y: bbox.y + bbox.height / 2
-                            };
+                            center = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
                             provinceCenters[mapChineseName] = center; 
                         }
 
-                        drawFlag(svgDoc, center.x, center.y);
+                        // 传递点击回调，使圆点点击也能触发连接线
+                        drawCircleMarker(svgDoc, center.x, center.y, function() {
+                            console.log('点击圆点:', mapChineseName);
+                            drawEventConnectors(svgDoc, center.x, center.y, events);
+                        });
 
+                        // 修改点击逻辑：不再直接弹窗，而是绘制连接线
                         path.addEventListener('click', function (e) {
                             e.stopPropagation();
                             console.log('点击:', mapChineseName, '事件数:', events.length);
-                            showEventModal(events, 0);
+                            // 绘制连接线
+                            drawEventConnectors(svgDoc, center.x, center.y, events);
                         });
                     }
                 });
@@ -437,40 +608,17 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // 添加金色描边样式（保留地图整体阴影）
     function addMapStyling(svgDoc) {
         var svg = svgDoc.documentElement;
-        
         var defs = svgDoc.querySelector('defs') || svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        if (!svgDoc.querySelector('defs')) {
-            svg.insertBefore(defs, svg.firstChild);
-        }
+        if (!svgDoc.querySelector('defs')) svg.insertBefore(defs, svg.firstChild);
 
         var style = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'style');
         style.textContent = `
-            /* 保留地图整体阴影立体感 */
-            #features {
-                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-            }
-
-            /* 默认状态：金色描边 */
-            #features path {
-                stroke: #FFD700;
-                stroke-width: 1.5;
-                stroke-linejoin: round;
-                stroke-linecap: round;
-            }
-
-            #label_points circle {
-                fill: none;
-                stroke: none;
-            }
-
-            #points circle {
-                fill: #d9534f;
-                stroke: #fff;
-                stroke-width: 2;
-            }
+            #features { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)); }
+            #features path { stroke: #FFD700; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+            #label_points circle { fill: none; stroke: none; }
+            #points circle { fill: #d9534f; stroke: #fff; stroke-width: 2; }
         `;
         defs.appendChild(style);
     }
