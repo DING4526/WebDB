@@ -34,7 +34,9 @@ $activeCtl = function($id) use ($cur) { return $cur === $id; };
   <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
   <?php $this->head() ?>
   <style>
-    body { background:#f7f9fb; }
+    /* 删除或注释掉下面这行，因为它会覆盖背景图片 */
+    /* body { background:#f7f9fb; } */
+    
     .navbar-brand b { letter-spacing: .5px; }
     .hero {
       margin-top: 70px;
@@ -69,6 +71,7 @@ $menuItemsLeft = [
 $menuItemsRight = [];
 if (Yii::$app->user->isGuest) {
   $menuItemsRight[] = ['label' => '登录', 'url' => ['/site/login']];
+  $menuItemsRight[] = ['label' => '注册', 'url' => ['/site/signup']];
 } else {
   $menuItemsRight[] = '<li>'
     . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
@@ -116,13 +119,6 @@ NavBar::end();
     <?= $content ?>
   </div>
 </div>
-
-<footer class="footer">
-  <div class="container" style="padding:16px 0;">
-    <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
-    <p class="pull-right"><?= Yii::powered() ?></p>
-  </div>
-</footer>
 
 <?php $this->endBody() ?>
 </body>

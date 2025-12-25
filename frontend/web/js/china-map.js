@@ -1,73 +1,63 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('[ChinaMap] 脚本已加载 - 悬浮框版');
+    console.log('[ChinaMap] 极简折线交互版 - 已加载');
 
-    // ---------------------------------------------------------
-    // 注意：页面顶部间距已移至 site.css 全局控制 (body { padding-top: 80px; })
-    // 这里不再需要单独设置 pageContainer.style.paddingTop
-    // ---------------------------------------------------------
-
-    // ---------------------------------------------------------
-    // 修复：强制调整地图容器高度，解决底部显示不全的问题
-    // ---------------------------------------------------------
     var mapObj = document.getElementById('china-map-object');
     if (mapObj) {
-        // 900px 通常足以显示包含南海诸岛的完整中国地图
-        mapObj.style.height = '900px'; 
+        mapObj.style.height = '900px';
     }
-    // ---------------------------------------------------------
 
     var baseUrl = window._EVENT_INDEX_URL || '/event/index';
     
-    // 创建悬浮框 (Tooltip)
-    var tooltip = document.createElement('div');
-    tooltip.id = 'map-tooltip';
-    tooltip.style.cssText = 'position:absolute; display:none; background:rgba(255,255,255,0.95); border:1px solid #ccc; padding:15px; border-radius:4px; box-shadow:0 4px 15px rgba(0,0,0,0.2); z-index:9999; min-width:200px; pointer-events:auto; font-size:14px; line-height:1.6; color:#333; text-align:left;';
-    document.body.appendChild(tooltip);
+    // --- 新增：获取图片基础路径 ---
+    var imageBasePath = (function() {
+        var scripts = document.getElementsByTagName('script');
+        for (var i = 0; i < scripts.length; i++) {
+            var src = scripts[i].src;
+            if (src && src.indexOf('/js/china-map.js') > -1) {
+                return src.substring(0, src.indexOf('/js/china-map.js'));
+            }
+        }
+        return '';
+    })();
+    
+    console.log('[ChinaMap] 图片基础路径:', imageBasePath);
 
-    var hideTimeout; // 用于控制悬浮框消失的延时
-
+    // 省份中英文映射
     var provinceMap = {
-        "Shaanxi Province": "陕西省",
-        "Shanghai Municipality": "上海市", 
-        "Chongqing Municipality": "重庆市",
-        "Zhejiang Province": "浙江省",
-        "Jiangxi Province": "江西省",
-        "Yunnan Province": "云南省",
-        "Shandong Province": "山东省",
-        "Liaoning Province": "辽宁省",
-        "Beijing Municipality": "北京市",
-        "Tianjin Municipality": "天津市",
-        "Hebei Province": "河北省",
-        "Shanxi Province": "山西省",
-        "Inner Mongolia Autonomous Region": "内蒙古自治区",
-        "Jilin Province": "吉林省",
-        "Heilongjiang Province": "黑龙江省",
-        "Jiangsu Province": "江苏省",
-        "Anhui Province": "安徽省",
-        "Fujian Province": "福建省",
-        "Henan Province": "河南省",
-        "Hubei Province": "湖北省",
-        "Hunan Province": "湖南省",
-        "Guangdong Province": "广东省",
-        "Guangxi Zhuang Autonomous Region": "广西壮族自治区",
-        "Hainan Province": "海南省",
-        "Sichuan Province": "四川省",
-        "Guizhou Province": "贵州省",
-        "Tibet Autonomous Region": "西藏自治区",
-        "Gansu Province": "甘肃省",
-        "Qinghai Province": "青海省",
-        "Ningxia Hui Autonomous Region": "宁夏回族自治区",
-        "Xinjiang Uygur Autonomous Region": "新疆维吾尔自治区",
-        "Taiwan Province": "台湾省",
-        "Hong Kong SAR": "香港特别行政区",
+        "Shaanxi Province": "陕西省", "Shanghai Municipality": "上海市", "Chongqing Municipality": "重庆市",
+        "Zhejiang Province": "浙江省", "Jiangxi Province": "江西省", "Yunnan Province": "云南省",
+        "Shandong Province": "山东省", "Liaoning Province": "辽宁省", "Beijing Municipality": "北京市",
+        "Tianjin Municipality": "天津市", "Hebei Province": "河北省", "Shanxi Province": "山西省",
+        "Inner Mongolia Autonomous Region": "内蒙古自治区", "Jilin Province": "吉林省", "Heilongjiang Province": "黑龙江省",
+        "Jiangsu Province": "江苏省", "Anhui Province": "安徽省", "Fujian Province": "福建省",
+        "Henan Province": "河南省", "Hubei Province": "湖北省", "Hunan Province": "湖南省",
+        "Guangdong Province": "广东省", "Guangxi Zhuang Autonomous Region": "广西壮族自治区", "Hainan Province": "海南省",
+        "Sichuan Province": "四川省", "Guizhou Province": "贵州省", "Tibet Autonomous Region": "西藏自治区",
+        "Gansu Province": "甘肃省", "Qinghai Province": "青海省", "Ningxia Hui Autonomous Region": "宁夏回族自治区",
+        "Xinjiang Uygur Autonomous Region": "新疆维吾尔自治区", "Taiwan Province": "台湾省", "Hong Kong SAR": "香港特别行政区",
         "Macao SAR": "澳门特别行政区"
     };
 
-    // 辅助函数：根据地图名称获取对应的事件列表
+    // 省份ID到中文名称的映射
+    var provinceIdMap = {
+        'CNSN': '陕西省', 'CNSH': '上海市', 'CNCQ': '重庆市', 'CNZJ': '浙江省',
+        'CNJX': '江西省', 'CNSC': '四川省', 'CNHB': '湖北省', 'CNHN': '湖南省',
+        'CNGD': '广东省', 'CNFJ': '福建省', 'CNAH': '安徽省', 'CNJS': '江苏省',
+        'CNSD': '山东省', 'CNHE': '河北省', 'CNHA': '河南省', 'CNSX': '山西省',
+        'CNLN': '辽宁省', 'CNJL': '吉林省', 'CNHL': '黑龙江省', 'CNGS': '甘肃省',
+        'CNQH': '青海省', 'CNYN': '云南省', 'CNGZ': '贵州省', 'CNGX': '广西壮族自治区',
+        'CNXJ': '新疆维吾尔自治区', 'CNXZ': '西藏自治区', 'CNBJ': '北京市',
+        'CNTJ': '天津市', 'CNNM': '内蒙古自治区', 'CNHI': '海南省', 'CNNX': '宁夏回族自治区',
+        'CNTW': '台湾省',
+        'CNHK': '香港特别行政区',
+        'CNMO': '澳门特别行政区'
+    };
+
+    var provinceCenters = {};
+    var provinceLabel = null;
+
     function getEventsForMapName(mapName, data) {
-        // data 结构: { "上海": [...], "陕西": [...] }
         for (var dbName in data) {
-            // 模糊匹配：兼容 "上海" 和 "上海市"
             if (dbName === mapName || mapName.indexOf(dbName) > -1 || dbName.indexOf(mapName) > -1) {
                 return data[dbName];
             }
@@ -75,156 +65,414 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    function initMap(svgDoc) {
-        // 1. 查找圆点
-        var circles = svgDoc.querySelectorAll('#label_points circle');
-        
-        // 兼容性回退
-        if (!circles.length) {
-             circles = svgDoc.querySelectorAll('circle[class*="Province"], circle[class*="Municipality"]');
-        }
 
-        if (!circles.length) {
-            console.warn('[ChinaMap] 警告: 未找到任何 circle 元素。');
+    function drawFlag(svgDoc, x, y) {
+        var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('transform', `translate(${x}, ${y}) scale(1.8)`);
+        
+        var pole = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        pole.setAttribute('x1', '0');
+        pole.setAttribute('y1', '0');
+        pole.setAttribute('x2', '0');
+        pole.setAttribute('y2', '-26');
+        pole.setAttribute('stroke', '#000000');
+        pole.setAttribute('stroke-width', '1.33');
+        pole.setAttribute('stroke-linecap', 'round');
+        pole.style.pointerEvents = 'none';
+        pole.style.filter = 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))';
+        
+        var flag = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        flag.setAttribute('fill', '#FF3333');
+        flag.setAttribute('stroke', '#CC0000');
+        flag.setAttribute('stroke-width', '0.5');
+        flag.style.pointerEvents = 'none';
+        flag.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))';
+        
+        var animationStartTime = Date.now();
+        var flagWidth = 16;
+        var flagHeight = 11;
+        
+        function animate() {
+            var elapsed = (Date.now() - animationStartTime) / 1000;
+            var progress = elapsed % 2;
+            var segments = 16;
+            var d = 'M 0,-26 ';
+            
+            for (var i = 0; i <= segments; i++) {
+                var t = i / segments;
+                var xPos = t * flagWidth;
+                var edgeFactor = Math.sin(t * Math.PI);
+                var phase = progress * Math.PI * 2;
+                var amplitude = 1.5;
+                var frequency = 2;
+                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
+                var yPos = -26 + yOffset;
+                d += `L ${xPos},${yPos} `;
+            }
+            
+            d += `L ${flagWidth},${-26 + flagHeight} `;
+            
+            for (var j = segments; j >= 0; j--) {
+                var t = j / segments;
+                var xPos = t * flagWidth;
+                var edgeFactor = Math.sin(t * Math.PI);
+                var phase = progress * Math.PI * 2;
+                var amplitude = 1.5;
+                var frequency = 2;
+                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
+                var yPos = -26 + flagHeight + yOffset;
+                d += `L ${xPos},${yPos} `;
+            }
+            
+            d += 'Z';
+            flag.setAttribute('d', d);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        g.appendChild(pole);
+        g.appendChild(flag);
+        svgDoc.documentElement.appendChild(g);
+    }
+
+    // 创建省份名称显示标签
+    function createProvinceLabel(svgDoc) {
+        provinceLabel = svgDoc.getElementById('province-label');
+        if (!provinceLabel) {
+            provinceLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+            provinceLabel.setAttribute('id', 'province-label');
+            provinceLabel.style.fontSize = '24px';
+            provinceLabel.style.fontFamily = '"SimHei", "Microsoft YaHei", sans-serif';
+            provinceLabel.style.fontWeight = 'bold';
+            provinceLabel.style.fill = '#FFD700';
+            provinceLabel.style.stroke = '#000000';
+            provinceLabel.style.strokeWidth = '1.5px';
+            provinceLabel.style.paintOrder = 'stroke fill';
+            provinceLabel.style.pointerEvents = 'none';
+            provinceLabel.style.opacity = '0';
+            provinceLabel.style.transition = 'opacity 0.3s ease';
+            provinceLabel.style.textAnchor = 'middle';
+            svgDoc.documentElement.appendChild(provinceLabel);
+        }
+        return provinceLabel;
+    }
+
+    // 获取省份标签点的坐标
+    function getProvinceLabelPosition(svgDoc, provinceId) {
+        var labelPoint = svgDoc.querySelector('#label_points circle[id="' + provinceId + '"]');
+        if (labelPoint) {
+            var pos = {
+                x: parseFloat(labelPoint.getAttribute('cx')),
+                y: parseFloat(labelPoint.getAttribute('cy'))
+            };
+            return pos;
+        }
+        return null;
+    }
+
+    // 显示省份名称
+    function showProvinceLabel(svgDoc, provinceId) {
+        var provinceName = provinceIdMap[provinceId];
+        if (!provinceName) return;
+        
+        var position = getProvinceLabelPosition(svgDoc, provinceId);
+        if (!position) return;
+        
+        var label = createProvinceLabel(svgDoc);
+        label.textContent = provinceName;
+        label.setAttribute('x', position.x);
+        label.setAttribute('y', position.y - 10);
+        label.style.opacity = '1';
+    }
+
+    // 隐藏省份名称
+    function hideProvinceLabel() {
+        if (provinceLabel) {
+            provinceLabel.style.opacity = '0';
+        }
+    }
+
+    // --- 修改：显示事件详情弹窗(修复图片路径) ---
+    var currentSwiper = null;
+    var currentEvents = [];
+
+    function showEventModal(events, initialIndex) {
+        if (typeof Swiper === 'undefined') {
+            console.error('[ChinaMap] Swiper 库尚未加载');
             return;
         }
 
-        // 初始化样式
-        circles.forEach(function(circle) {
-            if (!circle.getAttribute('r') || circle.getAttribute('r') == '0') circle.setAttribute('r', 6);
-            if (!circle.style.fill && !circle.getAttribute('fill')) circle.style.fill = '#555';
-            circle.style.opacity = '1';
-            circle.style.transition = 'all 0.3s ease';
+        var modal = document.getElementById('event-detail-modal');
+        currentEvents = events;
+
+        if (currentSwiper) {
+            currentSwiper.destroy(true, true);
+        }
+
+        var swiperWrapper = document.getElementById('modal-swiper-wrapper');
+        swiperWrapper.innerHTML = '';
+
+        events.forEach(function(ev) {
+            var slide = document.createElement('div');
+            slide.className = 'swiper-slide';
+
+            // --- 修复：统一图片路径处理逻辑 ---
+            var imageUrl = '';
+            
+            if (ev.image_path) {
+                // 如果是完整URL (http开头)
+                if (ev.image_path.indexOf('http') === 0) {
+                    imageUrl = ev.image_path;
+                } else {
+                    // 构建本地路径
+                    var base = window._BASE_WEB_URL || '';
+                    if (base.slice(-1) === '/') base = base.slice(0, -1);
+                    
+                    // 修复：处理 Windows 路径反斜杠
+                    var path = ev.image_path.replace(/\\/g, '/');
+                    
+                    // 确保路径以 / 开头
+                    if (path.indexOf('/') !== 0) {
+                        // 如果路径不包含 uploads，尝试添加
+                        if (path.indexOf('uploads') === -1) {
+                            path = '/uploads/' + path;
+                        } else {
+                            path = '/' + path;
+                        }
+                    }
+                    
+                    imageUrl = base + path;
+                }
+            } else {
+                // --- 关键修复：数据库无图片时，使用纯色占位图而非文件 ---
+                // 使用 data URI 生成灰色占位图，避免 404 错误
+                imageUrl = 'data:image/svg+xml;base64,' + btoa(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="300" height="210" viewBox="0 0 300 210">
+                        <rect width="300" height="210" fill="#4a5568"/>
+                        <text x="50%" y="45%" fill="#e2e8f0" font-size="16" font-family="Arial" text-anchor="middle" dominant-baseline="middle">暂无图片</text>
+                        <text x="50%" y="60%" fill="#cbd5e0" font-size="12" font-family="Arial" text-anchor="middle" dominant-baseline="middle">${ev.title || '未知事件'}</text>
+                    </svg>
+                `);
+            }
+            
+            console.log('[ChinaMap] 事件:', ev.title, '加载图片:', imageUrl.substring(0, 100) + '...');
+
+            // 移除 onerror 处理，因为 data URI 不会失败
+            slide.innerHTML = `
+                <img src="${imageUrl}" alt="${ev.title || ''}">
+                <div class="overlay">
+                    <h2>${ev.title || '未知事件'}</h2>
+                </div>
+            `;
+            swiperWrapper.appendChild(slide);
         });
 
-        // 3. 请求后端数据
+        // 初始化 Swiper
+        setTimeout(function() {
+            currentSwiper = new Swiper('#event-detail-modal .swiper', {
+                effect: 'cards',
+                grabCursor: true,
+                initialSlide: initialIndex || 0,
+                loop: events.length > 1,
+                pagination: {
+                    el: '#event-detail-modal .swiper-pagination',
+                    clickable: true
+                },
+                on: {
+                    slideChange: function() {
+                        var realIndex = this.realIndex;
+                        updateModalInfo(currentEvents[realIndex]);
+                    }
+                }
+            });
+
+            updateModalInfo(events[initialIndex || 0]);
+            modal.classList.add('show');
+        }, 100);
+    }
+
+    function updateModalInfo(event) {
+        var titleElem = document.getElementById('modal-title');
+        titleElem.textContent = event.title || '未知事件';
+        titleElem.onclick = function() {
+            var url = window._EVENT_INDEX_URL || '/event/index';
+            if (url.indexOf('event%2Findex') > -1) {
+                url = url.replace('event%2Findex', 'timeline%2Fview') + '&id=' + event.id;
+            } else if (url.indexOf('event/index') > -1) {
+                url = url.replace('event/index', 'timeline/view');
+                url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + event.id;
+            } else {
+                url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + event.id;
+            }
+            window.open(url, '_blank');
+        };
+
+        var dateStr = event.event_date || '未知';
+        if (dateStr && dateStr.length > 10) {
+            dateStr = dateStr.substring(0, 10);
+        }
+        document.getElementById('modal-date').textContent = dateStr;
+        document.getElementById('modal-location').textContent = event.location || '未知';
+        document.getElementById('modal-summary').textContent = event.summary || '暂无摘要';
+    }
+
+    function initMap(svgDoc) {
+        var labelPoints = svgDoc.getElementById('label_points');
+        if (labelPoints) {
+            var circles = labelPoints.querySelectorAll('circle');
+            circles.forEach(function(c) {
+                var pName = c.getAttribute('class') || c.getAttribute('id');
+                var cx = parseFloat(c.getAttribute('cx'));
+                var cy = parseFloat(c.getAttribute('cy'));
+                
+                if (pName && !isNaN(cx)) {
+                    pName = pName.trim();
+                    provinceCenters[pName] = { x: cx, y: cy };
+                    
+                    if (provinceMap[pName]) {
+                        provinceCenters[provinceMap[pName]] = { x: cx, y: cy };
+                    }
+                }
+            });
+            labelPoints.style.display = 'none';
+        }
+        
+        var pointsGroup = svgDoc.getElementById('points');
+        if (pointsGroup) pointsGroup.style.display = 'none';
+
+        // 添加金色描边样式
+        addMapStyling(svgDoc);
+
+        var paths = svgDoc.querySelectorAll('#features path');
+        
+        paths.forEach(function(path) {
+            var originalFill = path.getAttribute('fill') || '';
+            var provinceId = path.getAttribute('id');
+            
+            path.style.transition = 'fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease';
+            
+            // 悬浮效果
+            path.addEventListener('mouseenter', function () {
+                this.style.fill = '#d9534f';
+                this.style.stroke = '#FFA500';
+                this.style.strokeWidth = '2';
+                this.style.opacity = '0.9';
+                this.style.transform = 'translateY(-3px)';
+                this.style.filter = 'drop-shadow(0 5px 10px rgba(0,0,0,0.5))';
+                
+                // 显示省份名称
+                if (provinceId) {
+                    showProvinceLabel(svgDoc, provinceId);
+                }
+            });
+
+            path.addEventListener('mouseleave', function () {
+                this.style.fill = originalFill;
+                this.style.stroke = '#FFD700';
+                this.style.strokeWidth = '1.5';
+                this.style.opacity = '1';
+                this.style.transform = 'translateY(0)';
+                this.style.filter = 'none';
+                
+                // 隐藏省份名称
+                hideProvinceLabel();
+            });
+        });
+        
+        svgDoc.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'path' && e.target.tagName !== 'text') {
+                var oldLayer = svgDoc.getElementById('interaction-layer');
+                if (oldLayer) oldLayer.remove();
+            }
+        });
+
         var sep = baseUrl.indexOf('?') === -1 ? '?' : '&';
         var fetchUrl = baseUrl + sep + 'action=get-active-locations';
-        
+
         fetch(fetchUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(activeData => {
-                console.log('[ChinaMap] 事件数据:', activeData);
+                if (!activeData) activeData = {};
+                console.log('[ChinaMap] 数据就绪', activeData);
 
-                if (!activeData || Object.keys(activeData).length === 0) return;
+                paths.forEach(function (path) {
+                    var mapEngName = path.getAttribute('name');
+                    if (!mapEngName) return;
+                    var mapChineseName = provinceMap[mapEngName];
+                    if (!mapChineseName) return;
 
-                circles.forEach(function (circle) {
-                    var className = circle.getAttribute('class');
-                    if (!className) return;
-                    
-                    className = className.trim();
-                    var mapChineseName = provinceMap[className];
-
-                    // 获取该省份的事件列表
                     var events = getEventsForMapName(mapChineseName, activeData);
 
-                    if (mapChineseName && events && events.length > 0) {
-                        // 激活样式
-                        circle.style.cursor = 'pointer';
-                        circle.style.fill = '#d9534f';
+                    if (events && events.length > 0) {
+                        path.style.cursor = 'pointer';
+
+                        var center = provinceCenters[mapEngName] || provinceCenters[mapChineseName];
                         
-                        var originalR = circle.getAttribute('r');
+                        if (!center) {
+                            var bbox = path.getBBox();
+                            center = {
+                                x: bbox.x + bbox.width / 2,
+                                y: bbox.y + bbox.height / 2
+                            };
+                            provinceCenters[mapChineseName] = center; 
+                        }
 
-                        // 鼠标移入：显示悬浮框
-                        circle.addEventListener('mouseenter', function (e) {
-                            // 高亮圆点
-                            this.style.fill = '#ff0000';
-                            this.setAttribute('r', parseFloat(originalR) + 4);
+                        drawFlag(svgDoc, center.x, center.y);
 
-                            // 构建悬浮框内容
-                            var html = '<div style="font-weight:bold; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:16px;">' + mapChineseName + '</div>';
-                            html += '<ul style="margin:0; padding-left:20px; max-height:250px; overflow-y:auto;">';
-                            
-                            events.forEach(function(ev) {
-                                // 构建跳转链接：替换 event/index 为 timeline/view
-                                var url = baseUrl;
-                                
-                                // 针对 Yii2 默认路由 ?r=event%2Findex 或 ?r=event/index 进行处理
-                                if (url.indexOf('event%2Findex') > -1) {
-                                    // 情况1: URL编码的路由 (例如 index.php?r=event%2Findex)
-                                    url = url.replace('event%2Findex', 'timeline%2Fview');
-                                    url += '&id=' + ev.id;
-                                } else if (url.indexOf('event/index') > -1) {
-                                    // 情况2: 未编码路由或伪静态 (例如 index.php?r=event/index 或 /event/index)
-                                    url = url.replace('event/index', 'timeline/view');
-                                    // 如果已有参数(如 ?r=...)，用 & 连接，否则用 ?
-                                    if (url.indexOf('?') > -1) {
-                                        url += '&id=' + ev.id;
-                                    } else {
-                                        url += '?id=' + ev.id;
-                                    }
-                                } else {
-                                    // 兜底情况
-                                    if (url.indexOf('?') > -1) {
-                                        url += '&id=' + ev.id;
-                                    } else {
-                                        url += '?id=' + ev.id;
-                                    }
-                                }
-
-                                html += '<li style="margin-bottom:5px;"><a href="' + url + '" target="_blank" style="text-decoration:none; color:#0056b3; display:block;">' + ev.title + '</a></li>';
-                            });
-                            html += '</ul>';
-
-                            tooltip.innerHTML = html;
-                            tooltip.style.display = 'block';
-
-                            // 修改：基于圆点元素位置定位，确保悬浮框始终在省份圆点附近
-                            var circleRect = this.getBoundingClientRect(); // 圆点相对 SVG 视口的位置
-                            var mapRect = mapObj.getBoundingClientRect();  // 地图容器相对浏览器视口的位置
-                            
-                            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                            var scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-
-                            // 计算绝对坐标 (相对于文档)
-                            // 默认显示在圆点右侧：地图X + 滚动X + 圆点X + 圆点宽 + 间距
-                            var left = mapRect.left + scrollLeft + circleRect.left + circleRect.width + 10;
-                            // 垂直居中稍偏上
-                            var top = mapRect.top + scrollTop + circleRect.top + (circleRect.height / 2) - 20;
-
-                            // 防止溢出屏幕右侧 (假设悬浮框宽度约 230px)
-                            // 使用 clientWidth 获取可视区域宽度
-                            if (mapRect.left + circleRect.left + 250 > document.documentElement.clientWidth) {
-                                left = mapRect.left + scrollLeft + circleRect.left - 230; // 改为显示在圆点左侧
-                            }
-
-                            tooltip.style.left = left + 'px';
-                            tooltip.style.top = top + 'px';
-
-                            clearTimeout(hideTimeout);
+                        path.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            console.log('点击:', mapChineseName, '事件数:', events.length);
+                            showEventModal(events, 0);
                         });
-
-                        // 鼠标移出：延时隐藏
-                        circle.addEventListener('mouseleave', function () {
-                            this.style.fill = '#d9534f';
-                            this.setAttribute('r', originalR);
-                            
-                            // 修改：将延时从 300ms 增加到 1000ms (1秒)，给用户足够时间移动鼠标进入悬浮框
-                            hideTimeout = setTimeout(function() {
-                                tooltip.style.display = 'none';
-                            }, 1000); 
-                        });
-                    } else {
-                        // 非活跃省份
-                        circle.style.cursor = 'default';
                     }
                 });
-
-                // 悬浮框交互：鼠标移入悬浮框时取消隐藏
-                tooltip.addEventListener('mouseenter', function() {
-                    clearTimeout(hideTimeout);
-                });
-                
-                // 鼠标移出悬浮框时隐藏
-                tooltip.addEventListener('mouseleave', function() {
-                    // 修改：增加 500ms 缓冲时间，防止鼠标意外滑出导致立即消失
-                    var _this = this;
-                    hideTimeout = setTimeout(function() {
-                        _this.style.display = 'none';
-                    }, 500);
-                });
             })
-            .catch(err => console.error('[ChinaMap] 请求失败:', err));
+            .catch(err => {
+                console.error('[ChinaMap] 数据获取失败:', err);
+            });
+    }
+
+    // 添加金色描边样式（保留地图整体阴影）
+    function addMapStyling(svgDoc) {
+        var svg = svgDoc.documentElement;
+        
+        var defs = svgDoc.querySelector('defs') || svgDoc.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        if (!svgDoc.querySelector('defs')) {
+            svg.insertBefore(defs, svg.firstChild);
+        }
+
+        var style = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'style');
+        style.textContent = `
+            /* 保留地图整体阴影立体感 */
+            #features {
+                filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            }
+
+            /* 默认状态：金色描边 */
+            #features path {
+                stroke: #FFD700;
+                stroke-width: 1.5;
+                stroke-linejoin: round;
+                stroke-linecap: round;
+            }
+
+            #label_points circle {
+                fill: none;
+                stroke: none;
+            }
+
+            #points circle {
+                fill: #d9534f;
+                stroke: #fff;
+                stroke-width: 2;
+            }
+        `;
+        defs.appendChild(style);
     }
 
     var obj = document.getElementById('china-map-object');
@@ -238,11 +486,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     } else {
         var inlineSvg = document.querySelector('#china-map-wrapper svg');
-        if (inlineSvg) {
-            initMap(document); 
-        }
+        if (inlineSvg) initMap(document);
     }
 });
-
-
-
