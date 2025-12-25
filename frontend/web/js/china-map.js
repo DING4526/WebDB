@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('[ChinaMap] 极简交互版 - 已加载');
 
-    var mapObj = document.getElementById('china-map-object');
-    if (mapObj) {
-        mapObj.style.height = '900px';
-    }
+    // var mapObj = document.getElementById('china-map-object');
+    // if (mapObj) {
+    //     mapObj.style.height = '900px';
+    // }
 
     var baseUrl = window._EVENT_INDEX_URL || '/event/index';
 
@@ -62,67 +62,81 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // --- 绘制旗帜 ---
-    function drawFlag(svgDoc, x, y) {
+    // --- 绘制三层同心圆点 (带交互效果) ---
+    function drawCircleMarker(svgDoc, x, y, onClickCallback) {
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('transform', `translate(${x}, ${y}) scale(1.8)`);
-        g.style.pointerEvents = 'none'; // 旗帜本身不响应点击，点击穿透到省份Path
+        g.setAttribute('transform', `translate(${x}, ${y})`);
+        g.style.cursor = 'pointer'; // 允许点击，鼠标变手型
         
-        var pole = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        pole.setAttribute('x1', '0'); pole.setAttribute('y1', '0');
-        pole.setAttribute('x2', '0'); pole.setAttribute('y2', '-26');
-        pole.setAttribute('stroke', '#000000');
-        pole.setAttribute('stroke-width', '1.33');
-        pole.setAttribute('stroke-linecap', 'round');
-        pole.style.filter = 'drop-shadow(1px 1px 2px rgba(0,0,0,0.4))';
-        
-        var flag = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        flag.setAttribute('fill', '#FF3333');
-        flag.setAttribute('stroke', '#CC0000');
-        flag.setAttribute('stroke-width', '0.5');
-        flag.style.filter = 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))';
-        
-        var animationStartTime = Date.now();
-        var flagWidth = 16;
-        var flagHeight = 11;
-        
-        function animate() {
-            var elapsed = (Date.now() - animationStartTime) / 1000;
-            var progress = elapsed % 2;
-            var segments = 16;
-            var d = 'M 0,-26 ';
-            
-            for (var i = 0; i <= segments; i++) {
-                var t = i / segments;
-                var xPos = t * flagWidth;
-                var edgeFactor = Math.sin(t * Math.PI);
-                var phase = progress * Math.PI * 2;
-                var amplitude = 1.5;
-                var frequency = 2;
-                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
-                var yPos = -26 + yOffset;
-                d += `L ${xPos},${yPos} `;
-            }
-            d += `L ${flagWidth},${-26 + flagHeight} `;
-            for (var j = segments; j >= 0; j--) {
-                var t = j / segments;
-                var xPos = t * flagWidth;
-                var edgeFactor = Math.sin(t * Math.PI);
-                var phase = progress * Math.PI * 2;
-                var amplitude = 1.5;
-                var frequency = 2;
-                var yOffset = Math.sin(phase + t * Math.PI * frequency) * amplitude * edgeFactor;
-                var yPos = -26 + flagHeight + yOffset;
-                d += `L ${xPos},${yPos} `;
-            }
-            d += 'Z';
-            flag.setAttribute('d', d);
-            requestAnimationFrame(animate);
-        }
-        animate();
+        // 定义过渡动画样式
+        var transitionStyle = 'r 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.3s ease, opacity 0.3s ease';
 
-        g.appendChild(pole);
-        g.appendChild(flag);
+        // 最外层圆：半径最大，透明度最高
+        var outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        outerCircle.setAttribute('cx', '0');
+        outerCircle.setAttribute('cy', '0');
+        outerCircle.setAttribute('r', '12'); // 基础半径的4倍
+        outerCircle.setAttribute('fill', '#FFD700');
+        outerCircle.setAttribute('opacity', '0.25'); // 最透明但不是百分百
+        outerCircle.style.filter = 'blur(1px)';
+        outerCircle.style.transition = transitionStyle;
+        
+        // 中间层圆：半径中等，中等透明度
+        var middleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        middleCircle.setAttribute('cx', '0');
+        middleCircle.setAttribute('cy', '0');
+        middleCircle.setAttribute('r', '6'); // 基础半径的2倍
+        middleCircle.setAttribute('fill', '#FFD700');
+        middleCircle.setAttribute('opacity', '0.5'); // 中等透明度
+        middleCircle.style.transition = transitionStyle;
+        
+        // 最内层圆：半径最小，透明度最低（即最不透明）
+        var innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        innerCircle.setAttribute('cx', '0');
+        innerCircle.setAttribute('cy', '0');
+        innerCircle.setAttribute('r', '3'); // 基础半径
+        innerCircle.setAttribute('fill', '#FFD700');
+        innerCircle.setAttribute('opacity', '1'); // 完全不透明
+        innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(255, 215, 0, 0.8))';
+        innerCircle.style.transition = transitionStyle;
+        
+        // 添加圆点（从外到内）
+        g.appendChild(outerCircle);
+        g.appendChild(middleCircle);
+        g.appendChild(innerCircle);
+        
+        // --- 交互事件监听 ---
+        g.addEventListener('mouseenter', function() {
+            // 悬浮：变大，中心变红
+            innerCircle.setAttribute('r', '6');
+            innerCircle.setAttribute('fill', '#FF3333'); 
+            middleCircle.setAttribute('r', '10');
+            middleCircle.setAttribute('opacity', '0.7');
+            outerCircle.setAttribute('r', '16');
+            outerCircle.setAttribute('opacity', '0.4');
+        });
+
+        g.addEventListener('mouseleave', function() {
+            // 恢复原状
+            innerCircle.setAttribute('r', '3');
+            innerCircle.setAttribute('fill', '#FFD700');
+            middleCircle.setAttribute('r', '6');
+            middleCircle.setAttribute('opacity', '0.5');
+            outerCircle.setAttribute('r', '12');
+            outerCircle.setAttribute('opacity', '0.25');
+        });
+
+        g.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // 点击反馈动画 (轻微收缩再恢复)
+            innerCircle.setAttribute('r', '4'); 
+            setTimeout(() => {
+                innerCircle.setAttribute('r', '6'); // 回到悬浮状态
+            }, 100);
+
+            if (onClickCallback) onClickCallback(e);
+        });
+
         svgDoc.documentElement.appendChild(g);
     }
 
@@ -573,7 +587,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             provinceCenters[mapChineseName] = center; 
                         }
 
-                        drawFlag(svgDoc, center.x, center.y);
+                        // 传递点击回调，使圆点点击也能触发连接线
+                        drawCircleMarker(svgDoc, center.x, center.y, function() {
+                            console.log('点击圆点:', mapChineseName);
+                            drawEventConnectors(svgDoc, center.x, center.y, events);
+                        });
 
                         // 修改点击逻辑：不再直接弹窗，而是绘制连接线
                         path.addEventListener('click', function (e) {

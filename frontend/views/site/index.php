@@ -6,15 +6,17 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
 ?>
 <div class="site-index">
     <!-- 标题区域 -->
-    <div class="jumbotron text-center" style="background:transparent; border:none;">
+    <!-- <div class="jumbotron text-center" style="background:transparent; border:none;">
         <h1 class="display-4" style="color:#fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">烽火记忆 · 抗战胜利80周年</h1>
         <p class="lead" style="color:#fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">以时间作证，以数据铭记 —— 1931–1945 </p>
-    </div>
+    </div> -->
 
-    <div class="body-content">
-        <!-- 地图容器 -->
-        <div id="china-map-wrapper" style="max-width:1000px; margin:0 auto; background:transparent; border:none; padding:10px;">
-            <object id="china-map-object" type="image/svg+xml" data="<?= \yii\helpers\BaseUrl::base(true) . '/images/china-map.svg' ?>" style="width:100%; height:900px; display:block;">
+<div class="site-index">
+    <div class="body-content" style="display:flex; justify-content:center; align-items:center; height: 90vh; width: 100%; overflow:hidden;">
+        
+        <div id="china-map-wrapper" style="width: 100%; height: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center;">
+            
+            <object id="china-map-object" type="image/svg+xml" data="<?= \yii\helpers\BaseUrl::base(true) . '/images/china-map.svg' ?>" style="width:100%; height:100%; display:block;">
                 您的浏览器不支持 SVG，请升级浏览器。
             </object>
         </div>
