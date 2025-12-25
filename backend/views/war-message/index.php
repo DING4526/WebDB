@@ -419,9 +419,6 @@ $totalCount    = $pendingCount + $approvedCount + $rejectedCount;
                     </table>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default wm-btn" data-dismiss="modal">关闭</button>
-                </div>
 
             </div>
         </div>
