@@ -313,3 +313,41 @@ a.desc:after { content: "\e152"; }
         width: 100%;
     }
 }
+
+/* --- 首页右侧竖排艺术字 --- */
+.vertical-slogan {
+    position: absolute;
+    right: 8%; /* 距离右侧的距离，占据空白区域 */
+    top: 50%;
+    transform: translateY(-50%); /* 垂直居中 */
+    writing-mode: vertical-rl; /* 竖排模式：从右向左排列 */
+    font-family: "KaiTi", "STKaiti", "楷体", "SimSun", "宋体", serif; /* 书法/衬线字体 */
+    font-weight: 900;
+    z-index: 5;
+    pointer-events: none; /* 鼠标穿透，不影响底层交互 */
+    user-select: none;
+    cursor: default;
+}
+
+.vertical-slogan .slogan-line {
+    font-size: 6rem; /* 大号字体 */
+    color: #FFD700; /* 深墨色 */
+    letter-spacing: 0.5rem; /* 字间距 */
+    margin: 0 15px; /* 列之间的间距 */
+    line-height: 1.2;
+    text-shadow: 
+        3px 3px 0px rgba(255, 255, 255, 0.4), 
+        -1px -1px 0 rgba(255, 255, 255, 0.2); /* 增加立体感和对比度 */
+    opacity: 0.9;
+}
+
+/* 响应式调整 */
+@media (max-width: 1400px) {
+    .vertical-slogan { right: 2%; }
+    .vertical-slogan .slogan-line { font-size: 3rem; }
+}
+
+@media (max-width: 992px) {
+    /* 屏幕较窄时隐藏，避免遮挡地图 */
+    .vertical-slogan { display: none; }
+}
