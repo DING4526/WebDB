@@ -1,81 +1,53 @@
 html,
 body {
     height: 100%;
-    /* 设置固定背景图片 - 修复：使用绝对路径 */
     background-image: url('/advanced/frontend/web/images/background.png');
-    background-attachment: fixed; /* 关键属性：背景固定 */
+    background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
-    background-size: cover; /* 铺满屏幕 */
+    background-size: cover;
 }
 
-
-
-
-/* 动态折线容器 - 修复：确保不填充三角形 */
+/* 动态折线容器 */
 .event-line-path {
-    fill: none !important; /* 强制禁止填充，防止出现三角形 */
-    stroke: #d9534f; /* 红色 */
+    fill: none !important;
+    stroke: #d9534f;
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
     pointer-events: none;
     opacity: 0.9;
-    /* 动画通过 JS 控制，这里不再需要 animation */
 }
 
-/* 移除旧的 animate-draw 类定义 */
-/* .animate-draw { ... } 删除 */
-/* @keyframes drawLine { ... } 删除 */
-
-/* 事件文字样式 - 修复：去除模糊阴影，使用清晰描边 */
+/* 事件文字样式 */
 .event-label-text {
-    font-size: 17px; /* 稍微再大一点点 */
-    font-family: "Microsoft YaHei", "SimHei", sans-serif; /* 确保微软雅黑在前 */
-    
-    /* 1. 纯黑字体 */
+    font-size: 17px;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
     fill: #000000 !important; 
-    
-    /* 2. 字体加粗 */
     font-weight: 900; 
-    
-    /* 3. 白色描边（确保在深色地图上可见） */
-    stroke: #ffffff;       /* 白色描边 */
-    stroke-width: 3px;   /* 加粗描边，增强对比度 */
-    stroke-linejoin: round; /* 圆角连接，防刺眼 */
+    stroke: #ffffff;
+    stroke-width: 3px;
+    stroke-linejoin: round;
     stroke-linecap: round;
-    
-    /* 4. 关键：描边在下，填充在上 */
     paint-order: stroke fill; 
-    
-    /* 5. 移除模糊阴影 */
-    /* text-shadow: 删除 */
-    
     cursor: pointer;
-    
-    /* 保持你的动画逻辑 */
     opacity: 0; 
     transition: opacity 0.4s ease-out, fill 0.2s ease;
 }
 
-/* 悬停效果 */
 .event-label-text:hover {
-    fill: #d9534f !important; /* 悬停红色 */
-    stroke: #ffffff; /* 保持白边 */
+    fill: #d9534f !important;
+    stroke: #ffffff;
     stroke-width: 3px;
     text-decoration: underline;
 }
-
-/* 移除 fadeIn 动画 */
-/* @keyframes fadeIn { ... } 删除 */
-
 
 .wrap {
     min-height: 100%;
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
-    background: transparent !important; /* 新增：透明背景 */
+    background: transparent !important;
 }
 
 .wrap > .container {
@@ -91,7 +63,7 @@ body {
 
 .jumbotron {
     text-align: center;
-    background-color: transparent !important; /* 强制透明 */
+    background-color: transparent !important;
     border: none;
 }
 
@@ -105,53 +77,34 @@ body {
     font-style: italic;
 }
 
-
-
-/* --- 修改：地图红色旗子样式 - 方形飘扬版 --- */
+/* 地图红色旗子样式 */
 .map-flag-icon {
-    fill: #FF3333; /* 亮红色填充 */
-    stroke: #CC0000; /* 深红色描边 */
+    fill: #FF3333;
+    stroke: #CC0000;
     stroke-width: 0.5px;
-    
-    /* 添加阴影效果 */
     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
-    
-    /* 关键：禁止旗子响应鼠标事件 */
     pointer-events: none; 
-    
-    /* 飘扬动画：模拟风吹效果 */
     animation: flag-flutter 2s ease-in-out infinite;
     transform-box: fill-box;
-    transform-origin: left center; /* 左侧固定在旗杆上 */
+    transform-origin: left center;
 }
 
 .map-flag-pole {
-    stroke: #000000; /* 黑色旗杆 */
-    stroke-width: 2px; /* 旗杆粗细 */
+    stroke: #000000;
+    stroke-width: 2px;
     stroke-linecap: round;
     pointer-events: none;
-    
-    /* 旗杆阴影 */
     filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.4));
 }
 
-/* 旗子飘扬动画 - 模拟波浪效果 */
 @keyframes flag-flutter {
-    0%, 100% { 
-        transform: skewX(0deg) scaleX(1);
-    }
-    25% { 
-        transform: skewX(-3deg) scaleX(0.98);
-    }
-    50% { 
-        transform: skewX(2deg) scaleX(1.02);
-    }
-    75% { 
-        transform: skewX(-2deg) scaleX(0.99);
-    }
+    0%, 100% { transform: skewX(0deg) scaleX(1); }
+    25% { transform: skewX(-3deg) scaleX(0.98); }
+    50% { transform: skewX(2deg) scaleX(1.02); }
+    75% { transform: skewX(-2deg) scaleX(0.99); }
 }
 
-/* add sorting icons to gridview sort links */
+/* GridView sorting icons */
 a.asc:after, a.desc:after {
     position: relative;
     top: 1px;
@@ -162,95 +115,38 @@ a.asc:after, a.desc:after {
     line-height: 1;
     padding-left: 5px;
 }
+a.asc:after { content: "\e151"; }
+a.desc:after { content: "\e152"; }
+.sort-numerical a.asc:after { content: "\e153"; }
+.sort-numerical a.desc:after { content: "\e154"; }
+.sort-ordinal a.asc:after { content: "\e155"; }
+.sort-ordinal a.desc:after { content: "\e156"; }
 
-a.asc:after {
-    content: "\e151";
-}
+.grid-view td { white-space: nowrap; }
+.grid-view .filters input, .grid-view .filters select { min-width: 50px; }
+.hint-block { display: block; margin-top: 5px; color: #999; }
+.error-summary { color: #a94442; background: #fdf7f7; border-left: 3px solid #eed3d7; padding: 10px 20px; margin: 0 0 15px 0; }
 
-a.desc:after {
-    content: "\e152";
-}
-
-.sort-numerical a.asc:after {
-    content: "\e153";
-}
-
-.sort-numerical a.desc:after {
-    content: "\e154";
-}
-
-.sort-ordinal a.asc:after {
-    content: "\e155";
-}
-
-.sort-ordinal a.desc:after {
-    content: "\e156";
-}
-
-.grid-view td {
-    white-space: nowrap;
-}
-
-.grid-view .filters input,
-.grid-view .filters select {
-    min-width: 50px;
-}
-
-.hint-block {
-    display: block;
-    margin-top: 5px;
-    color: #999;
-}
-
-.error-summary {
-    color: #a94442;
-    background: #fdf7f7;
-    border-left: 3px solid #eed3d7;
-    padding: 10px 20px;
-    margin: 0 0 15px 0;
-}
-
-/* align the logout "link" (button in form) of the navbar */
-.nav li > form > button.logout {
-    padding: 15px;
-    border: none;
-}
-
+.nav li > form > button.logout { padding: 15px; border: none; }
 @media(max-width:767px) {
-    .nav li > form > button.logout {
-        display:block;
-        text-align: left;
-        width: 100%;
-        padding: 10px 15px;
-    }
+    .nav li > form > button.logout { display:block; text-align: left; width: 100%; padding: 10px 15px; }
 }
+.nav > li > form > button.logout:focus, .nav > li > form > button.logout:hover { text-decoration: none; }
+.nav > li > form > button.logout:focus { outline: none; }
 
-.nav > li > form > button.logout:focus,
-.nav > li > form > button.logout:hover {
-    text-decoration: none;
-}
-
-.nav > li > form > button.logout:focus {
-    outline: none;
-}
-
-/* --- 修改：事件详情弹窗样式(纯毛玻璃效果) --- */
+/* --- 事件详情弹窗样式(纯毛玻璃效果) --- */
 #event-detail-modal {
     position: fixed;
-    /* 修改：使用 !important 强制生效 */
-    left: 30% !important;           /* 居中 */
-    top: 30% !important;            /* 向下移动 (原为50%) */
-    transform: translate(-50%, -50%) !important; /* 居中修正 */
-    
+    left: 30% !important;
+    top: 30% !important;
+    transform: translate(-50%, -50%) !important;
     width: 600px;
     max-height: 50vh;
-    /* 修改：极淡的白色背景 + 强毛玻璃 */
     background: rgba(255, 255, 255, 0.05); 
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.18);
     z-index: 10001;
     overflow: hidden;
@@ -293,35 +189,25 @@ a.desc:after {
     flex-direction: row;
     gap: 20px;
     height: 100%;
-    
-    /* 关键修复：强制移除 Bootstrap 默认的白色背景和边框 */
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-/* 左侧轮播图区域 */
-#event-detail-modal .modal-image-swiper {
+/* 左侧图片区域 (移除 Swiper 样式，改为单图容器) */
+#event-detail-modal .modal-image-container {
     width: 300px;
+    height: 210px;
     flex-shrink: 0;
     position: relative;
-    padding: 20px 0;
-}
-
-#event-detail-modal .swiper {
-    width: 300px;
-    height: 210px; /* 保持高度大于宽度 */
-}
-
-#event-detail-modal .swiper-slide {
     border-radius: 10px;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    position: relative;
     user-select: none;
+    margin-top: 20px; /* 垂直居中微调 */
 }
 
-#event-detail-modal .swiper-slide img {
+#event-detail-modal .modal-image-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -331,6 +217,7 @@ a.desc:after {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(15, 32, 39, 0.9), transparent 60%);
+    pointer-events: none;
 }
 
 #event-detail-modal .overlay h2 {
@@ -357,11 +244,10 @@ a.desc:after {
 #event-detail-modal .event-title {
     font-size: 24px;
     font-weight: bold;
-    color: #000; /* 修改：黑色文字 */
+    color: #000;
     margin-bottom: 5px;
     cursor: pointer;
     transition: color 0.2s;
-    /* 字体样式：黑体 */
     font-family: "SimHei", "Microsoft YaHei", sans-serif;
 }
 
@@ -380,7 +266,7 @@ a.desc:after {
     display: flex;
     align-items: center;
     gap: 15px;
-    color: #333; /* 修改：深灰色文字 */
+    color: #333;
     font-size: 14px;
     font-weight: 500;
 }
@@ -397,95 +283,33 @@ a.desc:after {
 #event-detail-modal .event-meta-item:nth-child(2) .tag { background-color: #f89e37; }
 #event-detail-modal .event-meta-item:nth-child(3) .tag { background-color: #3a77fa; }
 
-#event-detail-modal .event-content {
-    height: 100px;
-    overflow-y: auto;
-    font-size: 15px;
-    color: #444; /* 修改：深灰色文字 */
-    line-height: 1.6;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-#event-detail-modal .event-content::-webkit-scrollbar {
-    display: none;
-}
-
-/* Swiper 分页器 */
-#event-detail-modal .swiper-pagination {
-    bottom: -10px !important;
-}
-
-#event-detail-modal .swiper-pagination-bullet {
-    background: #fff;
-    opacity: 0.5;
-}
-
-#event-detail-modal .swiper-pagination-bullet-active {
-    opacity: 1;
-}
-
-/* 滚动条样式 */
 #event-detail-modal .modal-info::-webkit-scrollbar {
     width: 6px;
 }
-
 #event-detail-modal .modal-info::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.3);
     border-radius: 3px;
 }
-
 #event-detail-modal .modal-info::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* 新增：确保主容器透明 */
-.site-index {
-    background: transparent;
-}
-
-.site-index .body-content {
-    background: transparent;
-}
-
-/* 新增：强制 .container 和 .wrap 透明，让背景图片显示出来 */
-.container {
+.site-index, .site-index .body-content, .container {
     background: transparent !important;
 }
 
-.wrap {
-    min-height: 100%;
-    height: auto;
-    margin: 0 auto -60px;
-    padding: 0 0 60px;
-    background: transparent !important; /* 新增：透明背景 */
-}
-
-/* 新增：地图立体感和金色描边样式 */
 #china-map-object {
-    /* 移除默认的阴影效果，让地图保持平整 */
-    filter: none;
-}
-
-/* 新增：确保地图整体阴影不被覆盖 */
-#china-map-object {
-    /* 保留地图立体感 */
     filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.8));
 }
 
-/* 响应式调整 */
 @media(max-width: 768px) {
     #event-detail-modal {
-        left: 10px;
-        right: 10px;
-        width: auto;
+        left: 10px; right: 10px; width: auto;
     }
-
     #event-detail-modal .modal-content {
         flex-direction: column;
     }
-
-    #event-detail-modal .modal-image-swiper {
+    #event-detail-modal .modal-image-container {
         width: 100%;
     }
 }
