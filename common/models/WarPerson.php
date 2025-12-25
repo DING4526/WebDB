@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ding 2310724
+ * 苏奕扬 2311330
  * 抗战人物模型
  */
 
@@ -64,4 +64,16 @@ class WarPerson extends ActiveRecord
             ->via('eventPeople')
             ->orderBy(['event_date' => SORT_ASC]);
     }
+
+    public function getMedias()
+    {
+        return $this->hasMany(WarMedia::class, ['person_id' => 'id']);
+    }
+
+    public function getCoverImage()
+    {
+        return $this->hasOne(WarMedia::class, ['person_id' => 'id'])
+            ->andWhere(['war_media.type' => 'image'])
+            ->orderBy(['war_media.uploaded_at' => SORT_ASC, 'war_media.id' => SORT_ASC]);
+    }  
 }

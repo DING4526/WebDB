@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ding 2310724
+ * 苏奕扬 2311330
  * 抗战访问日志模型
  */
 
@@ -20,7 +20,7 @@ class WarVisitLog extends ActiveRecord
     {
         return [
             [['target_type', 'target_id', 'visited_at'], 'required'],
-            [['target_id', 'visited_at'], 'integer'],
+            [['target_id', 'visited_at', 'user_id'], 'integer'],
             [['target_type'], 'string', 'max' => 20],
         ];
     }
@@ -29,6 +29,7 @@ class WarVisitLog extends ActiveRecord
     {
         return [
             'id' => 'ID',
+            'user_id' => '用户ID',
             'target_type' => '目标类型',
             'target_id' => '目标ID',
             'visited_at' => '访问时间',

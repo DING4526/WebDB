@@ -5,7 +5,15 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\web\Response;
 use common\models\LoginForm;
+use common\models\TeamMember;
+use common\models\TeamMemberApply;
+use common\models\WarMessage;
+use common\models\WarEvent;
+use common\models\WarPerson;
+use common\models\WarMedia;
+use common\models\WarVisitLog;
 
 /**
  * Site controller
@@ -26,7 +34,7 @@ class SiteController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index', 'help', 'dashboard-data'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -96,5 +104,264 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
+    }
+
+    /**
+     * Help page action.
+     * 显示帮助信息（角色与权限模型、成员注册/管理链路）
+     *
+     * @return string
+     */
+    public function actionHelp()
+    {
+        return $this->renderPartial('help');
+    }
+
+    /**
+     * Dashboard data API.
+     * 返回仪表板所需的统计数据
+     *
+     * @return Response
+     */
+    public function actionDashboardData()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $teamId = Yii::$app->teamProvider ? Yii::$app->teamProvider->getId() : null;
+        $visitMode = Yii::$app->request->get('visitMode', 'day');
+        $messageMode = Yii::$app->request->get('messageMode', 'day');
+
+        // 基础统计
+        $memberCount = TeamMember::find()
+            ->andWhere(['team_id' => $teamId, 'status' => TeamMember::STATUS_ACTIVE])
+            ->count();
+
+        $pendingApplyCount = TeamMemberApply::find()
+            ->andWhere(['team_id' => $teamId, 'status' => TeamMemberApply::STATUS_PENDING])
+            ->count();
+
+        $pendingMessageCount = WarMessage::find()
+            ->andWhere(['status' => WarMessage::STATUS_PENDING])
+            ->count();
+
+        $eventCount = WarEvent::find()->count();
+        $personCount = WarPerson::find()->count();
+        $mediaCount = WarMedia::find()->count();
+
+        // 近7天访问量
+        $sevenDaysAgo = strtotime('-7 days');
+        $visits7Days = WarVisitLog::find()
+            ->andWhere(['>=', 'visited_at', $sevenDaysAgo])
+            ->count();
+
+        // 近7天新增内容
+        $newEvents7Days = WarEvent::find()
+            ->andWhere(['>=', 'created_at', $sevenDaysAgo])
+            ->count();
+        $newPersons7Days = WarPerson::find()
+            ->andWhere(['>=', 'created_at', $sevenDaysAgo])
+            ->count();
+        $newContent7Days = $newEvents7Days + $newPersons7Days;
+
+        // 访问趋势数据
+        $trendDays = 7;
+        $visitTrend = [];
+        if ($visitMode === 'hour') {
+            // 最近24小时（按整点对齐）
+            $trendHours = 24;
+            $endHourStart = strtotime(date('Y-m-d H:00:00')); // 当前整点
+            for ($i = $trendHours - 1; $i >= 0; $i--) {
+                $hourStart = $endHourStart - ($i * 3600);
+                $hourEnd = $hourStart + 3599;
+
+                $count = WarVisitLog::find()
+                    ->andWhere(['>=', 'visited_at', $hourStart])
+                    ->andWhere(['<=', 'visited_at', $hourEnd])
+                    ->count();
+
+                $visitTrend[] = [
+                    'date' => date('H:i', $hourStart),  // 跨天也清晰
+                    'count' => (int)$count,
+                ];
+            }
+        } else {
+            // 最近7天（按天）
+            for ($i = $trendDays - 1; $i >= 0; $i--) {
+                $dayStart = strtotime("-{$i} days 00:00:00");
+                $dayEnd = strtotime("-{$i} days 23:59:59");
+
+                $count = WarVisitLog::find()
+                    ->andWhere(['>=', 'visited_at', $dayStart])
+                    ->andWhere(['<=', 'visited_at', $dayEnd])
+                    ->count();
+
+                $visitTrend[] = [
+                    'date' => date('m-d', $dayStart),
+                    'count' => (int)$count,
+                ];
+            }
+        }
+
+        // 留言趋势数据（小时/天，分状态）
+        $messageTrend = [];
+        if ($messageMode === 'hour') {
+            $trendHours = 24;
+            $endHourStart = strtotime(date('Y-m-d H:00:00'));
+            for ($i = $trendHours - 1; $i >= 0; $i--) {
+                $hourStart = $endHourStart - ($i * 3600);
+                $hourEnd = $hourStart + 3599;
+
+                $pending = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $hourStart])
+                    ->andWhere(['<=', 'created_at', $hourEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_PENDING])
+                    ->count();
+                $approved = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $hourStart])
+                    ->andWhere(['<=', 'created_at', $hourEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_APPROVED])
+                    ->count();
+                $rejected = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $hourStart])
+                    ->andWhere(['<=', 'created_at', $hourEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_REJECTED])
+                    ->count();
+
+                $messageTrend[] = [
+                    'date' => date('H:i', $hourStart),
+                    'pending' => (int)$pending,
+                    'approved' => (int)$approved,
+                    'rejected' => (int)$rejected,
+                ];
+            }
+        } else {
+            for ($i = $trendDays - 1; $i >= 0; $i--) {
+                $dayStart = strtotime("-{$i} days 00:00:00");
+                $dayEnd = strtotime("-{$i} days 23:59:59");
+                $pending = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $dayStart])
+                    ->andWhere(['<=', 'created_at', $dayEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_PENDING])
+                    ->count();
+                $approved = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $dayStart])
+                    ->andWhere(['<=', 'created_at', $dayEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_APPROVED])
+                    ->count();
+                $rejected = WarMessage::find()
+                    ->andWhere(['>=', 'created_at', $dayStart])
+                    ->andWhere(['<=', 'created_at', $dayEnd])
+                    ->andWhere(['status' => WarMessage::STATUS_REJECTED])
+                    ->count();
+                $messageTrend[] = [
+                    'date' => date('m-d', $dayStart),
+                    'pending' => (int)$pending,
+                    'approved' => (int)$approved,
+                    'rejected' => (int)$rejected,
+                ];
+            }
+        }
+
+        // 内容质量概览
+        $totalEvents = (int)$eventCount;
+        $eventsWithCover = (int) WarMedia::find()
+            ->select('event_id')
+            ->distinct()
+            ->where(['type' => 'image'])
+            ->andWhere(['not', ['event_id' => null]])
+            ->count();
+        $eventsWithSummary = WarEvent::find()
+            ->andWhere(['not', ['summary' => null]])
+            ->andWhere(['!=', 'summary', ''])
+            ->count();
+        $eventsWithPerson = WarEvent::find()
+            ->innerJoinWith('eventPeople')
+            ->distinct()
+            ->count();
+
+        $totalPersons = (int)$personCount;
+        $personsWithIntro = WarPerson::find()
+            ->andWhere(['not', ['intro' => null]])
+            ->andWhere(['!=', 'intro', ''])
+            ->count();
+        $personsWithCover = (int) WarMedia::find()
+            ->select('person_id')
+            ->distinct()
+            ->where(['type' => 'image'])
+            ->andWhere(['not', ['person_id' => null]])
+            ->count();
+
+        // 热榜TOP5 - 使用批量查询避免N+1问题
+        $topEvents = WarVisitLog::find()
+            ->select(['target_id', 'COUNT(*) as visit_count'])
+            ->andWhere(['target_type' => 'event'])
+            ->groupBy('target_id')
+            ->orderBy(['visit_count' => SORT_DESC])
+            ->limit(5)
+            ->asArray()
+            ->all();
+        
+        $topEventDetails = [];
+        if (!empty($topEvents)) {
+            $eventIds = array_column($topEvents, 'target_id');
+            $events = WarEvent::find()->andWhere(['id' => $eventIds])->indexBy('id')->all();
+            $visitCounts = array_column($topEvents, 'visit_count', 'target_id');
+            foreach ($eventIds as $eventId) {
+                if (isset($events[$eventId])) {
+                    $topEventDetails[] = [
+                        'id' => $events[$eventId]->id,
+                        'title' => $events[$eventId]->title,
+                        'visits' => (int)$visitCounts[$eventId],
+                    ];
+                }
+            }
+        }
+
+        $topPersons = WarVisitLog::find()
+            ->select(['target_id', 'COUNT(*) as visit_count'])
+            ->andWhere(['target_type' => 'person'])
+            ->groupBy('target_id')
+            ->orderBy(['visit_count' => SORT_DESC])
+            ->limit(5)
+            ->asArray()
+            ->all();
+
+        $topPersonDetails = [];
+        if (!empty($topPersons)) {
+            $personIds = array_column($topPersons, 'target_id');
+            $persons = WarPerson::find()->andWhere(['id' => $personIds])->indexBy('id')->all();
+            $visitCounts = array_column($topPersons, 'visit_count', 'target_id');
+            foreach ($personIds as $personId) {
+                if (isset($persons[$personId])) {
+                    $topPersonDetails[] = [
+                        'id' => $persons[$personId]->id,
+                        'name' => $persons[$personId]->name,
+                        'visits' => (int)$visitCounts[$personId],
+                    ];
+                }
+            }
+        }
+
+        return [
+            'memberCount' => (int)$memberCount,
+            'pendingApplyCount' => (int)$pendingApplyCount,
+            'pendingMessageCount' => (int)$pendingMessageCount,
+            'eventCount' => $totalEvents,
+            'personCount' => $totalPersons,
+            'mediaCount' => (int)$mediaCount,
+            'visits7Days' => (int)$visits7Days,
+            'newContent7Days' => (int)$newContent7Days,
+            'visitTrend' => $visitTrend,
+            'messageTrend' => $messageTrend,
+            'quality' => [
+                'eventCover' => $totalEvents > 0 ? round($eventsWithCover / $totalEvents * 100) : 0,
+                'eventSummary' => $totalEvents > 0 ? round($eventsWithSummary / $totalEvents * 100) : 0,
+                'eventPerson' => $totalEvents > 0 ? round($eventsWithPerson / $totalEvents * 100) : 0,
+                'personIntro' => $totalPersons > 0 ? round($personsWithIntro / $totalPersons * 100) : 0,
+                'personCover' => $totalPersons > 0 ? round($personsWithCover / $totalPersons * 100) : 0,
+            ],
+            'topEvents' => $topEventDetails,
+            'topPersons' => $topPersonDetails,
+        ];
     }
 }

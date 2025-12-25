@@ -2,6 +2,7 @@
 
 /**
  * Ding 2310724
+ * KongXianghao 2311439
  * 抗战事件模型
  */
 
@@ -68,5 +69,17 @@ class WarEvent extends ActiveRecord
     {
         return $this->hasMany(WarPerson::class, ['id' => 'person_id'])
             ->via('eventPeople');
+    }
+
+    public function getMedias()
+    {
+        return $this->hasMany(WarMedia::class, ['event_id' => 'id']);
+    }
+
+    public function getCoverImage()
+    {
+        return $this->hasOne(WarMedia::class, ['event_id' => 'id'])
+            ->andWhere(['war_media.type' => 'image'])
+            ->orderBy(['war_media.uploaded_at' => SORT_ASC, 'war_media.id' => SORT_ASC]);
     }
 }

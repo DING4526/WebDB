@@ -1,0 +1,892 @@
+/* ==========================================================================
+   war-event.css  (Bootstrap 3 friendly)
+   War Event Admin UI (modernized)
+   - Index / Create / Update / View / Relations&Media
+   ========================================================================== */
+
+/* ===== Hero (Index) ===== */
+.we-hero{
+  border-radius:18px; padding:18px 18px 16px;
+  background: linear-gradient(135deg, #8B2500 0%, #6B4423 50%, #4A5568 100%);
+  color:#fff; box-shadow:0 18px 50px rgba(139,37,0,.15);
+  position:relative; overflow:hidden;
+}
+.we-hero:before{
+  content:"";position:absolute;right:-70px;top:-70px;
+  width:220px;height:220px;border-radius:50%;
+  background:rgba(255,255,255,.13);
+}
+.we-hero:after{
+  content:"";position:absolute;left:-120px;bottom:-120px;
+  width:280px;height:280px;border-radius:50%;
+  background:rgba(255,255,255,.10);
+}
+.we-hero-inner{
+  position:relative;z-index:1;
+  display:flex;gap:12px;align-items:flex-end;justify-content:space-between;
+  flex-wrap:wrap;
+}
+.we-hero h2{ margin:0;font-weight:900;letter-spacing:.4px; }
+.we-hero .desc{ margin-top:8px;opacity:.92;font-weight:700; }
+
+/* ===== Top bar (Create/Update/View) ===== */
+.we-top{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;
+}
+.we-top h2{ margin:0;font-weight:900; }
+.we-ops, .we-actions{
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;
+}
+.we-actions .btn, .we-ops .btn, .we-top .btn{
+  border-radius:12px;font-weight:900;padding:8px 12px;
+}
+
+/* ===== Buttons (Index hero) ===== */
+.we-actions .btn{ border:0;padding:9px 12px; }
+.we-actions .btn-default{ background:rgba(255,255,255,.18);color:#fff; }
+.we-actions .btn-default:hover{ background:rgba(255,255,255,.26);color:#fff; }
+.we-actions .btn-success{ background:#A52A2A; }
+.we-actions .btn-success:hover{ background:#8B2500; }
+
+/* ===== Card Shell ===== */
+.we-card{
+  margin-top:14px;
+  background:#fff;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+.we-card-head{
+  padding:14px 16px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;
+}
+.we-card-title, .we-card-head .title{
+  margin:0;font-weight:900;color:#111827;font-size:16px;
+}
+.we-card-body{ padding:14px 16px 18px; }
+.we-body{ padding:14px 16px 18px; }
+.we-hint, .we-muted{ color:#64748b;font-weight:700; }
+
+/* ===== Pills / Dots ===== */
+.we-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  font-size:12px;font-weight:900;
+  border:1px solid rgba(0,0,0,.08);
+  background:#fff;color:#111827;
+}
+.we-dot{
+  width:8px;height:8px;border-radius:50%;
+  display:inline-block;background:#111827;
+}
+
+/* ===== Grid/Table (Index) ===== */
+.we-grid{ padding:12px 14px 16px; }
+.we-grid .table{
+  margin:0;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:14px;
+  overflow:hidden;
+}
+.we-grid .table>thead>tr>th{
+  background:#f8fafc;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  color:#334155;
+  font-weight:900;
+  font-size:13px;
+  padding:12px 10px;
+}
+.we-grid .table>tbody>tr>td{
+  border-top:1px solid rgba(0,0,0,.06);
+  padding:12px 10px;
+  vertical-align:middle;
+  color:#0f172a;
+}
+.we-grid .table>tbody>tr:hover{ background:#fbfdff; }
+.we-grid .filters input,
+.we-grid .filters select{
+  height:34px;
+  border-radius:12px!important;
+  border:1px solid rgba(0,0,0,.14)!important;
+  box-shadow:none!important;
+}
+
+/* ===== Status Badge ===== */
+.we-badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid rgba(0,0,0,.08);
+}
+.we-badge-pub{ background:rgba(34,197,94,.14); color:#14532d; }
+.we-badge-draft{ background:rgba(107,114,128,.14); color:#374151; }
+
+/* ===== Action Buttons (Index table) ===== */
+.we-actions-col{ white-space:nowrap; }
+.we-actions-col .btn{ border-radius:12px;font-weight:900;padding:6px 10px; }
+.we-actions-col .btn + .btn{ margin-left:6px; }
+
+
+/* ===== Tabs (Update) ===== */
+.we-tabs{ padding:0 12px; }
+.we-tabs .nav-tabs{ border-bottom:1px solid rgba(0,0,0,.06); }
+.we-tabs .nav-tabs>li>a{
+  border:0!important;
+  border-radius:12px 12px 0 0;
+  font-weight:900;
+  color:#4b5563;
+  margin-right:6px;
+}
+.we-tabs .nav-tabs>li.active>a,
+.we-tabs .nav-tabs>li.active>a:hover,
+.we-tabs .nav-tabs>li.active>a:focus{
+  background:#fff!important;
+  color:#111827;
+  border:0!important;
+  box-shadow:0 -10px 26px rgba(0,0,0,.06);
+}
+
+/* ===== Form (Create/Update _form.php) ===== */
+.we-form .form-control{ border-radius:12px; box-shadow:none; }
+.we-form textarea.form-control{ line-height:1.6; }
+.we-form .help-block{ color:#64748b; font-weight:700; }
+.we-form .btn{ border-radius:12px; font-weight:900; padding:9px 14px; }
+.we-form .we-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px 14px;
+}
+@media (max-width: 992px){
+  .we-form .we-grid{ grid-template-columns: 1fr; }
+}
+.we-form .we-full{ grid-column: 1 / -1; }
+.we-form .we-section{
+  border:1px solid rgba(0,0,0,.06);
+  background:#f8fafc;
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:12px;
+}
+.we-form .we-section-title{
+  font-weight:900;color:#111827;
+  margin:0 0 8px;
+}
+
+
+/* ==========================================================================
+   we3 Workspace（单一来源样式）
+   ========================================================================== */
+
+/* Wrapper & width */
+.we3{ padding: 12px 0 22px; }
+.we3.we3-wrap{ padding: 12px 0 22px; }
+.we3-headcard,
+.we3-canvas{
+  max-width: 1120px;
+  margin: 0 auto 12px;
+}
+@media (max-width: 1200px){
+  .we3-headcard,
+  .we3-canvas{
+    max-width: calc(100% - 24px);
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+}
+
+/* Header card */
+.we3-headcard{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.06);
+  padding: 14px 16px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.we3-title{ font-size:18px; font-weight:900; color:#111827; line-height:1.2; }
+.we3-subtitle{ margin-top:6px; color:#64748b; font-weight:700; }
+.we3-meta{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.we3-head-right{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+.we3-btn{ border-radius:12px; font-weight:900; padding:8px 12px; }
+.we3-btn-strong{ padding:9px 14px; }
+
+/* Chips / badges */
+.we3-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  border: 1px solid rgba(0,0,0,.08);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight:900;
+  color:#0f172a;
+  background: rgba(17,24,39,.04);
+}
+.we3-chip-green{ background: rgba(34,197,94,.14); color:#14532d; }
+.we3-chip-gray{ background: rgba(107,114,128,.14); color:#374151; }
+.we3-chip-light{ background:#fff; }
+.we3-chip-muted{ color:#475569; background: rgba(148,163,184,.12); }
+
+.we3-badge{
+  display:inline-flex;
+  align-items:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(0,0,0,.08);
+  background:#fff;
+  color:#111827;
+}
+
+/* Canvas */
+.we3-canvas{
+  background:#fff;
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:18px;
+  box-shadow:0 18px 45px rgba(0,0,0,.06);
+  overflow:hidden;
+}
+.we3-body{ padding: 14px 16px 4px; }
+
+/* Card */
+.we3-card{
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+}
+.we3-card-hd{
+  padding: 12px 14px;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  background: linear-gradient(180deg, rgba(248,250,252,.9), #fff);
+}
+.we3-card-title{ font-weight:900; color:#111827; font-size:14px; }
+.we3-card-desc{ margin-top:6px; color:#64748b; font-weight:700; }
+.we3-card-bd{ padding: 14px; }
+
+/* Grid */
+.we3-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px 10px;
+}
+@media (max-width: 640px){
+  .we3-grid{ grid-template-columns: 1fr; }
+}
+.we3-grid2{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+}
+@media (max-width: 900px){
+  .we3-grid2{ grid-template-columns: 1fr; }
+}
+.we3-twoCols{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+}
+@media (max-width: 860px){
+  .we3-twoCols{ grid-template-columns: 1fr; }
+}
+.we3-span-2,
+.we3-spanfull{ grid-column: 1 / -1; }
+
+/* Field / form */
+.we3-fieldline{
+  display:flex;
+  gap: 10px;
+  align-items:flex-start;
+}
+.we3-lab{
+  width: 82px;
+  flex: 0 0 82px;
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #64748b;
+}
+.we3-ctl{ flex: 1 1 auto; min-width: 0; }
+.we3-field-inner{ margin:0; }
+.we3-form .form-group{ margin:0; }
+.we3-form .form-control{
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  box-shadow:none;
+}
+.we3-form input.form-control,
+.we3-form select.form-control{
+  height: 36px;
+  padding: 7px 10px;
+  max-width: 420px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.we3-form textarea.form-control{
+  padding: 9px 10px;
+  line-height: 1.6;
+}
+.we3-form .help-block{ display:none; }
+.we3-span-2 .form-control{ max-width: 920px; }
+.we3-readonly{
+  margin-top: 6px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.06);
+  background:#f8fafc;
+  font-weight:600;
+  color:#0f172a;
+}
+.we3-pre{ white-space:pre-wrap; word-break:break-word; }
+
+/* View/Edit switch */
+.we3-canvas.is-view .we3-editable{ display:none; }
+.we3-canvas.is-view .we3-readonly{ display:block; }
+.we3-canvas.is-edit .we3-editable{ display:block; }
+.we3-canvas.is-edit .we3-readonly{ display:none; }
+.we3-canvas.is-view .we3-editable-inline{ display:none; }
+
+/* Save bar */
+.we3-save{
+  border-top: 1px solid rgba(0,0,0,.06);
+  background: rgba(248,250,252,.9);
+  padding: 12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.we3-hint{ color:#64748b; font-weight:700; }
+.we3-save-right{ display:flex; gap:10px; flex-wrap:wrap; }
+
+/* Buttons inside workspace */
+.we3 .btn{
+  border-radius: 12px;
+  font-weight: 900;
+  border: 0;
+}
+.we3 .btn-default{
+  background: rgba(17,24,39,.06);
+  color: #111827;
+}
+.we3 .btn-default:hover{ background: rgba(17,24,39,.10); }
+.we3 .btn-primary{
+  background: rgba(59,130,246,.14);
+  color: #1e3a8a;
+}
+.we3 .btn-primary:hover{
+  background: rgba(59,130,246,.22);
+  color: #1e3a8a;
+}
+.we3 .btn-success{
+  background:#22c55e;
+  color:#fff;
+}
+.we3 .btn-success:hover{ background:#16a34a; }
+.we3 .btn-warning{
+  background: rgba(245,158,11,.18);
+  color:#78350f;
+}
+.we3 .btn-warning:hover{ background: rgba(245,158,11,.26); }
+.we3 .btn-danger{
+  background: rgba(239,68,68,.14);
+  color:#7f1d1d;
+}
+.we3 .btn-danger:hover{ background: rgba(239,68,68,.22); }
+.we3 .btn-xs{ padding: 5px 8px; border-radius: 10px; }
+
+/* Drawer */
+.we3-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease;
+  z-index: 98;
+}
+.we3-overlay.is-open{ opacity:1; pointer-events:auto; }
+.we3-drawer{
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 560px;
+  max-width: calc(100vw - 16px);
+  background:#fff;
+  border-left: 1px solid rgba(0,0,0,.10);
+  box-shadow: -20px 0 60px rgba(0,0,0,.18);
+  transform: translateX(102%);
+  transition: transform .22s ease;
+  z-index: 99;
+  display:flex;
+  flex-direction:column;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #0f172a;
+}
+.we3-drawer.is-open{ transform: translateX(0); }
+.we3-drawer-hd{
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  background: linear-gradient(180deg, rgba(248,250,252,.9), #fff);
+}
+.we3-drawer-title{ font-weight:900; color:#111827; }
+.we3-drawer-sub{ margin-top:6px; color:#64748b; font-weight:700; }
+.we3-iconbtn{
+  border:none;
+  background:#f1f5f9;
+  color:#0f172a;
+  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  font-weight:900;
+  line-height: 36px;
+  text-align:center;
+  cursor:pointer;
+}
+.we3-drawer-bd{
+  padding: 12px 14px 18px;
+  overflow:auto;
+}
+
+/* Panels / list / file */
+.we3-panel{
+  border: 1px solid rgba(0,0,0,.06);
+  background:#fff;
+  border-radius: 18px;
+  overflow:hidden;
+  margin-bottom: 12px;
+}
+.we3-panel-hd{
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.we3-panel-title{
+  font-weight:700;
+  font-size: 18px;
+  letter-spacing: .2px;
+  color:#0f172a;
+  line-height: 1.15;
+}
+.we3-panel-meta{ color:#64748b; font-weight:600; font-size:12px; }
+.we3-panel-bd{ padding: 10px 12px 12px; }
+.we3-list{ display:flex; flex-direction:column; gap:8px; }
+.we3-item{
+  border: 1px solid rgba(0,0,0,.06);
+  background:#f8fafc;
+  border-radius: 14px;
+  padding: 10px 12px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+}
+.we3-item-title{ font-weight:900; color:#111827; }
+.we3-item-sub{ margin-top:4px; color:#64748b; font-weight:500; font-size:12px; }
+.we3-empty{ padding: 6px 2px; color:#64748b; font-weight:500; font-size:12px; }
+.we3-minihead{
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+  margin: 6px 0 10px;
+}
+.we3-mini{ font-weight:900; color:#0f172a; }
+.we3-note{
+  margin: 0 0 10px;
+  color:#64748b;
+  font-weight:500;
+  font-size:12px;
+}
+.we3-file{
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:8px;
+  background:#fff;
+}
+.we3-file-title{ font-weight:900; color:#111827; }
+.we3-file-sub{
+  margin-top:4px;
+  font-weight:500;
+  font-size:12px;
+  color:#64748b;
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.we3-split{
+  height:1px;
+  background: rgba(0,0,0,.06);
+  margin: 12px 0;
+}
+
+/* Drawer forms */
+.we3-miniGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  align-items:end;
+}
+@media (max-width: 740px){
+  .we3-miniGrid{ grid-template-columns: 1fr; }
+}
+.we3-miniColBtn .btn{ height: 36px; padding: 8px 12px; }
+.we3-miniForm .form-group{ margin:0; }
+.we3-miniForm label.control-label{
+  font-size: 12px;
+  font-weight: 700;
+  color:#64748b;
+  margin: 0 0 6px;
+}
+.we3-miniForm .help-block{ display:none; }
+.we3-miniForm .form-control{
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  height: 36px;
+  padding: 7px 10px;
+}
+.we3-miniop{ margin:0; }
+
+/* =========================
+   we3 Drawer polishing v5
+   只影响侧边栏：分区更明显、卡片更精致、按钮更协调
+   ========================= */
+
+/* 分区区分：人物/媒资不同边条 + 轻底色 */
+/* 人物关联：暗酒红 */
+.we3-panel-people{
+  border-left: 6px solid rgba(127, 29, 29, .42); /* 深红色条 */
+  background: linear-gradient(
+    180deg,
+    rgba(127, 29, 29, .06), /* 顶部淡红雾 */
+    #fff 42%
+  );
+}
+
+/* 媒资：铁灰（偏冷），避免和人物同色抢戏 */
+.we3-panel-media{
+  border-left: 6px solid rgba(30, 41, 59, .38); /* 铁灰色条 */
+  background: linear-gradient(
+    180deg,
+    rgba(30, 41, 59, .055), /* 顶部淡灰雾 */
+    #fff 42%
+  );
+}
+.we3-panel-people .we3-panel-hd,
+.we3-panel-media .we3-panel-hd{
+  background: transparent;
+}
+
+/* 人物卡片：grid 小卡，不占整行 */
+.we3-person-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 10px;
+}
+@media (max-width: 560px){
+  .we3-person-grid{ grid-template-columns: 1fr; }
+}
+
+.we3-person-card{
+  position: relative;
+  border: 1px solid rgba(0,0,0,.06);
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px 12px;
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 10px;
+  align-items: center;
+  box-shadow: 0 10px 26px rgba(0,0,0,.05);
+}
+.we3-person-ava{
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  overflow: hidden;                 /* 关键：裁切 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 作为 fallback 的“字母徽章”背景 */
+  font-weight: 700;
+  color: #0f172a;
+  background: rgba(197, 121, 34, 0.14);
+  border: 1px solid rgba(140, 114, 80, 0.18);
+}
+
+/* ✅关键：约束图片并裁切填充 */
+.we3-person-ava img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;                /* 裁切铺满，不变形 */
+  object-position: center;          /* 居中裁切 */
+  display: block;                   /* 去掉 img 底部空隙 */
+}
+.we3-person-name{ font-weight: 700; color:#111827; line-height:1.1; }
+.we3-person-rel{
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color:#64748b;
+}
+.we3-person-op{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.we3-typebadge{
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: #f8fafc;
+  display:flex;
+  align-items:center;
+  padding: 0 10px;
+  font-weight: 900;
+  color:#334155;
+}
+
+/* 媒资区域：图片/文档更协调的排布 */
+.we3-media-sections{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.we3-media-sec{
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 16px;
+  padding: 10px 10px;
+  background: #fff;
+}
+.we3-media-sec-hd{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 8px;
+}
+
+.we3-media-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 10px;
+}
+@media (max-width: 560px){
+  .we3-media-grid{ grid-template-columns: 1fr; }
+}
+
+/* 媒资卡片：限宽、信息更简洁 */
+.we3-media-card{
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 16px;
+  background: #fff;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 10px;
+  align-items: center;
+  box-shadow: 0 10px 26px rgba(0,0,0,.05);
+  position: relative;
+}
+.we3-media-op{
+  position:absolute;
+  top: 8px;
+  right: 8px;
+}
+.we3-media-thumb{
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  overflow: hidden;
+  display:block;
+  border: 1px solid rgba(0,0,0,.06);
+  background: #f8fafc;
+}
+.we3-media-thumb img{
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  display:block;
+}
+.we3-media-title{
+  font-weight: 700;
+  color:#111827;
+  font-size: 13px;
+  line-height: 1.25;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.we3-media-links{
+  margin-top: 6px;
+}
+.we3-media-links .we3-link{
+  font-size: 12px;
+  font-weight: 600;
+}
+.we3-link{
+  font-weight: 900;
+  font-size: 12px;
+  color: #2563eb;
+  text-decoration: none;
+}
+.we3-link:hover{ text-decoration: underline; }
+
+/* 文档卡片 icon */
+.we3-media-card-doc{
+  grid-template-columns: 56px 1fr;
+}
+.we3-docicon{
+  width:56px; height:56px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  color:#0f172a;
+  background: rgba(245,158,11,.14);
+  border: 1px solid rgba(245,158,11,.18);
+}
+
+/* 让 drawer 内按钮更统一 */
+.we3-drawer .btn-xs{
+  padding: 5px 8px;
+  border-radius: 10px;
+}
+
+/* =========================================
+   Fix: bind/add buttons + uploadbar alignment
+   ========================================= */
+
+/* 让 miniGrid 的按钮不再“傻大宽”，桌面端做第三列固定宽度 */
+.we3-miniGrid-people,
+.we3-miniGrid-media{
+  grid-template-columns: 1fr 1fr 160px;
+  align-items: end;
+}
+
+/* 按钮列：保证同高、对齐 */
+.we3-miniColBtn{ display:flex; }
+.we3-miniColBtn .btn{
+  height: 36px;
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* 桌面端：按钮别再强制全宽占一整行（由第三列控制宽度） */
+.we3-btn-block{
+  width: 100%;
+  height: 36px;
+  padding: 8px 12px;
+}
+
+/* 小屏：三列变一列，按钮自动全宽（你原先想要的移动体验） */
+@media (max-width: 740px){
+  .we3-miniGrid-people,
+  .we3-miniGrid-media{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------
+   Uploadbar：按钮左，提示右
+   ------------------------- */
+.we3-uploadbar{
+  border: 1px dashed rgba(96, 96, 96, 0.35);
+  background: rgba(110, 110, 110, 0.04);
+  border-radius: 16px;
+  padding: 12px 12px;
+  margin-bottom: 12px;
+}
+
+.we3-uploadrow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.we3-btn-upload{
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  box-shadow: 0 10px 22px rgba(59,130,246,.12);
+}
+
+/* 右侧提示：两行，层级清晰 */
+.we3-uploadhint{
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.we3-uploadhint-title{
+  font-weight: 900;
+  color:#0f172a;
+  font-size: 13px;
+  line-height: 1.2;
+}
+.we3-uploadhint-sub{
+  margin-top: 4px;
+  font-weight: 800;
+  color:#64748b;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* 小屏：上传条变竖排，按钮全宽更舒服 */
+@media (max-width: 560px){
+  .we3-uploadrow{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .we3-btn-upload{
+    width: 100%;
+  }
+}
+
+/* ========= Doc cards should be full-width ========= */
+.we3-media-sec:last-child .we3-media-grid{
+  grid-template-columns: 1fr !important;  /* 文档区单列 */
+}
+.we3-media-sec:last-child .we3-media-card{
+  grid-template-columns: 64px 1fr !important; /* 文档卡片更舒展 */
+  position: relative;
+  padding-right: 54px; /* 预留给右侧按钮 */
+}
+.we3-media-sec:last-child .we3-media-op{
+  top: 12px;
+  right: 12px;
+}

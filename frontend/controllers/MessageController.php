@@ -2,6 +2,7 @@
 
 /**
  * Ding 2310724
+ * liyu 2311591
  * 前台抗战专题留言板
  */
 
@@ -45,6 +46,37 @@ class MessageController extends Controller
 
         return $this->render('index', [
             'messages' => $messages,
+            'model' => $model,
+        ]);
+    }
+    public function actionCreate($target_type = null, $target_id = null)
+    {
+        $model = new WarMessage();
+        
+        // 1. 接收从详情页传过来的关联信息
+        $model->target_type = $target_type;
+        $model->target_id = (int)$target_id;
+        $model->status = 0; // 默认待审核
+
+        if ($model->load(Yii::$app->request->post())) {
+            // 设置时间戳
+            $model->created_at = time();
+            $model->updated_at = time();
+
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', '感言提交成功，请等待审核。');
+                
+                // 2. 提交成功后，如果是针对事件的留言，跳回事件详情页
+                if ($model->target_type === 'event' && $model->target_id) {
+                    return $this->redirect(['timeline/view', 'id' => $model->target_id]);
+                }
+                // 否则跳到留言墙
+                return $this->redirect(['index']);
+            }
+        }
+
+        // 3. 渲染专门的提交页面
+        return $this->render('create', [
             'model' => $model,
         ]);
     }

@@ -1,0 +1,493 @@
+/* ==========================================================================
+   admin-common.css (Bootstrap 3 friendly)
+   Common Admin UI for backend modules (Team, Member, Personal Work, etc.)
+   Consistent with war-event.css style
+   ========================================================================== */
+/* ===== Global content padding adjustment ===== */
+#content.table-layout > div {
+  padding: 15px !important;
+}
+
+/* ===== Hero (Index pages) ===== */
+.adm-hero {
+  border-radius: 18px;
+  padding: 18px 18px 16px;
+  background: linear-gradient(135deg, #8B2500 0%, #6B4423 50%, #4A5568 100%);
+  color: #fff;
+  box-shadow: 0 18px 50px rgba(139, 37, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.adm-hero:before {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -70px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.adm-hero:after {
+  content: "";
+  position: absolute;
+  left: -120px;
+  bottom: -120px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.adm-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.adm-hero h2 {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+}
+
+.adm-hero .desc {
+  margin-top: 8px;
+  opacity: 0.92;
+  font-weight: 700;
+}
+
+/* ===== Actions ===== */
+.adm-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.adm-actions .btn {
+  border: 0;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-weight: 900;
+}
+
+.adm-actions .btn-default {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.adm-actions .btn-default:hover {
+  background: rgba(255, 255, 255, 0.26);
+  color: #fff;
+}
+
+.adm-actions .btn-success {
+  background: #A52A2A;
+}
+
+.adm-actions .btn-success:hover {
+  background: #8B2500;
+}
+
+.adm-actions .btn-primary {
+  background: #B8860B;
+}
+
+.adm-actions .btn-primary:hover {
+  background: #CD853F;
+}
+
+/* ===== Card Shell ===== */
+.adm-card {
+  margin-top: 14px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.adm-card-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adm-card-title {
+  margin: 0;
+  font-weight: 900;
+  color: #111827;
+  font-size: 16px;
+}
+
+.adm-card-body {
+  padding: 14px 16px 18px;
+}
+
+.adm-hint,
+.adm-muted {
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* ===== Pills / Dots ===== */
+.adm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  color: #111827;
+}
+
+.adm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #111827;
+}
+
+/* ===== Grid/Table ===== */
+.adm-grid {
+  padding: 12px 14px 16px;
+}
+
+.adm-grid .table {
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.adm-grid .table > thead > tr > th {
+  background: #f8fafc;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: #334155;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 12px 10px;
+}
+
+.adm-grid .table > tbody > tr > td {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px 10px;
+  vertical-align: middle;
+  color: #0f172a;
+}
+
+.adm-grid .table > tbody > tr:hover {
+  background: #fbfdff;
+}
+
+.adm-grid .filters input,
+.adm-grid .filters select {
+  height: 34px;
+  border-radius: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none !important;
+}
+
+/* ===== Status Badge ===== */
+.adm-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  border: 1px solid rgba(15,23,42,0.10);
+}
+
+/* Active：深酒红（当前启用/生效） */
+.adm-badge-active {
+  background: rgba(127, 29, 29, 0.16);
+  color: #7f1d1d;
+  border-color: rgba(127, 29, 29, 0.22);
+}
+
+/* Inactive：铁灰（禁用/隐藏） */
+.adm-badge-inactive {
+  background: rgba(30, 41, 59, 0.10);
+  color: #334155;
+  border-color: rgba(30, 41, 59, 0.16);
+}
+
+/* Pending：哑铜/土金（待处理/待发布） */
+.adm-badge-pending {
+  background: rgba(146, 101, 29, 0.18);
+  color: #6b3f12;
+  border-color: rgba(146, 101, 29, 0.24);
+}
+
+/* Info：军绿灰（信息/提示，不抢主视觉） */
+.adm-badge-info {
+  background: rgba(71, 93, 51, 0.207);
+  color: #2b3b1e;
+  border-color: rgba(74, 94, 55, 0.20);
+}
+/* ===== Action Buttons (table) ===== */
+.adm-actions-col {
+  white-space: nowrap;
+}
+
+.adm-actions-col .btn {
+  border-radius: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+}
+
+.adm-actions-col .btn + .btn {
+  margin-left: 6px;
+}
+
+/* 基础：中性幽灵按钮（铁灰系） */
+.btn-soft-ghost{
+  background: rgba(30, 41, 59, 0.08);   /* slate */
+  color:#0f172a;
+  border:0;
+}
+.btn-soft-ghost:hover{
+  background: rgba(30, 41, 59, 0.14);
+}
+
+/* Primary：哑铜（用于“主要操作/入口”，符合纪念章质感） */
+.btn-soft-primary{
+  background: rgba(146, 101, 29, 0.16); /* muted bronze */
+  color:#6b3f12;
+  border:0;
+}
+.btn-soft-primary:hover{
+  background: rgba(146, 101, 29, 0.24);
+  color:#5a320e;
+}
+
+/* Success：军绿偏橄榄（比亮绿克制，更“历史”） */
+.btn-soft-success{
+  background: rgba(74, 94, 55, 0.18);   /* olive */
+  color:#2f3f22;
+  border:0;
+}
+.btn-soft-success:hover{
+  background: rgba(74, 94, 55, 0.26);
+  color:#253219;
+}
+
+/* Danger：暗酒红（与你整体深红调一致，用于删除/危险） */
+.btn-soft-danger{
+  background: rgba(127, 29, 29, 0.16);  /* deep wine red */
+  color:#7f1d1d;
+  border:0;
+}
+.btn-soft-danger:hover{
+  background: rgba(127, 29, 29, 0.24);
+  color:#6b1616;
+}
+
+/* Warning：赭黄/土金（提示/下线/谨慎，比亮橙更稳） */
+.btn-soft-warning{
+  background: rgba(152, 98, 24, 0.16);  /* ochre */
+  color:#7a3f10;
+  border:0;
+}
+.btn-soft-warning:hover{
+  background: rgba(152, 98, 24, 0.24);
+  color:#63320c;
+}
+
+
+/* ===== Form styles ===== */
+.adm-form .form-control {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.adm-form textarea.form-control {
+  line-height: 1.6;
+}
+
+.adm-form .help-block {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.adm-form .btn {
+  border-radius: 12px;
+  font-weight: 900;
+  padding: 9px 14px;
+}
+
+/* ===== Two column grid for forms ===== */
+.adm-form .adm-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+}
+
+@media (max-width: 992px) {
+  .adm-form .adm-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adm-form .adm-full {
+  grid-column: 1 / -1;
+}
+
+/* ===== Section container ===== */
+.adm-section {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.adm-section-title {
+  font-weight: 900;
+  color: #111827;
+  margin: 0 0 8px;
+}
+
+/* ===== Stats/KPI cards ===== */
+.adm-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.adm-stat-card {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.adm-stat-value {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.adm-stat-label {
+  color: #64748b;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ===== Panel modernization (for existing panel-based layouts) ===== */
+.panel {
+  border-radius: 18px !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+}
+
+.panel-heading {
+  font-weight: 900 !important;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.9), #fff) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.panel-info > .panel-heading {
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 55%) !important;
+  color: #fff !important;
+  border: 0 !important;
+}
+
+.panel-default > .panel-heading {
+  color: #111827 !important;
+}
+
+/* ===== Utility classes ===== */
+.adm-mb-0 { margin-bottom: 0 !important; }
+.adm-mb-8 { margin-bottom: 8px !important; }
+.adm-mb-12 { margin-bottom: 12px !important; }
+.adm-mb-16 { margin-bottom: 16px !important; }
+.adm-mt-8 { margin-top: 8px !important; }
+.adm-mt-12 { margin-top: 12px !important; }
+.adm-mt-16 { margin-top: 16px !important; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .adm-hero-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .adm-actions {
+    justify-content: flex-start;
+  }
+  
+  .adm-stats {
+    flex-direction: column;
+  }
+  
+  .adm-stat-card {
+    min-width: 100%;
+  }
+}
+
+/* ===== Links (Military History Theme) ===== */
+th>a {
+  color: #B8860B !important;
+  transition: color 0.2s ease, text-decoration 0.2s ease !important;
+}
+
+th>a:hover,
+th>a:focus {
+  color: #CD853F !important;
+  text-decoration: underline !important;
+}
+
+/* ===== pwFolderList (Personal Work Folder List) ===== */
+#pwFolderList .list-group-item {
+  border: 1px solid #EAE4D6 !important;
+  border-radius: 8px !important;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+#pwFolderList .list-group-item:hover {
+  background: rgba(184, 134, 11, 0.08) !important;
+  border-color: #B8860B !important;
+  transform: translateX(2px);
+}
+
+#pwFolderList .list-group-item.active,
+#pwFolderList .list-group-item.active:hover,
+#pwFolderList .list-group-item.active:focus {
+  background: linear-gradient(135deg, rgba(139, 37, 0, 0.12), rgba(107, 68, 35, 0.12)) !important;
+  border-color: #A52A2A !important;
+  color: #111827 !important;
+  font-weight: 700;
+  z-index: 2;
+}
+
+#pwFolderList .badge {
+  background: #B8860B !important;
+  color: #fff !important;
+  border-radius: 999px;
+  font-weight: 700;
+}

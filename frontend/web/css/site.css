@@ -1,6 +1,45 @@
 html,
 body {
     height: 100%;
+    background-image: url('/advanced/frontend/web/images/background.png');
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* 动态折线容器 */
+.event-line-path {
+    fill: none !important;
+    stroke: #d9534f;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    opacity: 0.9;
+}
+
+/* 事件文字样式 */
+.event-label-text {
+    font-size: 17px;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    fill: #000000 !important; 
+    font-weight: 900; 
+    stroke: #ffffff;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    paint-order: stroke fill; 
+    cursor: pointer;
+    opacity: 0; 
+    transition: opacity 0.4s ease-out, fill 0.2s ease;
+}
+
+.event-label-text:hover {
+    fill: #d9534f !important;
+    stroke: #ffffff;
+    stroke-width: 3px;
+    text-decoration: underline;
 }
 
 .wrap {
@@ -8,6 +47,7 @@ body {
     height: auto;
     margin: 0 auto -60px;
     padding: 0 0 60px;
+    background: transparent !important;
 }
 
 .wrap > .container {
@@ -23,7 +63,8 @@ body {
 
 .jumbotron {
     text-align: center;
-    background-color: transparent;
+    background-color: transparent !important;
+    border: none;
 }
 
 .jumbotron .btn {
@@ -36,7 +77,34 @@ body {
     font-style: italic;
 }
 
-/* add sorting icons to gridview sort links */
+/* 地图红色旗子样式 */
+.map-flag-icon {
+    fill: #FF3333;
+    stroke: #CC0000;
+    stroke-width: 0.5px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+    pointer-events: none; 
+    animation: flag-flutter 2s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: left center;
+}
+
+.map-flag-pole {
+    stroke: #000000;
+    stroke-width: 2px;
+    stroke-linecap: round;
+    pointer-events: none;
+    filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.4));
+}
+
+@keyframes flag-flutter {
+    0%, 100% { transform: skewX(0deg) scaleX(1); }
+    25% { transform: skewX(-3deg) scaleX(0.98); }
+    50% { transform: skewX(2deg) scaleX(1.02); }
+    75% { transform: skewX(-2deg) scaleX(0.99); }
+}
+
+/* GridView sorting icons */
 a.asc:after, a.desc:after {
     position: relative;
     top: 1px;
@@ -47,74 +115,239 @@ a.asc:after, a.desc:after {
     line-height: 1;
     padding-left: 5px;
 }
+a.asc:after { content: "\e151"; }
+a.desc:after { content: "\e152"; }
+.sort-numerical a.asc:after { content: "\e153"; }
+.sort-numerical a.desc:after { content: "\e154"; }
+.sort-ordinal a.asc:after { content: "\e155"; }
+.sort-ordinal a.desc:after { content: "\e156"; }
 
-a.asc:after {
-    content: "\e151";
-}
+.grid-view td { white-space: nowrap; }
+.grid-view .filters input, .grid-view .filters select { min-width: 50px; }
+.hint-block { display: block; margin-top: 5px; color: #999; }
+.error-summary { color: #a94442; background: #fdf7f7; border-left: 3px solid #eed3d7; padding: 10px 20px; margin: 0 0 15px 0; }
 
-a.desc:after {
-    content: "\e152";
-}
-
-.sort-numerical a.asc:after {
-    content: "\e153";
-}
-
-.sort-numerical a.desc:after {
-    content: "\e154";
-}
-
-.sort-ordinal a.asc:after {
-    content: "\e155";
-}
-
-.sort-ordinal a.desc:after {
-    content: "\e156";
-}
-
-.grid-view td {
-    white-space: nowrap;
-}
-
-.grid-view .filters input,
-.grid-view .filters select {
-    min-width: 50px;
-}
-
-.hint-block {
-    display: block;
-    margin-top: 5px;
-    color: #999;
-}
-
-.error-summary {
-    color: #a94442;
-    background: #fdf7f7;
-    border-left: 3px solid #eed3d7;
-    padding: 10px 20px;
-    margin: 0 0 15px 0;
-}
-
-/* align the logout "link" (button in form) of the navbar */
-.nav li > form > button.logout {
-    padding: 15px;
-    border: none;
-}
-
+.nav li > form > button.logout { padding: 15px; border: none; }
 @media(max-width:767px) {
-    .nav li > form > button.logout {
-        display:block;
-        text-align: left;
+    .nav li > form > button.logout { display:block; text-align: left; width: 100%; padding: 10px 15px; }
+}
+.nav > li > form > button.logout:focus, .nav > li > form > button.logout:hover { text-decoration: none; }
+.nav > li > form > button.logout:focus { outline: none; }
+
+/* --- 事件详情弹窗样式(纯毛玻璃效果) --- */
+#event-detail-modal {
+    position: fixed;
+    left: 30% !important;
+    top: 30% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 600px;
+    max-height: 50vh;
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    z-index: 10001;
+    overflow: hidden;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    padding: 20px 25px;
+}
+
+#event-detail-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+#event-detail-modal .modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+#event-detail-modal .modal-close:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+#event-detail-modal .modal-content {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    height: 100%;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 左侧图片区域 (移除 Swiper 样式，改为单图容器) */
+#event-detail-modal .modal-image-container {
+    width: 300px;
+    height: 210px;
+    flex-shrink: 0;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    user-select: none;
+    margin-top: 20px; /* 垂直居中微调 */
+}
+
+#event-detail-modal .modal-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#event-detail-modal .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 32, 39, 0.9), transparent 60%);
+    pointer-events: none;
+}
+
+#event-detail-modal .overlay h2 {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    color: #fff;
+    font-weight: 400;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* 右侧信息区域 */
+#event-detail-modal .modal-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+#event-detail-modal .event-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-family: "SimHei", "Microsoft YaHei", sans-serif;
+}
+
+#event-detail-modal .event-title:hover {
+    color: #3a77fa;
+    text-decoration: underline;
+}
+
+#event-detail-modal .event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#event-detail-modal .event-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+#event-detail-modal .tag {
+    color: #fff;
+    padding: 2px 8px;
+    font-size: 13px;
+    border-radius: 5px;
+    flex-shrink: 0;
+}
+
+#event-detail-modal .event-meta-item:nth-child(1) .tag { background-color: #f35a5a; }
+#event-detail-modal .event-meta-item:nth-child(2) .tag { background-color: #f89e37; }
+#event-detail-modal .event-meta-item:nth-child(3) .tag { background-color: #3a77fa; }
+
+#event-detail-modal .modal-info::-webkit-scrollbar {
+    width: 6px;
+}
+#event-detail-modal .modal-info::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+#event-detail-modal .modal-info::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.site-index, .site-index .body-content, .container {
+    background: transparent !important;
+}
+
+#china-map-object {
+    filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.8));
+}
+
+@media(max-width: 768px) {
+    #event-detail-modal {
+        left: 10px; right: 10px; width: auto;
+    }
+    #event-detail-modal .modal-content {
+        flex-direction: column;
+    }
+    #event-detail-modal .modal-image-container {
         width: 100%;
-        padding: 10px 15px;
     }
 }
 
-.nav > li > form > button.logout:focus,
-.nav > li > form > button.logout:hover {
-    text-decoration: none;
+/* --- 首页右侧竖排艺术字 --- */
+.vertical-slogan {
+    position: absolute;
+    right: 8%; /* 距离右侧的距离，占据空白区域 */
+    top: 50%;
+    transform: translateY(-50%); /* 垂直居中 */
+    writing-mode: vertical-rl; /* 竖排模式：从右向左排列 */
+    font-family: "KaiTi", "STKaiti", "楷体", "SimSun", "宋体", serif; /* 书法/衬线字体 */
+    font-weight: 900;
+    z-index: 5;
+    pointer-events: none; /* 鼠标穿透，不影响底层交互 */
+    user-select: none;
+    cursor: default;
 }
 
-.nav > li > form > button.logout:focus {
-    outline: none;
+.vertical-slogan .slogan-line {
+    font-size: 6rem; /* 大号字体 */
+    color: #FFD700; /* 深墨色 */
+    letter-spacing: 0.5rem; /* 字间距 */
+    margin: 0 15px; /* 列之间的间距 */
+    line-height: 1.2;
+    text-shadow: 
+        3px 3px 0px rgba(255, 255, 255, 0.4), 
+        -1px -1px 0 rgba(255, 255, 255, 0.2); /* 增加立体感和对比度 */
+    opacity: 0.9;
+}
+
+/* 响应式调整 */
+@media (max-width: 1400px) {
+    .vertical-slogan { right: 2%; }
+    .vertical-slogan .slogan-line { font-size: 3rem; }
+}
+
+@media (max-width: 992px) {
+    /* 屏幕较窄时隐藏，避免遮挡地图 */
+    .vertical-slogan { display: none; }
 }

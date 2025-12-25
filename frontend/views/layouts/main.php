@@ -34,7 +34,9 @@ $activeCtl = function($id) use ($cur) { return $cur === $id; };
   <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
   <?php $this->head() ?>
   <style>
-    body { background:#f7f9fb; }
+    /* 删除或注释掉下面这行，因为它会覆盖背景图片 */
+    /* body { background:#f7f9fb; } */
+    
     .navbar-brand b { letter-spacing: .5px; }
     .hero {
       margin-top: 70px;
@@ -46,7 +48,7 @@ $activeCtl = function($id) use ($cur) { return $cur === $id; };
     }
     .hero h3 { margin-top:0; font-weight:800; }
     .hero .btn { margin-right:8px; }
-    .content-wrap { margin-top: 14px; }
+    .content-wrap { margin-top: 120px; }
     .footer { background:#fff; border-top:1px solid #eef1f5; }
   </style>
 </head>
@@ -69,6 +71,7 @@ $menuItemsLeft = [
 $menuItemsRight = [];
 if (Yii::$app->user->isGuest) {
   $menuItemsRight[] = ['label' => '登录', 'url' => ['/site/login']];
+  $menuItemsRight[] = ['label' => '注册', 'url' => ['/site/signup']];
 } else {
   $menuItemsRight[] = '<li>'
     . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
@@ -93,8 +96,8 @@ NavBar::end();
 ?>
 
 <div class="container">
-  <!-- 顶部专题横幅（可留可删） -->
-  <div class="hero">
+         <!-- 顶部专题横幅（可留可删）  -->
+  <!-- <div class="hero">
     <h3>抗战史实时间轴 · 人物群像数据库</h3>
     <div class="text-muted" style="margin-bottom:10px;">
       以时间作证，以数据铭记 —— 1931–1945 史实与人物关联展示
@@ -105,7 +108,7 @@ NavBar::end();
     <a class="btn btn-default btn-sm" href="<?= Url::to(['/person/index']) ?>">
       <span class="glyphicon glyphicon-user"></span> 浏览人物库
     </a>
-  </div>
+  </div>  -->
 
   <div class="content-wrap">
     <?= Breadcrumbs::widget([
@@ -116,13 +119,6 @@ NavBar::end();
     <?= $content ?>
   </div>
 </div>
-
-<footer class="footer">
-  <div class="container" style="padding:16px 0;">
-    <p class="pull-left">&copy; <?= Html::encode(Yii::$app->name) ?> <?= date('Y') ?></p>
-    <p class="pull-right"><?= Yii::powered() ?></p>
-  </div>
-</footer>
 
 <?php $this->endBody() ?>
 </body>
