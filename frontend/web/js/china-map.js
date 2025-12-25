@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
         "Macao SAR": "澳门特别行政区"
     };
 
-    // 省份ID到中文名称的映射 - 修复：补全缺失的省份
+    // 省份ID到中文名称的映射
     var provinceIdMap = {
         'CNSN': '陕西省', 'CNSH': '上海市', 'CNCQ': '重庆市', 'CNZJ': '浙江省',
         'CNJX': '江西省', 'CNSC': '四川省', 'CNHB': '湖北省', 'CNHN': '湖南省',
@@ -48,9 +48,9 @@ document.addEventListener('DOMContentLoaded', function () {
         'CNQH': '青海省', 'CNYN': '云南省', 'CNGZ': '贵州省', 'CNGX': '广西壮族自治区',
         'CNXJ': '新疆维吾尔自治区', 'CNXZ': '西藏自治区', 'CNBJ': '北京市',
         'CNTJ': '天津市', 'CNNM': '内蒙古自治区', 'CNHI': '海南省', 'CNNX': '宁夏回族自治区',
-        'CNTW': '台湾省', // 新增台湾
-        'CNHK': '香港特别行政区', // 新增香港
-        'CNMO': '澳门特别行政区'  // 新增澳门
+        'CNTW': '台湾省',
+        'CNHK': '香港特别行政区',
+        'CNMO': '澳门特别行政区'
     };
 
     var provinceCenters = {};
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return provinceLabel;
     }
 
-    // 获取省份标签点的坐标 - 增强：添加调试日志
+    // 获取省份标签点的坐标
     function getProvinceLabelPosition(svgDoc, provinceId) {
         var labelPoint = svgDoc.querySelector('#label_points circle[id="' + provinceId + '"]');
         if (labelPoint) {
@@ -165,10 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 x: parseFloat(labelPoint.getAttribute('cx')),
                 y: parseFloat(labelPoint.getAttribute('cy'))
             };
-            console.log('[ChinaMap] 找到标签点:', provinceId, pos);
             return pos;
-        } else {
-            console.warn('[ChinaMap] 未找到标签点:', provinceId);
         }
         return null;
     }
@@ -219,18 +216,50 @@ document.addEventListener('DOMContentLoaded', function () {
             var slide = document.createElement('div');
             slide.className = 'swiper-slide';
 
-            // 修复图片路径：使用正确的相对路径
-            var imageName = 'songhu.webp';
-            if (ev.title && ev.title.indexOf('128') > -1) {
-                imageName = '128_songhu.webp';
+            // --- 修复：统一图片路径处理逻辑 ---
+            var imageUrl = '';
+            
+            if (ev.image_path) {
+                // 如果是完整URL (http开头)
+                if (ev.image_path.indexOf('http') === 0) {
+                    imageUrl = ev.image_path;
+                } else {
+                    // 构建本地路径
+                    var base = window._BASE_WEB_URL || '';
+                    if (base.slice(-1) === '/') base = base.slice(0, -1);
+                    
+                    // 修复：处理 Windows 路径反斜杠
+                    var path = ev.image_path.replace(/\\/g, '/');
+                    
+                    // 确保路径以 / 开头
+                    if (path.indexOf('/') !== 0) {
+                        // 如果路径不包含 uploads，尝试添加
+                        if (path.indexOf('uploads') === -1) {
+                            path = '/uploads/' + path;
+                        } else {
+                            path = '/' + path;
+                        }
+                    }
+                    
+                    imageUrl = base + path;
+                }
+            } else {
+                // --- 关键修复：数据库无图片时，使用纯色占位图而非文件 ---
+                // 使用 data URI 生成灰色占位图，避免 404 错误
+                imageUrl = 'data:image/svg+xml;base64,' + btoa(`
+                    <svg xmlns="http://www.w3.org/2000/svg" width="300" height="210" viewBox="0 0 300 210">
+                        <rect width="300" height="210" fill="#4a5568"/>
+                        <text x="50%" y="45%" fill="#e2e8f0" font-size="16" font-family="Arial" text-anchor="middle" dominant-baseline="middle">暂无图片</text>
+                        <text x="50%" y="60%" fill="#cbd5e0" font-size="12" font-family="Arial" text-anchor="middle" dominant-baseline="middle">${ev.title || '未知事件'}</text>
+                    </svg>
+                `);
             }
             
-            // 构建完整路径
-            var imageUrl = imageBasePath + '/images/' + imageName;
-            console.log('[ChinaMap] 加载图片:', imageUrl);
+            console.log('[ChinaMap] 事件:', ev.title, '加载图片:', imageUrl.substring(0, 100) + '...');
 
+            // 移除 onerror 处理，因为 data URI 不会失败
             slide.innerHTML = `
-                <img src="${imageUrl}" alt="${ev.title || ''}" onerror="console.error('[ChinaMap] 图片加载失败:', this.src)">
+                <img src="${imageUrl}" alt="${ev.title || ''}">
                 <div class="overlay">
                     <h2>${ev.title || '未知事件'}</h2>
                 </div>
@@ -285,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modal-date').textContent = dateStr;
         document.getElementById('modal-location').textContent = event.location || '未知';
         document.getElementById('modal-summary').textContent = event.summary || '暂无摘要';
-        // document.getElementById('modal-content').textContent = event.content || '暂无详情';
     }
 
     function initMap(svgDoc) {
@@ -312,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var pointsGroup = svgDoc.getElementById('points');
         if (pointsGroup) pointsGroup.style.display = 'none';
 
-        // 添加金色描边样式（保留地图整体阴影）
+        // 添加金色描边样式
         addMapStyling(svgDoc);
 
         var paths = svgDoc.querySelectorAll('#features path');
@@ -321,12 +349,6 @@ document.addEventListener('DOMContentLoaded', function () {
             var originalFill = path.getAttribute('fill') || '';
             var provinceId = path.getAttribute('id');
             
-            // 调试：打印省份ID
-            if (provinceId) {
-                console.log('[ChinaMap] 省份路径:', provinceId, provinceIdMap[provinceId] || '未映射');
-            }
-            
-            // 确保初始状态正确
             path.style.transition = 'fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease';
             
             // 悬浮效果
@@ -368,7 +390,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var fetchUrl = baseUrl + sep + 'action=get-active-locations';
 
         fetch(fetchUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(activeData => {
                 if (!activeData) activeData = {};
                 console.log('[ChinaMap] 数据就绪', activeData);
@@ -405,7 +432,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('[ChinaMap] 数据获取失败:', err);
+            });
     }
 
     // 添加金色描边样式（保留地图整体阴影）
