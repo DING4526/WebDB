@@ -4,15 +4,13 @@ use yii\helpers\Html;
 
 $this->title = '烽火记忆 · 抗战胜利80周年';
 ?>
-<div class="site-index">
-    <!-- 标题区域 -->
-    <!-- <div class="jumbotron text-center" style="background:transparent; border:none;">
-        <h1 class="display-4" style="color:#fff; text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">烽火记忆 · 抗战胜利80周年</h1>
-        <p class="lead" style="color:#fff; text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">以时间作证，以数据铭记 —— 1931–1945 </p>
-    </div> -->
+
+<!-- 背景遮罩层 - 压低背景对比度 -->
+<div class="background-overlay"></div>
+<div class="vignette-overlay"></div>
 
 <div class="site-index">
-    <div class="body-content" style="display:flex; justify-content:center; align-items:center; height: 90vh; width: 100%; overflow:hidden;">
+    <div class="body-content" style="display:flex; justify-content:center; align-items:center; height: 90vh; width: 100%; overflow:hidden; position: relative;">
         
         <div id="china-map-wrapper" style="width: 100%; height: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center;">
             
@@ -21,7 +19,7 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
             </object>
         </div>
 
-            <!-- 右侧竖排艺术字 -->
+        <!-- 右侧竖排艺术字 -->
         <div class="vertical-slogan">
             <div class="slogan-line">以时间作证，</div>
             <div class="slogan-line">以数据铭记。</div>
@@ -29,13 +27,16 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
     </div>
 </div>
 
-<!-- 事件详情弹窗 (单事件版) -->
+<!-- 弹窗背景遮罩 -->
+<div id="modal-backdrop" class="modal-backdrop-overlay" onclick="closeEventModal()"></div>
+
+<!-- 事件详情弹窗 -->
 <div id="event-detail-modal">
-    <div class="modal-close" onclick="closeEventModal()">×</div>
+    <div class="modal-close" onclick="closeEventModal()" title="关闭">×</div>
     <div class="modal-content">
         <!-- 左侧单图 -->
         <div class="modal-image-container">
-            <img id="modal-image" src="" alt="Event Image">
+            <img id="modal-image" src="" alt="事件图片">
             <div class="overlay">
                 <h2 id="modal-image-title"></h2>
             </div>
@@ -79,7 +80,16 @@ $this->registerJsFile('@web/js/china-map.js', ['depends' => [\yii\web\JqueryAsse
 $this->registerJs("
 function closeEventModal() {
     var modal = document.getElementById('event-detail-modal');
+    var backdrop = document.getElementById('modal-backdrop');
     modal.classList.remove('show');
+    if (backdrop) backdrop.classList.remove('show');
 }
+
+// ESC 键关闭弹窗
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEventModal();
+    }
+});
 ", \yii\web\View::POS_END);
 ?>
