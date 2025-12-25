@@ -20,6 +20,12 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
                 您的浏览器不支持 SVG，请升级浏览器。
             </object>
         </div>
+
+            <!-- 右侧竖排艺术字 -->
+        <div class="vertical-slogan">
+            <div class="slogan-line">以时间作证，</div>
+            <div class="slogan-line">以数据铭记。</div>
+        </div>
     </div>
 </div>
 
