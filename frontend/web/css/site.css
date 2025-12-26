@@ -214,7 +214,7 @@ a.desc:after { content: "\e152"; }
 /* --- 事件详情弹窗样式(优化毛玻璃效果) --- */
 #event-detail-modal {
     position: fixed;
-    left: 12% !important;
+    left: 8% !important;
     top: 15% !important;
     transform: translate(0, 0) scale(0.95) !important;
     width: 580px;
@@ -674,7 +674,7 @@ a.desc:after { content: "\e152"; }
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
 }
 

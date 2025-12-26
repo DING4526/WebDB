@@ -70,7 +70,7 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
                     <span id="modal-location"></span>
                 </div>
                 <div class="event-meta-item">
-                    <span class="tag">摘要</span>
+                    <!-- <span class="tag">摘要</span> -->
                     <span id="modal-summary"></span>
                 </div>
             </div>

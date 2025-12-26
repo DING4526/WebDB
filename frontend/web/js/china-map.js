@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     console.log('[ChinaMap] 优化交互版 - 已加载');
 
     // === 配色变量 (与CSS保持一致) ===
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // 历史动画播放相关时长
         animModalDelay: 300,       // 动画时显示弹窗前的延迟
         animModalDuration: 1800,   // 动画时弹窗显示时长
-        animEventGap: 400          // 动画时事件间隔
+        animEventGap: 100          // 动画时事件间隔
     };
 
     // === 几何常量 ===
@@ -101,15 +101,58 @@ document.addEventListener('DOMContentLoaded', function () {
         '太行山区': ['山西省', '河北省', '河南省'],
         '太行山': ['山西省', '河北省', '河南省'],
         '华北': ['北京市', '天津市', '河北省', '山西省', '内蒙古自治区'],
+
     };
+
+    /**
+     * 标准化省份名称，支持模糊匹配
+     * 例如："上海" <-> "上海市", "北京" <-> "北京市"
+     */
+    function normalizeProvinceName(name) {
+        if (!name) return name;
+        
+        // 去除首尾空格
+        name = name.trim();
+        
+        // 省级行政区后缀列表
+        var suffixes = ['省', '市', '自治区', '特别行政区'];
+        
+        // 移除后缀，获取核心名称
+        var coreName = name;
+        for (var i = 0; i < suffixes.length; i++) {
+            if (name.endsWith(suffixes[i])) {
+                coreName = name.substring(0, name.length - suffixes[i].length);
+                break;
+            }
+        }
+        
+        return coreName;
+    }
+
+    /**
+     * 检查两个省份名称是否匹配（支持模糊匹配）
+     * 例如："上海" 匹配 "上海市", "北京" 匹配 "北京市"
+     */
+    function isProvinceMatch(name1, name2) {
+        if (!name1 || !name2) return false;
+        
+        // 完全相同
+        if (name1 === name2) return true;
+        
+        // 标准化后比较
+        var core1 = normalizeProvinceName(name1);
+        var core2 = normalizeProvinceName(name2);
+        
+        return core1 === core2;
+    }
 
 
     function getEventsForMapName(mapName, data) {
 
         var result = [];
-        var seenEventIds = new Set();   // ⭐ 去重核心
+        var seenEventIds = new Set();   // 去重核心
 
-        // 1️⃣ 直接拿该省已有事件
+        // 1. 直接匹配该省已有事件（精确匹配）
         if (data[mapName] && Array.isArray(data[mapName])) {
             data[mapName].forEach(function (ev) {
                 var id = ev.id || ev._id || JSON.stringify(ev);
@@ -120,7 +163,28 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // 2️⃣ 扫描所有事件，检查是否有“特殊地名”应归属到该省
+
+        // 2. 模糊匹配：遍历所有数据键，查找可能的匹配
+        // 例如：地图是"上海市"，数据可能是"上海"
+        for (var locationKey in data) {
+            if (!Array.isArray(data[locationKey])) continue;
+            
+            // 跳过已经精确匹配过的
+            if (locationKey === mapName) continue;
+            
+            // 使用模糊匹配函数检查
+            if (isProvinceMatch(locationKey, mapName)) {
+                data[locationKey].forEach(function (ev) {
+                    var id = ev.id || ev._id || JSON.stringify(ev);
+                    if (!seenEventIds.has(id)) {
+                        seenEventIds.add(id);
+                        result.push(ev);
+                    }
+                });
+            }
+        }
+
+        // 3. 扫描所有事件，检查是否有“特殊地名”应归属到该省
         for (var locationKey in specialLocationMap) {
             var provinces = specialLocationMap[locationKey];
             if (!provinces.includes(mapName)) continue;
@@ -619,46 +683,46 @@ document.addEventListener('DOMContentLoaded', function () {
         var itemG = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
         itemG.style.pointerEvents = 'none'; // 动画时禁用点击
         
-        // 1. 连接线
+        // 1. 连接线 - 使用与点击时一致的样式
         var line = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', centerX);
         line.setAttribute('y1', centerY);
         line.setAttribute('x2', endX);
         line.setAttribute('y2', endY);
-        line.setAttribute('stroke', COLORS.goldLight);
-        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke', COLORS.goldMuted);
+        line.setAttribute('stroke-width', '1.5');
         line.setAttribute('stroke-linecap', 'round');
-        line.setAttribute('stroke-opacity', '0.9');
+        line.setAttribute('stroke-opacity', '0.7');
         
-        // 2. 连接处的圆形
+        // 2. 连接处的圆形 - 使用与点击时一致的样式
         var circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', endX);
         circle.setAttribute('cy', endY);
-        circle.setAttribute('r', '4');
-        circle.setAttribute('fill', COLORS.goldLight);
+        circle.setAttribute('r', '3');
+        circle.setAttribute('fill', COLORS.goldPrimary);
         
-        // 3. 矩形标签 - 使用更醒目的样式
+        // 3. 矩形标签 - 使用与点击时一致的样式
         var rect = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', rectX);
         rect.setAttribute('y', rectY);
         rect.setAttribute('width', rectWidth);
         rect.setAttribute('height', rectHeight);
-        rect.setAttribute('fill', 'rgba(35, 28, 20, 0.95)');
-        rect.setAttribute('stroke', COLORS.goldPrimary);
-        rect.setAttribute('stroke-width', '1.5');
-        rect.setAttribute('rx', '6');
-        rect.style.filter = 'drop-shadow(2px 3px 6px rgba(0,0,0,0.4))';
+        rect.setAttribute('fill', 'rgba(30, 25, 20, 0.9)');
+        rect.setAttribute('stroke', COLORS.goldMuted);
+        rect.setAttribute('stroke-width', '1');
+        rect.setAttribute('rx', '4');
+        rect.style.filter = 'drop-shadow(1px 2px 3px rgba(0,0,0,0.3))';
         
-        // 4. 文字
+        // 4. 文字 - 使用与点击时一致的样式
         var textX = rectX + paddingX;
         var textY = rectY + paddingY + fontSize * 0.75;
         
         var text = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', textX);
         text.setAttribute('y', textY);
-        text.setAttribute('fill', COLORS.goldLight);
+        text.setAttribute('fill', COLORS.textLight);
         text.setAttribute('font-size', fontSize + 'px');
-        text.setAttribute('font-weight', '600');
+        text.setAttribute('font-weight', '500');
         text.setAttribute('font-family', '"Microsoft YaHei", sans-serif');
         text.textContent = textStr;
         
@@ -1228,7 +1292,8 @@ document.addEventListener('DOMContentLoaded', function () {
             var mapEngName = path.getAttribute('name');
             if (!mapEngName) return;
             var mapChineseName = provinceMap[mapEngName];
-            if (mapChineseName === province) {
+            // 使用模糊匹配，支持"上海" <-> "上海市"等情况
+            if (isProvinceMatch(mapChineseName, province)) {
                 targetPath = path;
                 targetCenter = provinceCenters[mapEngName] || provinceCenters[province];
                 if (!targetCenter) {
