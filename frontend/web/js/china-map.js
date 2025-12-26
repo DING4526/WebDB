@@ -811,6 +811,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     }
                 });
+                
+                // 绑定动画控制按钮
+                bindAnimationControls(svgDoc, activeData);
             })
             .catch(err => {
                 console.error('[ChinaMap] 数据获取失败:', err);
@@ -881,6 +884,450 @@ document.addEventListener('DOMContentLoaded', function () {
         gradHover.appendChild(h2);
 
         defs.appendChild(gradHover);
+    }
+
+    // ======================================
+    // === 历史动画播放系统 ===
+    // ======================================
+    
+    var animationState = {
+        isPlaying: false,
+        currentStep: 0,
+        allEvents: [],
+        timeouts: [],
+        svgDoc: null,
+        arrowLayer: null,
+        previousLocation: null
+    };
+
+    // 获取所有事件并按时间排序
+    function getAllEventsSorted(activeData) {
+        var allEvents = [];
+        var seenIds = new Set();
+        
+        for (var province in activeData) {
+            if (!Array.isArray(activeData[province])) continue;
+            activeData[province].forEach(function(event) {
+                var id = event.id || event._id || JSON.stringify(event);
+                if (!seenIds.has(id)) {
+                    seenIds.add(id);
+                    allEvents.push({
+                        event: event,
+                        province: province,
+                        date: event.event_date || '1931-01-01'
+                    });
+                }
+            });
+        }
+        
+        // 按日期排序
+        allEvents.sort(function(a, b) {
+            return new Date(a.date) - new Date(b.date);
+        });
+        
+        return allEvents;
+    }
+
+    // 更新时间标签
+    function updateTimelineLabel(event, show) {
+        var label = document.getElementById('timeline-label');
+        if (!label) return;
+        
+        if (!show) {
+            label.classList.remove('show', 'animating');
+            return;
+        }
+        
+        var dateStr = event.event_date || '';
+        var year = '';
+        var fullDate = '';
+        
+        if (dateStr) {
+            var parts = dateStr.split('-');
+            year = parts[0] || '';
+            if (parts[1] && parts[2]) {
+                fullDate = parts[1] + '月' + parts[2] + '日';
+            } else if (parts[1]) {
+                fullDate = parts[1] + '月';
+            }
+        }
+        
+        var yearEl = label.querySelector('.timeline-label-year');
+        var dateEl = label.querySelector('.timeline-label-date');
+        var eventEl = label.querySelector('.timeline-label-event');
+        
+        if (yearEl) yearEl.textContent = year;
+        if (dateEl) dateEl.textContent = fullDate;
+        if (eventEl) eventEl.textContent = event.title || '';
+        
+        label.classList.add('show', 'animating');
+    }
+
+    // 创建箭头图层
+    function createArrowLayer(svgDoc) {
+        var existing = svgDoc.getElementById('arrow-layer');
+        if (existing) existing.remove();
+        
+        var layer = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        layer.setAttribute('id', 'arrow-layer');
+        svgDoc.documentElement.appendChild(layer);
+        return layer;
+    }
+
+    // 绘制地点变化箭头
+    function drawLocationArrow(svgDoc, fromCenter, toCenter) {
+        if (!fromCenter || !toCenter) return null;
+        
+        var layer = svgDoc.getElementById('arrow-layer');
+        if (!layer) layer = createArrowLayer(svgDoc);
+        
+        // 清除之前的箭头
+        layer.innerHTML = '';
+        
+        // 计算箭头路径
+        var dx = toCenter.x - fromCenter.x;
+        var dy = toCenter.y - fromCenter.y;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 20) return null; // 距离太近不画箭头
+        
+        // 归一化方向
+        var nx = dx / distance;
+        var ny = dy / distance;
+        
+        // 起点和终点偏移（避免覆盖圆点）
+        var startOffset = 15;
+        var endOffset = 20;
+        var startX = fromCenter.x + nx * startOffset;
+        var startY = fromCenter.y + ny * startOffset;
+        var endX = toCenter.x - nx * endOffset;
+        var endY = toCenter.y - ny * endOffset;
+        
+        // 创建贝塞尔曲线控制点（弧形路径）
+        var midX = (startX + endX) / 2;
+        var midY = (startY + endY) / 2;
+        var perpX = -ny * (distance * 0.15); // 垂直方向偏移
+        var perpY = nx * (distance * 0.15);
+        var ctrlX = midX + perpX;
+        var ctrlY = midY + perpY;
+        
+        // 创建路径
+        var path = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'path');
+        var pathD = 'M ' + startX + ' ' + startY + ' Q ' + ctrlX + ' ' + ctrlY + ' ' + endX + ' ' + endY;
+        path.setAttribute('d', pathD);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', COLORS.goldLight);
+        path.setAttribute('stroke-width', '2.5');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-dasharray', '8, 4');
+        path.style.filter = 'drop-shadow(0 2px 4px rgba(201, 162, 39, 0.5))';
+        path.style.opacity = '0';
+        path.style.transition = 'opacity 0.5s ease';
+        
+        // 创建箭头头部
+        var arrowSize = 10;
+        // 计算终点处的切线方向
+        var t = 0.95; // 接近终点
+        var tangentX = 2 * (1 - t) * (ctrlX - startX) + 2 * t * (endX - ctrlX);
+        var tangentY = 2 * (1 - t) * (ctrlY - startY) + 2 * t * (endY - ctrlY);
+        var tangentLen = Math.sqrt(tangentX * tangentX + tangentY * tangentY);
+        tangentX /= tangentLen;
+        tangentY /= tangentLen;
+        
+        var arrowAngle = Math.PI / 6; // 30度
+        var ax1 = endX - arrowSize * (tangentX * Math.cos(arrowAngle) - tangentY * Math.sin(arrowAngle));
+        var ay1 = endY - arrowSize * (tangentY * Math.cos(arrowAngle) + tangentX * Math.sin(arrowAngle));
+        var ax2 = endX - arrowSize * (tangentX * Math.cos(-arrowAngle) - tangentY * Math.sin(-arrowAngle));
+        var ay2 = endY - arrowSize * (tangentY * Math.cos(-arrowAngle) + tangentX * Math.sin(-arrowAngle));
+        
+        var arrowHead = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        arrowHead.setAttribute('points', endX + ',' + endY + ' ' + ax1 + ',' + ay1 + ' ' + ax2 + ',' + ay2);
+        arrowHead.setAttribute('fill', COLORS.goldLight);
+        arrowHead.style.filter = 'drop-shadow(0 1px 3px rgba(201, 162, 39, 0.6))';
+        arrowHead.style.opacity = '0';
+        arrowHead.style.transition = 'opacity 0.5s ease';
+        
+        layer.appendChild(path);
+        layer.appendChild(arrowHead);
+        
+        // 添加虚线流动动画
+        var animateOffset = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        animateOffset.setAttribute('attributeName', 'stroke-dashoffset');
+        animateOffset.setAttribute('from', '24');
+        animateOffset.setAttribute('to', '0');
+        animateOffset.setAttribute('dur', '0.8s');
+        animateOffset.setAttribute('repeatCount', 'indefinite');
+        path.appendChild(animateOffset);
+        
+        // 显示箭头
+        requestAnimationFrame(function() {
+            path.style.opacity = '0.85';
+            arrowHead.style.opacity = '0.9';
+        });
+        
+        return { path: path, arrow: arrowHead };
+    }
+
+    // 清除箭头
+    function clearArrows(svgDoc) {
+        var layer = svgDoc.getElementById('arrow-layer');
+        if (layer) layer.innerHTML = '';
+    }
+
+    // 播放单个事件的动画
+    function playEventAnimation(svgDoc, eventData, index, callback) {
+        var event = eventData.event;
+        var province = eventData.province;
+        
+        // 获取省份路径
+        var paths = svgDoc.querySelectorAll('#features path');
+        var targetPath = null;
+        var targetCenter = null;
+        
+        paths.forEach(function(path) {
+            var mapEngName = path.getAttribute('name');
+            if (!mapEngName) return;
+            var mapChineseName = provinceMap[mapEngName];
+            if (mapChineseName === province) {
+                targetPath = path;
+                targetCenter = provinceCenters[mapEngName] || provinceCenters[province];
+                if (!targetCenter) {
+                    var bbox = path.getBBox();
+                    targetCenter = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+                }
+            }
+        });
+        
+        if (!targetPath || !targetCenter) {
+            if (callback) callback();
+            return;
+        }
+        
+        // 更新时间标签
+        updateTimelineLabel(event, true);
+        
+        // 绘制地点变化箭头
+        if (animationState.previousLocation && 
+            (animationState.previousLocation.x !== targetCenter.x || 
+             animationState.previousLocation.y !== targetCenter.y)) {
+            drawLocationArrow(svgDoc, animationState.previousLocation, targetCenter);
+        }
+        animationState.previousLocation = targetCenter;
+        
+        // 高亮省份
+        setProvinceHighlight(targetPath);
+        
+        // 显示省份名
+        var provinceId = targetPath.getAttribute('id');
+        if (provinceId) {
+            showProvinceLabel(svgDoc, provinceId);
+        }
+        
+        // 创建临时高亮圆点
+        var highlightCircle = createHighlightCircle(svgDoc, targetCenter.x, targetCenter.y);
+        
+        // 延迟后显示事件弹窗
+        animationState.timeouts.push(setTimeout(function() {
+            showEventModal(event);
+            
+            // 弹窗显示后的延迟
+            animationState.timeouts.push(setTimeout(function() {
+                // 移除高亮圆点
+                if (highlightCircle && highlightCircle.parentNode) {
+                    highlightCircle.style.opacity = '0';
+                    setTimeout(function() {
+                        if (highlightCircle.parentNode) {
+                            highlightCircle.parentNode.removeChild(highlightCircle);
+                        }
+                    }, 300);
+                }
+                
+                // 关闭弹窗
+                closeEventModal();
+                
+                // 继续下一个
+                if (callback) callback();
+            }, 2000)); // 弹窗显示2秒
+        }, 800)); // 高亮后0.8秒显示弹窗
+    }
+
+    // 创建高亮圆点效果
+    function createHighlightCircle(svgDoc, x, y) {
+        var g = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('transform', 'translate(' + x + ', ' + y + ')');
+        g.setAttribute('class', 'animation-highlight-marker');
+        
+        // 外层脉冲圈
+        var pulseCircle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        pulseCircle.setAttribute('cx', '0');
+        pulseCircle.setAttribute('cy', '0');
+        pulseCircle.setAttribute('r', '20');
+        pulseCircle.setAttribute('fill', 'none');
+        pulseCircle.setAttribute('stroke', COLORS.goldLight);
+        pulseCircle.setAttribute('stroke-width', '2');
+        pulseCircle.setAttribute('opacity', '0.8');
+        
+        // 添加脉冲动画
+        var animateR = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        animateR.setAttribute('attributeName', 'r');
+        animateR.setAttribute('from', '10');
+        animateR.setAttribute('to', '30');
+        animateR.setAttribute('dur', '1.2s');
+        animateR.setAttribute('repeatCount', 'indefinite');
+        pulseCircle.appendChild(animateR);
+        
+        var animateOpacity = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        animateOpacity.setAttribute('attributeName', 'opacity');
+        animateOpacity.setAttribute('from', '0.8');
+        animateOpacity.setAttribute('to', '0');
+        animateOpacity.setAttribute('dur', '1.2s');
+        animateOpacity.setAttribute('repeatCount', 'indefinite');
+        pulseCircle.appendChild(animateOpacity);
+        
+        // 中心亮点
+        var centerCircle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        centerCircle.setAttribute('cx', '0');
+        centerCircle.setAttribute('cy', '0');
+        centerCircle.setAttribute('r', '8');
+        centerCircle.setAttribute('fill', COLORS.goldPrimary);
+        centerCircle.setAttribute('opacity', '0.9');
+        centerCircle.style.filter = 'drop-shadow(0 0 8px rgba(201, 162, 39, 0.8))';
+        
+        g.appendChild(pulseCircle);
+        g.appendChild(centerCircle);
+        
+        g.style.opacity = '0';
+        g.style.transition = 'opacity 0.3s ease';
+        
+        svgDoc.documentElement.appendChild(g);
+        
+        requestAnimationFrame(function() {
+            g.style.opacity = '1';
+        });
+        
+        return g;
+    }
+
+    // 关闭事件弹窗
+    function closeEventModal() {
+        var modal = document.getElementById('event-detail-modal');
+        var backdrop = document.getElementById('modal-backdrop');
+        if (modal) modal.classList.remove('show');
+        if (backdrop) backdrop.classList.remove('show');
+    }
+
+    // 开始播放动画
+    function startAnimation(svgDoc, activeData) {
+        if (animationState.isPlaying) return;
+        
+        animationState.isPlaying = true;
+        animationState.svgDoc = svgDoc;
+        animationState.currentStep = 0;
+        animationState.previousLocation = null;
+        animationState.allEvents = getAllEventsSorted(activeData);
+        
+        console.log('[Animation] 开始播放，共 ' + animationState.allEvents.length + ' 个事件');
+        
+        // 更新按钮状态
+        var playBtn = document.getElementById('btn-play-animation');
+        var skipBtn = document.getElementById('btn-skip-animation');
+        if (playBtn) {
+            playBtn.classList.add('playing');
+            playBtn.innerHTML = '<i class="glyphicon glyphicon-pause"></i><span>暂停</span>';
+        }
+        if (skipBtn) skipBtn.style.display = 'flex';
+        
+        // 创建箭头图层
+        createArrowLayer(svgDoc);
+        
+        // 开始播放
+        playNextEvent();
+    }
+
+    // 播放下一个事件
+    function playNextEvent() {
+        if (!animationState.isPlaying) return;
+        
+        if (animationState.currentStep >= animationState.allEvents.length) {
+            // 动画结束
+            stopAnimation();
+            console.log('[Animation] 播放完成');
+            return;
+        }
+        
+        var eventData = animationState.allEvents[animationState.currentStep];
+        animationState.currentStep++;
+        
+        playEventAnimation(animationState.svgDoc, eventData, animationState.currentStep - 1, function() {
+            // 短暂延迟后播放下一个
+            animationState.timeouts.push(setTimeout(function() {
+                playNextEvent();
+            }, 500));
+        });
+    }
+
+    // 停止动画
+    function stopAnimation() {
+        animationState.isPlaying = false;
+        
+        // 清除所有定时器
+        animationState.timeouts.forEach(function(t) {
+            clearTimeout(t);
+        });
+        animationState.timeouts = [];
+        
+        // 恢复UI
+        var playBtn = document.getElementById('btn-play-animation');
+        var skipBtn = document.getElementById('btn-skip-animation');
+        if (playBtn) {
+            playBtn.classList.remove('playing');
+            playBtn.innerHTML = '<i class="glyphicon glyphicon-play"></i><span>回顾历史</span>';
+        }
+        if (skipBtn) skipBtn.style.display = 'none';
+        
+        // 隐藏时间标签
+        updateTimelineLabel(null, false);
+        
+        // 关闭弹窗
+        closeEventModal();
+        
+        // 清除高亮和箭头
+        if (animationState.svgDoc) {
+            clearProvinceHighlight();
+            hideProvinceLabel();
+            clearConnectors(animationState.svgDoc);
+            clearArrows(animationState.svgDoc);
+            
+            // 移除高亮标记
+            var markers = animationState.svgDoc.querySelectorAll('.animation-highlight-marker');
+            markers.forEach(function(m) {
+                if (m.parentNode) m.parentNode.removeChild(m);
+            });
+        }
+        
+        animationState.previousLocation = null;
+    }
+
+    // 绑定按钮事件
+    function bindAnimationControls(svgDoc, activeData) {
+        var playBtn = document.getElementById('btn-play-animation');
+        var skipBtn = document.getElementById('btn-skip-animation');
+        
+        if (playBtn) {
+            playBtn.addEventListener('click', function() {
+                if (animationState.isPlaying) {
+                    stopAnimation();
+                } else {
+                    startAnimation(svgDoc, activeData);
+                }
+            });
+        }
+        
+        if (skipBtn) {
+            skipBtn.addEventListener('click', function() {
+                stopAnimation();
+            });
+        }
     }
 
     var obj = document.getElementById('china-map-object');

@@ -20,6 +20,25 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
             <div class="slogan-line">以时间作证，</div>
             <div class="slogan-line">以数据铭记。</div>
         </div>
+
+        <!-- 动态时间标签 -->
+        <div id="timeline-label" class="timeline-label">
+            <div class="timeline-label-year"></div>
+            <div class="timeline-label-date"></div>
+            <div class="timeline-label-event"></div>
+        </div>
+
+        <!-- 动画控制按钮 -->
+        <div id="animation-controls" class="animation-controls">
+            <button id="btn-play-animation" class="anim-btn" title="播放历史动画">
+                <i class="glyphicon glyphicon-play"></i>
+                <span>回顾历史</span>
+            </button>
+            <button id="btn-skip-animation" class="anim-btn anim-btn-secondary" title="跳过动画" style="display: none;">
+                <i class="glyphicon glyphicon-forward"></i>
+                <span>跳过</span>
+            </button>
+        </div>
     </div>
 </div>
 
