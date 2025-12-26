@@ -1,7 +1,8 @@
 <?php
 /**
  * 苏奕扬 2311330
- * 前台人物列表视图
+ * 前台人物列表视图 - 深色主题优化版
+ * 注意：主题色变量定义在 site.css 中
  */
 
 use yii\helpers\Html;
@@ -11,109 +12,145 @@ $this->title = '抗战人物志';
 ?>
 
 <style>
-/* 复用/模仿 Timeline 风格 */
+/* 页面头部 */
 .page-header {
     margin: 40px 0 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: none;
+}
+
+.page-header h1 {
+    color: var(--gold-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.page-header .text-muted {
+    color: var(--text-light) !important;
+    opacity: 0.8;
+}
+
+/* 分隔线 */
+.page-header div[style*="background"] {
+    background: linear-gradient(90deg, transparent, var(--gold-primary), transparent) !important;
 }
 
 /* 侧边栏样式优化 */
 .sidebar-wrapper {
-    background: #fff;
-    border: 1px solid #e1e4e8;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
+
 .sidebar-header {
-    background-color: #f8f9fa;
+    background: rgba(201, 162, 39, 0.1);
     padding: 15px 20px;
-    border-bottom: 1px solid #e1e4e8;
+    border-bottom: 1px solid var(--card-border);
     font-weight: bold;
-    color: #8b0000;
+    color: var(--gold-primary);
     font-size: 16px;
 }
+
 .sidebar-nav .nav-link {
     display: block;
     padding: 12px 20px;
-    color: #555;
+    color: var(--text-light);
     text-decoration: none;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--card-border);
     transition: all 0.2s;
     border-left: 3px solid transparent;
 }
+
 .sidebar-nav .nav-link:last-child {
     border-bottom: none;
 }
+
 .sidebar-nav .nav-link:hover {
-    background-color: #fff5f5;
-    color: #a94442;
+    background-color: rgba(201, 162, 39, 0.1);
+    color: var(--gold-light);
     padding-left: 25px;
-}
-.sidebar-nav .nav-link.active {
-    background-color: #a94442;
-    color: #fff;
-    border-left-color: #8b0000;
+    border-left-color: var(--gold-muted);
 }
 
-/* 人物卡片样式 - 模仿 Timeline Panel */
+.sidebar-nav .nav-link.active {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted));
+    color: var(--text-dark);
+    border-left-color: var(--gold-light);
+    font-weight: 600;
+}
+
+/* 人物卡片样式 */
 .person-card {
-    background: #fff;
-    border: 1px solid #e1e4e8;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     margin-bottom: 25px;
-    height: 420px; /* 固定高度 */
+    height: 420px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
+
 .person-card:hover {
-    box-shadow: 0 8px 20px rgba(169, 68, 66, 0.15);
-    border-color: #a94442;
-    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(201, 162, 39, 0.3);
+    border-color: var(--gold-muted);
+    transform: translateY(-5px);
 }
+
 .person-img-wrapper {
     height: 220px;
     overflow: hidden;
     position: relative;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #f0f0f0;
+    background-color: rgba(20, 15, 10, 0.5);
+    border-bottom: 1px solid var(--card-border);
 }
+
 .person-img-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* 改为 contain 以完整显示图片 */
+    object-fit: contain;
     transition: transform 0.5s ease;
 }
+
 .person-card:hover .person-img-wrapper img {
     transform: scale(1.05);
 }
+
 .person-info {
     padding: 15px;
     flex: 1;
     display: flex;
     flex-direction: column;
 }
+
 .person-name {
     font-size: 18px;
     font-weight: bold;
-    color: #333;
+    color: var(--text-light);
     margin-bottom: 5px;
 }
+
 .person-role {
     display: inline-block;
     font-size: 12px;
-    color: #fff;
-    background-color: #a94442;
-    padding: 2px 8px;
+    color: var(--text-dark);
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted));
+    padding: 2px 10px;
     border-radius: 10px;
     margin-bottom: 10px;
+    font-weight: 600;
 }
+
 .person-intro {
     font-size: 13px;
-    color: #666;
+    color: var(--text-light);
+    opacity: 0.75;
     line-height: 1.6;
     margin-bottom: 15px;
     flex: 1;
@@ -123,26 +160,43 @@ $this->title = '抗战人物志';
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .person-footer {
     text-align: right;
     margin-top: auto;
 }
 
-/* 分页样式红色主题 */
+.person-footer .btn-danger {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted)) !important;
+    border: none !important;
+    color: var(--text-dark) !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.person-footer .btn-danger:hover {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-primary)) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.4);
+}
+
+/* 分页样式 */
 .pagination > li > a,
 .pagination > li > span {
-    color: #a94442;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    color: var(--gold-primary);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
+
 .pagination > li > a:hover,
 .pagination > li > span:hover,
 .pagination > li > a:focus,
 .pagination > li > span:focus {
-    color: #8b0000;
-    background-color: #f2dede;
-    border-color: #ddd;
+    color: var(--gold-light);
+    background-color: rgba(201, 162, 39, 0.15);
+    border-color: var(--gold-muted);
 }
+
 .pagination > .active > a,
 .pagination > .active > span,
 .pagination > .active > a:hover,
@@ -150,20 +204,28 @@ $this->title = '抗战人物志';
 .pagination > .active > a:focus,
 .pagination > .active > span:focus {
     z-index: 2;
-    color: #fff;
+    color: var(--text-dark);
     cursor: default;
-    background-color: #a94442;
-    border-color: #a94442;
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted));
+    border-color: var(--gold-primary);
 }
+
 .pagination > .disabled > span,
 .pagination > .disabled > span:hover,
 .pagination > .disabled > span:focus,
 .pagination > .disabled > a,
 .pagination > .disabled > a:hover,
 .pagination > .disabled > a:focus {
-    color: #ccc;
-    background-color: #fff;
-    border-color: #ddd;
+    color: rgba(245, 230, 200, 0.3);
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
+}
+
+/* 无数据提示 */
+.alert-warning {
+    background: rgba(201, 162, 39, 0.15) !important;
+    border-color: var(--card-border) !important;
+    color: var(--text-light) !important;
 }
 </style>
 

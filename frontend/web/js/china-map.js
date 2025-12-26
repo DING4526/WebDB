@@ -1,10 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('[ChinaMap] 极简交互版 - 已加载');
+    console.log('[ChinaMap] 优化交互版 - 已加载');
 
-    // var mapObj = document.getElementById('china-map-object');
-    // if (mapObj) {
-    //     mapObj.style.height = '900px';
-    // }
+    // === 配色变量 (与CSS保持一致) ===
+    var COLORS = {
+        goldPrimary: '#C9A227',    // 古铜金 - 主色
+        goldLight: '#D4AF37',      // 浅古铜金 - 高亮
+        goldMuted: '#A88B2A',      // 暗金 - 次要
+        redPrimary: '#8B1A1A',     // 暗红 - 圆点/强调
+        redHover: '#A52A2A',       // 棕红 - 备用悬停
+        // 地图填充采用低饱和暗红渐变，避免刺眼
+        mapRedTop: '#5A2323',      // 顶部渐变色：低饱和暗红
+        mapRedBottom: '#4A1C1D',   // 底部渐变色：更深的暗红
+        mapRedHoverTop: '#6B2B2B', // 悬停顶部：略亮但仍克制
+        mapRedHoverBottom: '#552323', // 悬停底部：适度加深
+        textLight: '#F5E6C8',      // 温暖的浅色文字
+        textDark: '#1A1A1A'
+    };
+
+    // === 动画时长常量 ===
+    var TIMING = {
+        fast: 200,
+        normal: 350,
+        slow: 500,
+        easeOutQuart: 'cubic-bezier(0.25, 1, 0.5, 1)',
+        easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
+    };
 
     var baseUrl = window._EVENT_INDEX_URL || '/event/index';
 
@@ -52,74 +72,143 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var provinceCenters = {};
     var provinceLabel = null;
+    var currentHighlightedPath = null;  // 跟踪当前高亮的省份
+    var currentEventId = null;  // 跟踪当前打开弹窗的事件ID
+
+    // 特殊地名到省份的映射（硬编码）
+    var specialLocationMap = {
+        '北京': ['北京市'],
+        '北平': ['北京市'],
+        '宛平': ['北京市'],
+        '北京宛平': ['北京市'],
+        '卢沟桥': ['北京市'],
+        '天津': ['天津市'],
+        '北平/天津': ['北京市', '天津市'],
+        '西安': ['陕西省'],
+        '南京': ['江苏省'],
+        '沈阳': ['辽宁省'],
+        '太行山区': ['山西省', '河北省', '河南省'],
+        '太行山': ['山西省', '河北省', '河南省'],
+        '华北': ['北京市', '天津市', '河北省', '山西省', '内蒙古自治区'],
+    };
+
 
     function getEventsForMapName(mapName, data) {
-        for (var dbName in data) {
-            if (dbName === mapName || mapName.indexOf(dbName) > -1 || dbName.indexOf(mapName) > -1) {
-                return data[dbName];
+
+        var result = [];
+        var seenEventIds = new Set();   // ⭐ 去重核心
+
+        // 1️⃣ 直接拿该省已有事件
+        if (data[mapName] && Array.isArray(data[mapName])) {
+            data[mapName].forEach(function (ev) {
+                var id = ev.id || ev._id || JSON.stringify(ev);
+                if (!seenEventIds.has(id)) {
+                    seenEventIds.add(id);
+                    result.push(ev);
+                }
+            });
+        }
+
+        // 2️⃣ 扫描所有事件，检查是否有“特殊地名”应归属到该省
+        for (var locationKey in specialLocationMap) {
+            var provinces = specialLocationMap[locationKey];
+            if (!provinces.includes(mapName)) continue;
+
+            for (var province in data) {
+                if (!Array.isArray(data[province])) continue;
+
+                data[province].forEach(function (ev) {
+                    if (ev.location && ev.location.indexOf(locationKey) > -1) {
+                        var id = ev.id || ev._id || JSON.stringify(ev);
+                        if (!seenEventIds.has(id)) {
+                            seenEventIds.add(id);
+                            result.push(ev);
+                        }
+                    }
+                });
             }
         }
-        return null;
+
+        return result.length > 0 ? result : null;
     }
 
-    // --- 绘制三层同心圆点 (带交互效果) ---
+    // --- 绘制三层同心圆点 (带呼吸动画效果) ---
     function drawCircleMarker(svgDoc, x, y, onClickCallback) {
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('transform', `translate(${x}, ${y})`);
-        g.style.cursor = 'pointer'; // 允许点击，鼠标变手型
+        g.style.cursor = 'pointer';
         
-        // 定义过渡动画样式
-        var transitionStyle = 'r 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), fill 0.3s ease, opacity 0.3s ease';
+        // 统一过渡动画 - 使用更自然的缓动
+        var transitionStyle = `r ${TIMING.normal}ms ${TIMING.easeOutQuart}, fill ${TIMING.normal}ms ease, opacity ${TIMING.normal}ms ease`;
 
-        // 最外层圆：半径最大，透明度最高
+        // 最外层圆：呼吸光晕
         var outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         outerCircle.setAttribute('cx', '0');
         outerCircle.setAttribute('cy', '0');
-        outerCircle.setAttribute('r', '12'); // 基础半径的4倍
-        outerCircle.setAttribute('fill', '#FFD700');
-        outerCircle.setAttribute('opacity', '0.25'); // 最透明但不是百分百
-        outerCircle.style.filter = 'blur(1px)';
+        outerCircle.setAttribute('r', '12');  // 从10增加到12
+        outerCircle.setAttribute('fill', COLORS.goldMuted);
+        outerCircle.setAttribute('opacity', '0.25');  // 从0.2增加到0.25
+        outerCircle.style.filter = 'blur(2px)';
         outerCircle.style.transition = transitionStyle;
         
-        // 中间层圆：半径中等，中等透明度
+        // 中间层圆：主体光环
         var middleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         middleCircle.setAttribute('cx', '0');
         middleCircle.setAttribute('cy', '0');
-        middleCircle.setAttribute('r', '6'); // 基础半径的2倍
-        middleCircle.setAttribute('fill', '#FFD700');
-        middleCircle.setAttribute('opacity', '0.5'); // 中等透明度
+        middleCircle.setAttribute('r', '6');  // 从5增加到6
+        middleCircle.setAttribute('fill', COLORS.goldPrimary);
+        middleCircle.setAttribute('opacity', '0.5');  // 从0.45增加到0.5
         middleCircle.style.transition = transitionStyle;
         
-        // 最内层圆：半径最小，透明度最低（即最不透明）
+        // 最内层圆：核心亮点
         var innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         innerCircle.setAttribute('cx', '0');
         innerCircle.setAttribute('cy', '0');
-        innerCircle.setAttribute('r', '3'); // 基础半径
-        innerCircle.setAttribute('fill', '#FFD700');
-        innerCircle.setAttribute('opacity', '1'); // 完全不透明
-        innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(255, 215, 0, 0.8))';
+        innerCircle.setAttribute('r', '3');  // 从2.5增加到3
+        innerCircle.setAttribute('fill', COLORS.goldLight);
+        innerCircle.setAttribute('opacity', '0.95');  // 从0.9增加到0.95
+        innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(201, 162, 39, 0.7))';  // 增强阴影
         innerCircle.style.transition = transitionStyle;
+        
+        // 添加柔和的呼吸动画 (检查 svgDoc 有效性)
+        if (svgDoc && svgDoc.createElementNS) {
+            var breatheAnimation = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'animate');
+            breatheAnimation.setAttribute('attributeName', 'opacity');
+            breatheAnimation.setAttribute('values', '0.15;0.3;0.15');
+            breatheAnimation.setAttribute('dur', '3s');
+            breatheAnimation.setAttribute('repeatCount', 'indefinite');
+            outerCircle.appendChild(breatheAnimation);
+        }
         
         // 添加圆点（从外到内）
         g.appendChild(outerCircle);
         g.appendChild(middleCircle);
         g.appendChild(innerCircle);
         
-        // --- 交互事件监听 ---
+        // 状态跟踪：记录是否处于 hover 状态
+        var isHovering = false;
+        
+        // --- 交互事件监听 - 增强交互效果 ---
         g.addEventListener('mouseenter', function() {
-            // 悬浮：变大，中心变红
-            innerCircle.setAttribute('r', '6');
-            innerCircle.setAttribute('fill', '#FF3333'); 
-            middleCircle.setAttribute('r', '10');
-            middleCircle.setAttribute('opacity', '0.7');
-            outerCircle.setAttribute('r', '16');
-            outerCircle.setAttribute('opacity', '0.4');
+            isHovering = true;
+            // 悬浮：明显放大，颜色变亮，增加光晕
+            innerCircle.setAttribute('r', '5');  // 从4增加到5
+            innerCircle.setAttribute('fill', '#FFD700');  // 更亮的金色
+            innerCircle.setAttribute('opacity', '1');
+            innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))';
+            middleCircle.setAttribute('r', '10');  // 从8增加到10
+            middleCircle.setAttribute('opacity', '0.7');  // 从0.6增加到0.7
+            outerCircle.setAttribute('r', '18');  // 从14增加到18
+            outerCircle.setAttribute('opacity', '0.45');  // 从0.35增加到0.45
         });
 
         g.addEventListener('mouseleave', function() {
+            isHovering = false;
             // 恢复原状
             innerCircle.setAttribute('r', '3');
-            innerCircle.setAttribute('fill', '#FFD700');
+            innerCircle.setAttribute('fill', COLORS.goldLight);
+            innerCircle.setAttribute('opacity', '0.95');
+            innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(201, 162, 39, 0.7))';
             middleCircle.setAttribute('r', '6');
             middleCircle.setAttribute('opacity', '0.5');
             outerCircle.setAttribute('r', '12');
@@ -128,16 +217,63 @@ document.addEventListener('DOMContentLoaded', function () {
 
         g.addEventListener('click', function(e) {
             e.stopPropagation();
-            // 点击反馈动画 (轻微收缩再恢复)
-            innerCircle.setAttribute('r', '4'); 
-            setTimeout(() => {
-                innerCircle.setAttribute('r', '6'); // 回到悬浮状态
-            }, 100);
+            // 点击反馈 - 更强烈的脉冲效果
+            innerCircle.setAttribute('r', '8');  // 从6增加到8
+            innerCircle.style.filter = 'drop-shadow(0 0 15px rgba(255, 215, 0, 1))';
+            middleCircle.setAttribute('r', '12');
+            outerCircle.setAttribute('r', '20');
+            outerCircle.setAttribute('opacity', '0.6');
+            
+            setTimeout(function() {
+                // 恢复时检查是否还在 hover 状态
+                if (isHovering) {
+                    // 恢复到 hover 状态
+                    innerCircle.setAttribute('r', '5');
+                    innerCircle.setAttribute('fill', '#FFD700');
+                    innerCircle.setAttribute('opacity', '1');
+                    innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))';
+                    middleCircle.setAttribute('r', '10');
+                    middleCircle.setAttribute('opacity', '0.7');
+                    outerCircle.setAttribute('r', '18');
+                    outerCircle.setAttribute('opacity', '0.45');
+                } else {
+                    // 恢复到初始状态
+                    innerCircle.setAttribute('r', '3');
+                    innerCircle.setAttribute('fill', COLORS.goldLight);
+                    innerCircle.setAttribute('opacity', '0.95');
+                    innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(201, 162, 39, 0.7))';
+                    middleCircle.setAttribute('r', '6');
+                    middleCircle.setAttribute('opacity', '0.5');
+                    outerCircle.setAttribute('r', '12');
+                    outerCircle.setAttribute('opacity', '0.25');
+                }
+            }, 200);  // 从150增加到200
 
             if (onClickCallback) onClickCallback(e);
         });
 
         svgDoc.documentElement.appendChild(g);
+    }
+
+    // --- 清除省份高亮状态 ---
+    function clearProvinceHighlight() {
+        if (currentHighlightedPath) {
+            currentHighlightedPath.style.fill = 'url(#mapFillGradient)';
+            currentHighlightedPath.style.stroke = COLORS.goldMuted;
+            currentHighlightedPath.style.strokeWidth = '1.2';
+            currentHighlightedPath.style.filter = 'none';
+            currentHighlightedPath = null;
+        }
+    }
+
+    // --- 设置省份高亮状态 ---
+    function setProvinceHighlight(path) {
+        clearProvinceHighlight();
+        currentHighlightedPath = path;
+        path.style.fill = 'url(#mapHoverGradient)';
+        path.style.stroke = COLORS.goldLight;
+        path.style.strokeWidth = '3';
+        path.style.filter = 'drop-shadow(0 4px 12px rgba(201,162,39,0.5)) brightness(1.1)';
     }
 
     // --- 新增：绘制事件连接线和矩形 ---
@@ -212,14 +348,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 angle = start + step * index;
             }
             
-            var fontSize = 16;
+            var fontSize = 16;  // 从18减少到16，减弱强调
             var textStr = ev.title || '未命名事件';
+            // 限制文字长度，超过10个字符截断
+            if (textStr.length > 12) {
+                textStr = textStr.substring(0, 11) + '…';
+            }
             var textLen = 0;
             for(var i=0; i<textStr.length; i++) {
-                textLen += (textStr.charCodeAt(i) > 255 ? 1 : 0.6);
+                textLen += (textStr.charCodeAt(i) > 255 ? 1 : 0.55);
             }
-            var rectWidth = textLen * fontSize + 20; 
-            var rectHeight = 30;
+            // 定义内边距，让文字和矩形更协调
+            var paddingX = 10;
+            var paddingY = 8;
+            var rectWidth = textLen * fontSize + paddingX * 2;
+            var rectHeight = fontSize + paddingY * 2;
 
             var currentRadius = baseRadius;
             var endX, endY, rectX, rectY;
@@ -287,55 +430,68 @@ document.addEventListener('DOMContentLoaded', function () {
             
             placedRects.push({x: rectX, y: rectY, w: rectWidth, h: rectHeight});
             
-            // 创建单个事件组
+            // 创建单个事件组 - 带入场动画
             var itemG = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
             itemG.style.cursor = 'pointer';
-            itemG.style.transition = 'opacity 0.3s';
+            itemG.style.opacity = '0';
+            itemG.style.transition = `opacity ${TIMING.normal}ms ${TIMING.easeOutQuart}`;
+            
+            // 延迟入场动画 - 依次展开
+            setTimeout(function() { itemG.style.opacity = '1'; }, index * 60);
             
             // 点击事件：打开详情弹窗
             itemG.onclick = function(e) {
-                e.stopPropagation(); // 阻止冒泡，防止触发地图点击清除
+                e.stopPropagation();
                 showEventModal(ev);
             };
             
-            // 1. 金黄色直线
+            // 1. 连接线 - 使用古铜金色
             var line = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.setAttribute('x1', centerX);
             line.setAttribute('y1', centerY);
             line.setAttribute('x2', endX);
             line.setAttribute('y2', endY);
-            line.setAttribute('stroke', '#FFD700');
-            line.setAttribute('stroke-width', '2');
+            line.setAttribute('stroke', COLORS.goldMuted);
+            line.setAttribute('stroke-width', '1.5');
             line.setAttribute('stroke-linecap', 'round');
+            line.setAttribute('stroke-opacity', '0.7');
+            line.style.transition = `stroke ${TIMING.fast}ms ease, stroke-opacity ${TIMING.fast}ms ease`;
             
             // 2. 连接处的圆形
             var circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', endX);
             circle.setAttribute('cy', endY);
-            circle.setAttribute('r', '4');
-            circle.setAttribute('fill', '#FFD700');
+            circle.setAttribute('r', '3');
+            circle.setAttribute('fill', COLORS.goldPrimary);
+            circle.style.transition = `fill ${TIMING.fast}ms ease, r ${TIMING.fast}ms ease`;
             
-            // 3. 矩形和文字 - 使用修正后的位置
-            var textX = rectX + 10; // 统一使用左对齐，避免文字方向问题
-            var textY = rectY + (rectHeight / 2) + (fontSize / 3); // 垂直居中
-            
+            // 3. 矩形标签 - 使用深色背景
             var rect = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', rectX);
-            rect.setAttribute('y', rectY); 
+            rect.setAttribute('y', rectY);
+            rect.setAttribute('padding', '8'); 
             rect.setAttribute('width', rectWidth);
             rect.setAttribute('height', rectHeight);
-            rect.setAttribute('fill', '#FFD700');
+            rect.setAttribute('fill', 'rgba(30, 25, 20, 0.9)');
+            rect.setAttribute('stroke', COLORS.goldMuted);
+            rect.setAttribute('stroke-width', '1');
             rect.setAttribute('rx', '4');
-            rect.style.filter = 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))';
+            rect.style.filter = 'drop-shadow(1px 2px 3px rgba(0,0,0,0.3))';
+            rect.style.transition = `fill ${TIMING.fast}ms ease, stroke ${TIMING.fast}ms ease`;
+            
+            // 4. 文字 - 使用温暖的浅色，位置基于内边距
+            var textX = rectX + paddingX;
+            var textY = rectY + paddingY + fontSize * 0.75;  // 基线对齐
             
             var text = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', textX);
             text.setAttribute('y', textY); 
-            text.setAttribute('fill', '#FF0000');
+            text.setAttribute('fill', COLORS.textLight);
             text.setAttribute('font-size', fontSize + 'px');
-            text.setAttribute('font-weight', 'bold');
+            text.setAttribute('font-weight', '500');
             text.setAttribute('font-family', '"Microsoft YaHei", sans-serif');
             text.style.pointerEvents = 'none';
+            text.style.transition = `fill ${TIMING.fast}ms ease`;
             text.textContent = textStr;
             
             // 组装
@@ -344,29 +500,42 @@ document.addEventListener('DOMContentLoaded', function () {
             itemG.appendChild(circle);
             itemG.appendChild(text);
             
-            // 悬停效果
+            // 悬停效果 - 更柔和的视觉反馈
             itemG.addEventListener('mouseenter', function() {
-                rect.setAttribute('fill', '#FFF'); // 变白高亮
-                line.setAttribute('stroke', '#FFF');
-                circle.setAttribute('fill', '#FFF');
+                rect.setAttribute('fill', 'rgba(50, 40, 30, 0.95)');
+                rect.setAttribute('stroke', COLORS.goldLight);
+                rect.setAttribute('stroke-width', '1.5');
+                rect.style.filter = 'drop-shadow(1px 2px 5px rgba(0,0,0,0.4))';
+                line.setAttribute('stroke', COLORS.goldLight);
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-opacity', '1');
+                circle.setAttribute('fill', COLORS.goldLight);
+                circle.setAttribute('r', '4');
+                text.setAttribute('fill', '#FFFFFF');
                 // 悬停时将元素移到最上层
                 gLayer.appendChild(itemG);
             });
             itemG.addEventListener('mouseleave', function() {
-                rect.setAttribute('fill', '#FFD700'); // 恢复金黄
-                line.setAttribute('stroke', '#FFD700');
-                circle.setAttribute('fill', '#FFD700');
+                rect.setAttribute('fill', 'rgba(30, 25, 20, 0.9)');
+                rect.setAttribute('stroke', COLORS.goldMuted);
+                rect.setAttribute('stroke-width', '1');
+                rect.style.filter = 'drop-shadow(1px 2px 3px rgba(0,0,0,0.3))';
+                line.setAttribute('stroke', COLORS.goldMuted);
+                line.setAttribute('stroke-width', '1.5');
+                line.setAttribute('stroke-opacity', '0.7');
+                circle.setAttribute('fill', COLORS.goldPrimary);
+                circle.setAttribute('r', '3');
+                text.setAttribute('fill', COLORS.textLight);
             });
 
             gLayer.appendChild(itemG);
         });
         
-        // 添加入场动画
+        // 整体入场动画
         gLayer.style.opacity = '0';
         svgDoc.documentElement.appendChild(gLayer);
-        // 强制重绘
         requestAnimationFrame(function() {
-            gLayer.style.transition = 'opacity 0.3s ease';
+            gLayer.style.transition = `opacity ${TIMING.normal}ms ${TIMING.easeOutQuart}`;
             gLayer.style.opacity = '1';
         });
     }
@@ -377,17 +546,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!provinceLabel) {
             provinceLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             provinceLabel.setAttribute('id', 'province-label');
-            provinceLabel.style.fontSize = '24px';
-            provinceLabel.style.fontFamily = '"SimHei", "Microsoft YaHei", sans-serif';
-            provinceLabel.style.fontWeight = 'bold';
-            provinceLabel.style.fill = '#FFD700';
-            provinceLabel.style.stroke = '#000000';
-            provinceLabel.style.strokeWidth = '1.5px';
-            provinceLabel.style.paintOrder = 'stroke fill';
+            provinceLabel.setAttribute('font-size', '26');
+            provinceLabel.setAttribute('font-weight', '600');
+            provinceLabel.setAttribute('fill', COLORS.goldLight);
+            provinceLabel.setAttribute('text-anchor', 'start');
+            provinceLabel.setAttribute('font-family', '"STKaiti", "KaiTi", "STSong", "SimSun", serif');
+            provinceLabel.setAttribute('letter-spacing', '2');
             provinceLabel.style.pointerEvents = 'none';
             provinceLabel.style.opacity = '0';
-            provinceLabel.style.transition = 'opacity 0.3s ease';
-            provinceLabel.style.textAnchor = 'middle';
+            provinceLabel.style.transition = `opacity ${TIMING.normal}ms ${TIMING.easeOutQuart}`;
+            // 金字+白边+多层阴影，增强对比度
+            provinceLabel.setAttribute('stroke', '#FFFFFF');
+            provinceLabel.setAttribute('stroke-width', '1.5');
+            provinceLabel.setAttribute('stroke-linejoin', 'round');
+            provinceLabel.setAttribute('stroke-linecap', 'round');
+            provinceLabel.setAttribute('paint-order', 'stroke fill');
+            provinceLabel.style.filter = 'drop-shadow(0 3px 5px rgba(0,0,0,0.9)) drop-shadow(0 0 8px rgba(0,0,0,0.7)) drop-shadow(0 0 15px rgba(201,162,39,0.4))';
             svgDoc.documentElement.appendChild(provinceLabel);
         }
         return provinceLabel;
@@ -411,18 +585,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!position) return;
         var label = createProvinceLabel(svgDoc);
         label.textContent = provinceName;
-        label.setAttribute('x', position.x);
-        label.setAttribute('y', position.y - 10);
-        label.style.opacity = '1';
+        // 将标签显示在省份位置左上方偏移
+        label.setAttribute('x', position.x - 60);
+        label.setAttribute('y', position.y - 15);
+        label.style.opacity = '0.92';
     }
 
     function hideProvinceLabel() {
         if (provinceLabel) provinceLabel.style.opacity = '0';
     }
 
-    // --- 修改：显示单个事件详情弹窗 (移除 Swiper) ---
+    // --- 修改：显示单个事件详情弹窗 ---
     function showEventModal(event) {
         var modal = document.getElementById('event-detail-modal');
+        var backdrop = document.getElementById('modal-backdrop');
+        
+        // 存储当前事件ID用于跳转
+        currentEventId = event.id;
+        modal.setAttribute('data-event-id', event.id);
         
         // 1. 处理图片路径
         var imageUrl = '';
@@ -439,12 +619,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 imageUrl = base + path;
             }
         } else {
-            // 纯色占位图
+            // 纯色占位图 - 使用新配色
             imageUrl = 'data:image/svg+xml;base64,' + btoa(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="300" height="210" viewBox="0 0 300 210">
-                    <rect width="300" height="210" fill="#4a5568"/>
-                    <text x="50%" y="45%" fill="#e2e8f0" font-size="16" font-family="Arial" text-anchor="middle" dominant-baseline="middle">暂无图片</text>
-                    <text x="50%" y="60%" fill="#cbd5e0" font-size="12" font-family="Arial" text-anchor="middle" dominant-baseline="middle">${event.title || '未知事件'}</text>
+                <svg xmlns="http://www.w3.org/2000/svg" width="280" height="200" viewBox="0 0 280 200">
+                    <rect width="280" height="200" fill="#2A2520"/>
+                    <text x="50%" y="42%" fill="#C9A227" font-size="14" font-family="Arial" text-anchor="middle" dominant-baseline="middle">暂无图片</text>
+                    <text x="50%" y="58%" fill="#A88B2A" font-size="11" font-family="Arial" text-anchor="middle" dominant-baseline="middle">${event.title || '未知事件'}</text>
                 </svg>
             `);
         }
@@ -457,24 +637,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (imgTitleElem) imgTitleElem.textContent = event.title || '';
 
         updateModalInfo(event);
+        
+        // 显示背景遮罩和弹窗
+        if (backdrop) backdrop.classList.add('show');
         modal.classList.add('show');
     }
 
     function updateModalInfo(event) {
         var titleElem = document.getElementById('modal-title');
         titleElem.textContent = event.title || '未知事件';
-        titleElem.onclick = function() {
-            var url = window._EVENT_INDEX_URL || '/event/index';
-            if (url.indexOf('event%2Findex') > -1) {
-                url = url.replace('event%2Findex', 'timeline%2Fview') + '&id=' + event.id;
-            } else if (url.indexOf('event/index') > -1) {
-                url = url.replace('event/index', 'timeline/view');
-                url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + event.id;
-            } else {
-                url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + event.id;
-            }
-            window.open(url, '_blank');
-        };
+        // 移除标题的单独点击事件，改为整个modal-content可点击
 
         var dateStr = event.event_date || '未知';
         if (dateStr && dateStr.length > 10) dateStr = dateStr.substring(0, 10);
@@ -514,30 +686,33 @@ document.addEventListener('DOMContentLoaded', function () {
             var originalFill = path.getAttribute('fill') || '';
             var provinceId = path.getAttribute('id');
             
-            path.style.transition = 'fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease';
+            // 统一过渡动画
+            path.style.transition = `fill ${TIMING.normal}ms ${TIMING.easeInOut}, stroke ${TIMING.normal}ms ${TIMING.easeInOut}, opacity ${TIMING.normal}ms ease, filter ${TIMING.normal}ms ease, stroke-width ${TIMING.fast}ms ease`;
             
             path.addEventListener('mouseenter', function () {
-                this.style.fill = '#d9534f';
-                this.style.stroke = '#FFA500';
-                this.style.strokeWidth = '2';
-                this.style.opacity = '0.9';
-                this.style.transform = 'translateY(-3px)';
-                this.style.filter = 'drop-shadow(0 5px 10px rgba(0,0,0,0.5))';
-                if (provinceId) showProvinceLabel(svgDoc, provinceId);
+                // 如果不是当前高亮的省份，才应用hover效果
+                if (this !== currentHighlightedPath) {
+                    this.style.fill = 'url(#mapHoverGradient)';
+                    this.style.stroke = COLORS.goldLight;
+                    this.style.strokeWidth = '2.5';
+                    this.style.opacity = '1';
+                    this.style.filter = 'drop-shadow(0 3px 10px rgba(201,162,39,0.4)) brightness(1.05)';
+                }
             });
 
             path.addEventListener('mouseleave', function () {
-                this.style.fill = originalFill;
-                this.style.stroke = '#FFD700';
-                this.style.strokeWidth = '1.5';
-                this.style.opacity = '1';
-                this.style.transform = 'translateY(0)';
-                this.style.filter = 'none';
-                hideProvinceLabel();
+                // 如果不是当前高亮的省份，才恢复默认样式
+                if (this !== currentHighlightedPath) {
+                    this.style.fill = 'url(#mapFillGradient)';
+                    this.style.stroke = COLORS.goldMuted;
+                    this.style.strokeWidth = '1.2';
+                    this.style.opacity = '1';
+                    this.style.filter = 'none';
+                }
             });
         });
         
-        // 全局点击监听：点击空白处清除连接线
+        // 全局点击监听：点击空白处清除连接线和高亮状态
         svgDoc.addEventListener('click', function(e) {
             var target = e.target;
             // 检查点击是否在连接线层内部
@@ -551,9 +726,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 parent = parent.parentNode;
             }
             
-            // 如果点击的不是省份块，也不是连接线上的元素，则清除连接线
-            if (target.tagName !== 'path' && !isConnector) {
+            // 检查是否点击了圆点标记
+            var isMarker = false;
+            parent = target;
+            while(parent && parent !== svgDoc) {
+                if (parent.tagName === 'g' && parent.style && parent.style.cursor === 'pointer') {
+                    // 检查是否是圆点组（包含circle元素）
+                    var circles = parent.querySelectorAll('circle');
+                    if (circles.length >= 2) {
+                        isMarker = true;
+                        break;
+                    }
+                }
+                parent = parent.parentNode;
+            }
+            
+            // 如果点击的不是省份块、连接线、圆点标记，则清除所有状态
+            if (target.tagName !== 'path' && !isConnector && !isMarker) {
                 clearConnectors(svgDoc);
+                hideProvinceLabel();
+                clearProvinceHighlight();
             }
         });
 
@@ -579,6 +771,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (events && events.length > 0) {
                         path.style.cursor = 'pointer';
+                        // 标记有事件的省份，用于样式强调
+                        path.classList.add('has-events');
 
                         var center = provinceCenters[mapEngName] || provinceCenters[mapChineseName];
                         if (!center) {
@@ -590,6 +784,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         // 传递点击回调，使圆点点击也能触发连接线
                         drawCircleMarker(svgDoc, center.x, center.y, function() {
                             console.log('点击圆点:', mapChineseName);
+                            // 获取省份 ID 用于显示省份名
+                            var provinceId = path.getAttribute('id');
+                            if (provinceId) {
+                                showProvinceLabel(svgDoc, provinceId);
+                            }
+                            // 使用统一的高亮函数
+                            setProvinceHighlight(path);
+                            
                             drawEventConnectors(svgDoc, center.x, center.y, events);
                         });
 
@@ -597,6 +799,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         path.addEventListener('click', function (e) {
                             e.stopPropagation();
                             console.log('点击:', mapChineseName, '事件数:', events.length);
+                            // 显示省份名
+                            var provinceId = path.getAttribute('id');
+                            if (provinceId) {
+                                showProvinceLabel(svgDoc, provinceId);
+                            }
+                            // 使用统一的高亮函数
+                            setProvinceHighlight(this);
                             // 绘制连接线
                             drawEventConnectors(svgDoc, center.x, center.y, events);
                         });
@@ -615,12 +824,63 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var style = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'style');
         style.textContent = `
-            #features { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)); }
-            #features path { stroke: #FFD700; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+            #features { filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25)); }
+            #features path { 
+                stroke: ${COLORS.goldMuted}; 
+                stroke-width: 1.2; 
+                stroke-linejoin: round; 
+                stroke-linecap: round; 
+                fill: url(#mapFillGradient);
+            }
+            #features path.has-events { stroke-width: 1.6; }
+            #features path.has-events:hover { stroke-width: 2.2; }
             #label_points circle { fill: none; stroke: none; }
-            #points circle { fill: #d9534f; stroke: #fff; stroke-width: 2; }
+            #points circle { fill: ${COLORS.redPrimary}; stroke: ${COLORS.textLight}; stroke-width: 1.5; }
         `;
         defs.appendChild(style);
+
+        // 渐变：增强层次，采用低饱和暗红系避免刺眼
+        var gradFill = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        gradFill.setAttribute('id', 'mapFillGradient');
+        gradFill.setAttribute('x1', '0%');
+        gradFill.setAttribute('y1', '0%');
+        gradFill.setAttribute('x2', '0%');
+        gradFill.setAttribute('y2', '100%');
+
+        var stop1 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop1.setAttribute('offset', '0%');
+        stop1.setAttribute('stop-color', COLORS.mapRedTop);
+        stop1.setAttribute('stop-opacity', '0.95');
+        gradFill.appendChild(stop1);
+
+        var stop2 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop2.setAttribute('offset', '100%');
+        stop2.setAttribute('stop-color', COLORS.mapRedBottom);
+        stop2.setAttribute('stop-opacity', '0.95');
+        gradFill.appendChild(stop2);
+
+        defs.appendChild(gradFill);
+
+        var gradHover = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        gradHover.setAttribute('id', 'mapHoverGradient');
+        gradHover.setAttribute('x1', '0%');
+        gradHover.setAttribute('y1', '0%');
+        gradHover.setAttribute('x2', '0%');
+        gradHover.setAttribute('y2', '100%');
+
+        var h1 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        h1.setAttribute('offset', '0%');
+        h1.setAttribute('stop-color', COLORS.mapRedHoverTop);
+        h1.setAttribute('stop-opacity', '0.98');
+        gradHover.appendChild(h1);
+
+        var h2 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        h2.setAttribute('offset', '100%');
+        h2.setAttribute('stop-color', COLORS.mapRedHoverBottom);
+        h2.setAttribute('stop-opacity', '0.98');
+        gradHover.appendChild(h2);
+
+        defs.appendChild(gradHover);
     }
 
     var obj = document.getElementById('china-map-object');
