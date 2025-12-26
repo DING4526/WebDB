@@ -65,7 +65,7 @@ NavBar::begin([
 $menuItemsLeft = [
   ['label' => '时间轴', 'url' => ['/timeline/index'], 'active' => $activeCtl('timeline')],
   ['label' => '人物库', 'url' => ['/person/index'], 'active' => $activeCtl('person')],
-  ['label' => '纪念留言', 'url' => ['/message/index'], 'active' => $activeCtl('message')],
+  // ['label' => '纪念留言', 'url' => ['/message/index'], 'active' => $activeCtl('message')],
 ];
 
 $menuItemsRight = [];
