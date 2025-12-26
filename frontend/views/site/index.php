@@ -15,12 +15,6 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
 
 <div class="site-index">
     <div class="body-content" style="position: fixed; top: 50px; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; margin: 0;">
-        
-        <!-- 地图图注 - 左上角 -->
-        <div class="map-caption hero-text">
-            <span class="caption-label">【图注】</span>
-            <span class="caption-text">抗战历史地图（1931—1945）</span>
-        </div>
 
         <div id="china-map-wrapper" style="width: 100%; height: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center;">
             
@@ -29,27 +23,29 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
             </object>
         </div>
 
-        <!-- 右侧竖排内容区 -->
-<!-- 右侧三列竖排铭文 -->
-<div class="right-side-content right-columns">
+        <!-- 右上角文案区域 -->
+        <div class="homepage-text-area">
+            <!-- 铭句 - 主视觉效果，偏左，大字 -->
+            <div class="motto-text hero-text" id="motto-text">
+                <div class="motto-line">以时间作证</div>
+                <div class="motto-line">以数据铭记</div>
+            </div>
 
-    <!-- 第一列：以数据铭记 -->
-    <div class="right-col col-main hero-text">
-        <div class="col-text">以数据铭记</div>
-    </div>
+            <!-- 标题 - 标注效果，偏右，小字 -->
+            <div class="commem-text hero-text" id="commem-text">
+                <div class="commem-line">纪念</div>
+                <div class="commem-line">抗日战争胜利</div>
+                <div class="commem-line commem-number">80</div>
+                <div class="commem-line">周年</div>
+            </div>
 
-    <!-- 第二列：以时间作证 -->
-    <div class="right-col col-main hero-text">
-        <div class="col-text">以时间作证</div>
-    </div>
-
-
-    <!-- 第三列：纪念说明 -->
-    <div class="right-col col-commem hero-text">
-        <div class="col-text">纪念中国人民抗日战争胜利80周年</div>
-    </div>
-
-</div>
+            <!-- 图注 - 大标题，最右侧 -->
+            <div class="map-title hero-text" id="map-title">
+                <div class="map-title-label">【图注】</div>
+                <div class="map-title-main">抗战历史地图</div>
+                <div class="map-title-year">1931—1945</div>
+            </div>
+        </div>
 
         <!-- 动态时间标签 -->
         <div id="timeline-label" class="timeline-label">

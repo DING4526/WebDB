@@ -1684,8 +1684,9 @@
     // 运行首页开场序列
     function runIntroSequence(svgDoc, activeData) {
         var introOverlay = document.getElementById('intro-overlay');
-        var heroTexts = document.querySelectorAll('.hero-text');
-        var mapCaption = document.querySelector('.map-caption');
+        var mottoText = document.getElementById('motto-text');
+        var commemText = document.getElementById('commem-text');
+        var mapTitle = document.getElementById('map-title');
         
         // 第一步: 显示开场遮罩 2.5 秒
         setTimeout(function() {
@@ -1701,17 +1702,19 @@
                     introOverlay.classList.add('hidden');
                 }
                 
-                // 错落显示文案元素
-                heroTexts.forEach(function(el, index) {
-                    el.classList.add('animate-in', 'delay-' + (index + 1));
-                });
-                
-                // 图注稍后显示
-                setTimeout(function() {
-                    if (mapCaption) {
-                        mapCaption.classList.add('animate-in');
-                    }
-                }, 400);
+                // 错落显示文案元素 - 按特定顺序
+                // 1. 铭句（主视觉）先显示
+                if (mottoText) {
+                    mottoText.classList.add('animate-in', 'delay-1');
+                }
+                // 2. 标题（标注）
+                if (commemText) {
+                    commemText.classList.add('animate-in', 'delay-2');
+                }
+                // 3. 图注（大标题）
+                if (mapTitle) {
+                    mapTitle.classList.add('animate-in', 'delay-3');
+                }
                 
                 // 文案显示后自动开始历史动画
                 setTimeout(function() {
