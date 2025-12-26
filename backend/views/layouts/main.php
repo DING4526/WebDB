@@ -250,15 +250,15 @@ $this->registerCssFile('@web/css/admin-common.css');
           ?>
 
           <!-- 抗战专题 -->
-          <li class="sidebar-label pt20">团队项目-抗战专题</li>
+          <li class="sidebar-label pt20">团队项目管理</li>
 
           <!-- 1) 项目数据展示：单独入口 -->
-          <li class="<?= $isWarShowActive ? 'active' : '' ?>">
+          <!-- <li class="<?= $isWarShowActive ? 'active' : '' ?>">
             <a href="<?= Url::to(['project-show/index']) ?>">
               <span class="glyphicon glyphicon-stats"></span>
               <span class="sidebar-title">项目数据展示</span>
             </a>
-          </li>
+          </li> -->
 
           <!-- 2) 项目数据管理：扁平化菜单 -->
           <?php if ($isRoot || $isMember): ?>

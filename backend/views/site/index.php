@@ -87,7 +87,7 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                 <div class="kpi-label">内容总量</div>
                 <!-- <div class="kpi-sub" id="kpi-content-detail">事/人/媒</div> -->
             </div>
-            <a href="<?= Url::to(['project-show/index']) ?>" class="kpi-link">查看</a>
+            <!-- <a href="<?= Url::to(['project-show/index']) ?>" class="kpi-link">查看</a> -->
         </div>
         <div class="kpi-card">
             <div class="kpi-icon kpi-icon-primary"><span class="glyphicon glyphicon-stats"></span></div>
@@ -207,9 +207,9 @@ $teamInfo = Yii::$app->teamProvider->getTeam();
                                 <span>团队设置</span>
                             </a>
                         <?php endif; ?>
-                        <a href="<?= Url::to(['project-show/index']) ?>" class="quick-action-btn">
-                            <span class="glyphicon glyphicon-stats"></span>
-                            <span>数据展示</span>
+                        <a href="<?= Url::to(['taskboard/index']) ?>" class="quick-action-btn">
+                            <span class="glyphicon glyphicon-tasks"></span>
+                            <span>任务分工</span>
                         </a>
                     </div>
                 </div>
