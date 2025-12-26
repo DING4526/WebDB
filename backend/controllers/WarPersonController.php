@@ -271,13 +271,14 @@ class WarPersonController extends Controller
     protected function extractTitleFromUrl(string $url): string
     {
         $path = parse_url($url, PHP_URL_PATH);
-        if ($path) {
+        if ($path && is_string($path)) {
             $basename = basename($path);
             if ($basename && $basename !== '/') {
                 return urldecode($basename);
             }
         }
-        return parse_url($url, PHP_URL_HOST) ?: '外部链接';
+        $host = parse_url($url, PHP_URL_HOST);
+        return ($host && is_string($host)) ? $host : '外部链接';
     }
 
     protected function findModel($id)
