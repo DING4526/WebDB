@@ -23,7 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
         normal: 350,
         slow: 500,
         easeOutQuart: 'cubic-bezier(0.25, 1, 0.5, 1)',
-        easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        // 历史动画播放相关时长
+        animModalDelay: 300,       // 动画时显示弹窗前的延迟
+        animModalDuration: 1800,   // 动画时弹窗显示时长
+        animEventGap: 400          // 动画时事件间隔
     };
 
     // === 几何常量 ===
@@ -547,6 +551,134 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // --- 绘制单个事件的连接线（用于动画播放时） ---
+    function drawSingleEventConnector(svgDoc, centerX, centerY, event) {
+        clearConnectors(svgDoc);
+        
+        var gLayer = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        gLayer.setAttribute('id', 'connector-layer');
+        
+        // 获取SVG视口边界
+        var svgRoot = svgDoc.documentElement;
+        var svgBounds = {
+            minX: 0, minY: 0, maxX: 1000, maxY: 800
+        };
+        
+        if (svgRoot.viewBox && svgRoot.viewBox.baseVal && svgRoot.viewBox.baseVal.width > 0) {
+            var vb = svgRoot.viewBox.baseVal;
+            svgBounds.minX = vb.x;
+            svgBounds.minY = vb.y;
+            svgBounds.maxX = vb.x + vb.width;
+            svgBounds.maxY = vb.y + vb.height;
+        }
+        
+        var padding = 25;
+        svgBounds.minX += padding;
+        svgBounds.minY += padding;
+        svgBounds.maxX -= padding;
+        svgBounds.maxY -= padding;
+        
+        // 计算地图中心来决定文字朝向
+        var mapCX = (svgBounds.minX + svgBounds.maxX) / 2;
+        var mapCY = (svgBounds.minY + svgBounds.maxY) / 2;
+        var vecX = centerX - mapCX;
+        var vecY = centerY - mapCY;
+        var baseAngle = Math.atan2(vecY, vecX);
+        
+        // 配置参数
+        var baseRadius = 100;
+        var fontSize = 16;
+        var textStr = event.title || '未命名事件';
+        if (textStr.length > 14) {
+            textStr = textStr.substring(0, 13) + '…';
+        }
+        
+        var textLen = 0;
+        for(var i = 0; i < textStr.length; i++) {
+            textLen += (textStr.charCodeAt(i) > 255 ? 1 : 0.55);
+        }
+        
+        var paddingX = 12;
+        var paddingY = 10;
+        var rectWidth = textLen * fontSize + paddingX * 2;
+        var rectHeight = fontSize + paddingY * 2;
+        
+        var endX = centerX + baseRadius * Math.cos(baseAngle);
+        var endY = centerY + baseRadius * Math.sin(baseAngle);
+        var isRightSide = Math.cos(baseAngle) >= 0;
+        var rectX = isRightSide ? endX : (endX - rectWidth);
+        var rectY = endY - rectHeight / 2;
+        
+        // 边界修正
+        if (rectX < svgBounds.minX) rectX = svgBounds.minX;
+        if (rectX + rectWidth > svgBounds.maxX) rectX = svgBounds.maxX - rectWidth;
+        if (rectY < svgBounds.minY) rectY = svgBounds.minY;
+        if (rectY + rectHeight > svgBounds.maxY) rectY = svgBounds.maxY - rectHeight;
+        
+        // 创建单个事件组
+        var itemG = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'g');
+        itemG.style.pointerEvents = 'none'; // 动画时禁用点击
+        
+        // 1. 连接线
+        var line = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', centerX);
+        line.setAttribute('y1', centerY);
+        line.setAttribute('x2', endX);
+        line.setAttribute('y2', endY);
+        line.setAttribute('stroke', COLORS.goldLight);
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('stroke-opacity', '0.9');
+        
+        // 2. 连接处的圆形
+        var circle = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', endX);
+        circle.setAttribute('cy', endY);
+        circle.setAttribute('r', '4');
+        circle.setAttribute('fill', COLORS.goldLight);
+        
+        // 3. 矩形标签 - 使用更醒目的样式
+        var rect = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', rectX);
+        rect.setAttribute('y', rectY);
+        rect.setAttribute('width', rectWidth);
+        rect.setAttribute('height', rectHeight);
+        rect.setAttribute('fill', 'rgba(35, 28, 20, 0.95)');
+        rect.setAttribute('stroke', COLORS.goldPrimary);
+        rect.setAttribute('stroke-width', '1.5');
+        rect.setAttribute('rx', '6');
+        rect.style.filter = 'drop-shadow(2px 3px 6px rgba(0,0,0,0.4))';
+        
+        // 4. 文字
+        var textX = rectX + paddingX;
+        var textY = rectY + paddingY + fontSize * 0.75;
+        
+        var text = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', textX);
+        text.setAttribute('y', textY);
+        text.setAttribute('fill', COLORS.goldLight);
+        text.setAttribute('font-size', fontSize + 'px');
+        text.setAttribute('font-weight', '600');
+        text.setAttribute('font-family', '"Microsoft YaHei", sans-serif');
+        text.textContent = textStr;
+        
+        // 组装
+        itemG.appendChild(line);
+        itemG.appendChild(rect);
+        itemG.appendChild(circle);
+        itemG.appendChild(text);
+        gLayer.appendChild(itemG);
+        
+        // 入场动画
+        gLayer.style.opacity = '0';
+        gLayer.style.transition = 'opacity 0.3s ease';
+        svgDoc.documentElement.appendChild(gLayer);
+        
+        requestAnimationFrame(function() {
+            gLayer.style.opacity = '1';
+        });
+    }
+
     // --- 省份标签逻辑 ---
     function createProvinceLabel(svgDoc) {
         provinceLabel = svgDoc.getElementById('province-label');
@@ -603,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- 修改：显示单个事件详情弹窗 ---
-    function showEventModal(event) {
+    function showEventModal(event, skipBackdrop) {
         var modal = document.getElementById('event-detail-modal');
         var backdrop = document.getElementById('modal-backdrop');
         
@@ -645,8 +777,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateModalInfo(event);
         
-        // 显示背景遮罩和弹窗
-        if (backdrop) backdrop.classList.add('show');
+        // 显示弹窗（动画模式时跳过背景遮罩）
+        if (!skipBackdrop && backdrop) backdrop.classList.add('show');
         modal.classList.add('show');
     }
 
@@ -904,7 +1036,8 @@ document.addEventListener('DOMContentLoaded', function () {
         timeouts: [],
         svgDoc: null,
         arrowLayer: null,
-        previousLocation: null
+        previousLocation: null,
+        interactionBlocked: false  // 动画期间阻止其他交互
     };
 
     // 获取所有事件并按时间排序
@@ -1133,9 +1266,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // 创建临时高亮圆点
         var highlightCircle = createHighlightCircle(svgDoc, targetCenter.x, targetCenter.y);
         
-        // 延迟后显示事件弹窗
+        // 绘制单个事件的连接线+rect（立即显示，无延迟）
+        drawSingleEventConnector(svgDoc, targetCenter.x, targetCenter.y, event);
+        
+        // 显示弹窗（无遮罩，更快显示）
         animationState.timeouts.push(setTimeout(function() {
-            showEventModal(event);
+            showEventModal(event, true); // 跳过背景遮罩
             
             // 弹窗显示后的延迟
             animationState.timeouts.push(setTimeout(function() {
@@ -1152,10 +1288,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 关闭弹窗
                 closeEventModal();
                 
+                // 清除连接线（准备下一个事件）
+                clearConnectors(svgDoc);
+                
                 // 继续下一个
                 if (callback) callback();
-            }, 2000)); // 弹窗显示2秒
-        }, 800)); // 高亮后0.8秒显示弹窗
+            }, TIMING.animModalDuration));
+        }, TIMING.animModalDelay));
     }
 
     // 创建高亮圆点效果
@@ -1228,6 +1367,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (animationState.isPlaying) return;
         
         animationState.isPlaying = true;
+        animationState.interactionBlocked = true;  // 阻止其他交互
         animationState.svgDoc = svgDoc;
         animationState.currentStep = 0;
         animationState.previousLocation = null;
@@ -1243,6 +1383,9 @@ document.addEventListener('DOMContentLoaded', function () {
             playBtn.innerHTML = '<i class="glyphicon glyphicon-pause"></i><span>暂停</span>';
         }
         if (skipBtn) skipBtn.style.display = 'flex';
+        
+        // 添加交互阻止遮罩
+        addInteractionBlocker();
         
         // 创建箭头图层
         createArrowLayer(svgDoc);
@@ -1269,19 +1412,59 @@ document.addEventListener('DOMContentLoaded', function () {
             // 短暂延迟后播放下一个
             animationState.timeouts.push(setTimeout(function() {
                 playNextEvent();
-            }, 500));
+            }, TIMING.animEventGap));
         });
+    }
+
+    // 添加交互阻止遮罩（仅覆盖地图区域，不影响控制按钮）
+    function addInteractionBlocker() {
+        var existing = document.getElementById('animation-interaction-blocker');
+        if (existing) return;
+        
+        var mapWrapper = document.getElementById('china-map-wrapper');
+        if (!mapWrapper) return;
+        
+        var blocker = document.createElement('div');
+        blocker.id = 'animation-interaction-blocker';
+        // 使用兼容性更好的 CSS 写法
+        blocker.style.cssText = 'position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; cursor: not-allowed; background: transparent;';
+        
+        // 阻止所有交互事件
+        var blockEvent = function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        blocker.addEventListener('click', blockEvent);
+        blocker.addEventListener('mousedown', blockEvent);
+        blocker.addEventListener('mouseup', blockEvent);
+        blocker.addEventListener('touchstart', blockEvent);
+        blocker.addEventListener('touchend', blockEvent);
+        
+        mapWrapper.style.position = 'relative';
+        mapWrapper.appendChild(blocker);
+    }
+    
+    // 移除交互阻止遮罩
+    function removeInteractionBlocker() {
+        var blocker = document.getElementById('animation-interaction-blocker');
+        if (blocker && blocker.parentNode) {
+            blocker.parentNode.removeChild(blocker);
+        }
     }
 
     // 停止动画
     function stopAnimation() {
         animationState.isPlaying = false;
+        animationState.interactionBlocked = false;  // 恢复交互
         
         // 清除所有定时器
         animationState.timeouts.forEach(function(t) {
             clearTimeout(t);
         });
         animationState.timeouts = [];
+        
+        // 移除交互阻止遮罩
+        removeInteractionBlocker();
         
         // 恢复UI
         var playBtn = document.getElementById('btn-play-animation');
