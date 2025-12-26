@@ -195,9 +195,9 @@ a.desc:after { content: "\e152"; }
 /* --- 事件详情弹窗样式(优化毛玻璃效果) --- */
 #event-detail-modal {
     position: fixed;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) scale(0.95) !important;
+    left: 12% !important;
+    top: 15% !important;
+    transform: translate(0, 0) scale(0.95) !important;
     width: 580px;
     max-height: 55vh;
     background: linear-gradient(
@@ -226,7 +226,7 @@ a.desc:after { content: "\e152"; }
 #event-detail-modal.show {
     display: flex;
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1) !important;
+    transform: translate(0, 0) scale(1) !important;
 }
 
 #event-detail-modal .modal-close {

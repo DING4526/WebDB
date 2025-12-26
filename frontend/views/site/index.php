@@ -10,7 +10,7 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
 <div class="vignette-overlay"></div>
 
 <div class="site-index">
-    <div class="body-content" style="display:flex; justify-content:center; align-items:center; height: 90vh; width: 100%; overflow:hidden; position: relative;">
+    <div class="body-content" style="position: fixed; top: 50px; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; margin: 0;">
         
         <div id="china-map-wrapper" style="width: 100%; height: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center;">
             

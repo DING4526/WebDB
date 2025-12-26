@@ -6,8 +6,13 @@ document.addEventListener('DOMContentLoaded', function () {
         goldPrimary: '#C9A227',    // 古铜金 - 主色
         goldLight: '#D4AF37',      // 浅古铜金 - 高亮
         goldMuted: '#A88B2A',      // 暗金 - 次要
-        redPrimary: '#8B1A1A',     // 暗红 - 地图填充
-        redHover: '#A52A2A',       // 棕红 - 悬停
+        redPrimary: '#8B1A1A',     // 暗红 - 圆点/强调
+        redHover: '#A52A2A',       // 棕红 - 备用悬停
+        // 地图填充采用低饱和暗红渐变，避免刺眼
+        mapRedTop: '#5A2323',      // 顶部渐变色：低饱和暗红
+        mapRedBottom: '#4A1C1D',   // 底部渐变色：更深的暗红
+        mapRedHoverTop: '#6B2B2B', // 悬停顶部：略亮但仍克制
+        mapRedHoverBottom: '#552323', // 悬停底部：适度加深
         textLight: '#F5E6C8',      // 温暖的浅色文字
         textDark: '#1A1A1A'
     };
@@ -90,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         outerCircle.setAttribute('cx', '0');
         outerCircle.setAttribute('cy', '0');
-        outerCircle.setAttribute('r', '10');
+        outerCircle.setAttribute('r', '12');  // 从10增加到12
         outerCircle.setAttribute('fill', COLORS.goldMuted);
-        outerCircle.setAttribute('opacity', '0.2');
+        outerCircle.setAttribute('opacity', '0.25');  // 从0.2增加到0.25
         outerCircle.style.filter = 'blur(2px)';
         outerCircle.style.transition = transitionStyle;
         
@@ -100,19 +105,19 @@ document.addEventListener('DOMContentLoaded', function () {
         var middleCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         middleCircle.setAttribute('cx', '0');
         middleCircle.setAttribute('cy', '0');
-        middleCircle.setAttribute('r', '5');
+        middleCircle.setAttribute('r', '6');  // 从5增加到6
         middleCircle.setAttribute('fill', COLORS.goldPrimary);
-        middleCircle.setAttribute('opacity', '0.45');
+        middleCircle.setAttribute('opacity', '0.5');  // 从0.45增加到0.5
         middleCircle.style.transition = transitionStyle;
         
         // 最内层圆：核心亮点
         var innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         innerCircle.setAttribute('cx', '0');
         innerCircle.setAttribute('cy', '0');
-        innerCircle.setAttribute('r', '2.5');
+        innerCircle.setAttribute('r', '3');  // 从2.5增加到3
         innerCircle.setAttribute('fill', COLORS.goldLight);
-        innerCircle.setAttribute('opacity', '0.9');
-        innerCircle.style.filter = 'drop-shadow(0 0 2px rgba(201, 162, 39, 0.6))';
+        innerCircle.setAttribute('opacity', '0.95');  // 从0.9增加到0.95
+        innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(201, 162, 39, 0.7))';  // 增强阴影
         innerCircle.style.transition = transitionStyle;
         
         // 添加柔和的呼吸动画 (检查 svgDoc 有效性)
@@ -155,13 +160,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
         g.addEventListener('click', function(e) {
             e.stopPropagation();
-            // 点击反馈 - 短暂脉冲效果
-            innerCircle.setAttribute('r', '6');
-            innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(201, 162, 39, 0.9))';
+            // 点击反馈 - 更强烈的脉冲效果
+            innerCircle.setAttribute('r', '8');  // 从6增加到8
+            innerCircle.style.filter = 'drop-shadow(0 0 15px rgba(255, 215, 0, 1))';
+            middleCircle.setAttribute('r', '12');
+            outerCircle.setAttribute('r', '20');
+            outerCircle.setAttribute('opacity', '0.6');
             setTimeout(function() {
-                innerCircle.setAttribute('r', '4');
-                innerCircle.style.filter = 'drop-shadow(0 0 2px rgba(201, 162, 39, 0.6))';
-            }, 150);
+                innerCircle.setAttribute('r', '5');
+                innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))';
+                middleCircle.setAttribute('r', '10');
+                outerCircle.setAttribute('r', '18');
+                outerCircle.setAttribute('opacity', '0.45');
+            }, 200);  // 从150增加到200
 
             if (onClickCallback) onClickCallback(e);
         });
@@ -241,14 +252,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 angle = start + step * index;
             }
             
-            var fontSize = 14;
+            var fontSize = 18;  // 从14增加到18
             var textStr = ev.title || '未命名事件';
             var textLen = 0;
             for(var i=0; i<textStr.length; i++) {
                 textLen += (textStr.charCodeAt(i) > 255 ? 1 : 0.6);
             }
-            var rectWidth = textLen * fontSize + 18; 
-            var rectHeight = 28;
+            var rectWidth = textLen * fontSize + 24;  // 增加padding
+            var rectHeight = 36;  // 从28增加到36
 
             var currentRadius = baseRadius;
             var endX, endY, rectX, rectY;
@@ -385,26 +396,38 @@ document.addEventListener('DOMContentLoaded', function () {
             itemG.appendChild(circle);
             itemG.appendChild(text);
             
-            // 悬停效果 - 更柔和的变化
+            // 悬停效果 - 增强视觉反馈
             itemG.addEventListener('mouseenter', function() {
-                rect.setAttribute('fill', 'rgba(50, 40, 30, 0.95)');
+                rect.setAttribute('fill', 'rgba(60, 50, 35, 0.98)');
                 rect.setAttribute('stroke', COLORS.goldLight);
+                rect.setAttribute('stroke-width', '2');  // 增加边框宽度
+                rect.style.filter = 'drop-shadow(2px 4px 8px rgba(0,0,0,0.6))';
                 line.setAttribute('stroke', COLORS.goldLight);
+                line.setAttribute('stroke-width', '2.5');  // 增加线条宽度
                 line.setAttribute('stroke-opacity', '1');
-                circle.setAttribute('fill', COLORS.goldLight);
-                circle.setAttribute('r', '4');
+                circle.setAttribute('fill', '#FFD700');
+                circle.setAttribute('r', '5');  // 从4增加到5
+                circle.style.filter = 'drop-shadow(0 0 6px rgba(255,215,0,0.8))';
                 text.setAttribute('fill', '#FFFFFF');
+                text.setAttribute('font-size', (fontSize + 2) + 'px');  // 文字放大
+                text.setAttribute('font-weight', '600');
                 // 悬停时将元素移到最上层
                 gLayer.appendChild(itemG);
             });
             itemG.addEventListener('mouseleave', function() {
                 rect.setAttribute('fill', 'rgba(30, 25, 20, 0.9)');
                 rect.setAttribute('stroke', COLORS.goldMuted);
+                rect.setAttribute('stroke-width', '1');
+                rect.style.filter = 'drop-shadow(1px 2px 3px rgba(0,0,0,0.3))';
                 line.setAttribute('stroke', COLORS.goldMuted);
+                line.setAttribute('stroke-width', '1.5');
                 line.setAttribute('stroke-opacity', '0.7');
                 circle.setAttribute('fill', COLORS.goldPrimary);
                 circle.setAttribute('r', '3');
+                circle.style.filter = '';
                 text.setAttribute('fill', COLORS.textLight);
+                text.setAttribute('font-size', fontSize + 'px');
+                text.setAttribute('font-weight', '500');
             });
 
             gLayer.appendChild(itemG);
@@ -425,17 +448,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!provinceLabel) {
             provinceLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             provinceLabel.setAttribute('id', 'province-label');
-            provinceLabel.style.fontSize = '20px';
-            provinceLabel.style.fontFamily = '"SimHei", "Microsoft YaHei", sans-serif';
-            provinceLabel.style.fontWeight = '600';
-            provinceLabel.style.fill = COLORS.goldLight;
-            provinceLabel.style.stroke = 'rgba(0, 0, 0, 0.6)';
-            provinceLabel.style.strokeWidth = '3px';
-            provinceLabel.style.paintOrder = 'stroke fill';
+            provinceLabel.setAttribute('font-size', '22');
+            provinceLabel.setAttribute('font-weight', '500');
+            provinceLabel.setAttribute('fill', COLORS.goldLight);
+            provinceLabel.setAttribute('text-anchor', 'start');
+            provinceLabel.setAttribute('font-family', '"STKaiti", "KaiTi", "STSong", "SimSun", serif');
+            provinceLabel.setAttribute('letter-spacing', '2');
             provinceLabel.style.pointerEvents = 'none';
             provinceLabel.style.opacity = '0';
             provinceLabel.style.transition = `opacity ${TIMING.normal}ms ${TIMING.easeOutQuart}`;
-            provinceLabel.style.textAnchor = 'middle';
+            provinceLabel.style.filter = 'drop-shadow(0 2px 6px rgba(0,0,0,0.8)) drop-shadow(0 0 12px rgba(201,162,39,0.3))';
             svgDoc.documentElement.appendChild(provinceLabel);
         }
         return provinceLabel;
@@ -459,9 +481,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!position) return;
         var label = createProvinceLabel(svgDoc);
         label.textContent = provinceName;
-        label.setAttribute('x', position.x);
-        label.setAttribute('y', position.y - 10);
-        label.style.opacity = '1';
+        // 将标签显示在省份位置左上方偏移
+        label.setAttribute('x', position.x - 60);
+        label.setAttribute('y', position.y - 15);
+        label.style.opacity = '0.92';
     }
 
     function hideProvinceLabel() {
@@ -567,15 +590,14 @@ document.addEventListener('DOMContentLoaded', function () {
             var provinceId = path.getAttribute('id');
             
             // 统一过渡动画
-            path.style.transition = `fill ${TIMING.normal}ms ${TIMING.easeInOut}, stroke ${TIMING.normal}ms ${TIMING.easeInOut}, opacity ${TIMING.normal}ms ease, filter ${TIMING.normal}ms ease`;
+            path.style.transition = `fill ${TIMING.normal}ms ${TIMING.easeInOut}, stroke ${TIMING.normal}ms ${TIMING.easeInOut}, opacity ${TIMING.normal}ms ease, filter ${TIMING.normal}ms ease, stroke-width ${TIMING.fast}ms ease`;
             
             path.addEventListener('mouseenter', function () {
-                this.style.fill = COLORS.redHover;
+                this.style.fill = 'url(#mapHoverGradient)';
                 this.style.stroke = COLORS.goldLight;
-                this.style.strokeWidth = '2';
-                this.style.opacity = '0.95';
-                this.style.filter = 'drop-shadow(0 3px 8px rgba(0,0,0,0.4))';
-                if (provinceId) showProvinceLabel(svgDoc, provinceId);
+                this.style.strokeWidth = '3';  // 从2增加到3
+                this.style.opacity = '1';  // 从0.95增加到1
+                this.style.filter = 'drop-shadow(0 4px 12px rgba(201,162,39,0.5)) brightness(1.1)';
             });
 
             path.addEventListener('mouseleave', function () {
@@ -584,7 +606,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.style.strokeWidth = '1.2';
                 this.style.opacity = '1';
                 this.style.filter = 'none';
-                hideProvinceLabel();
             });
         });
         
@@ -602,9 +623,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 parent = parent.parentNode;
             }
             
-            // 如果点击的不是省份块，也不是连接线上的元素，则清除连接线
+            // 如果点击的不是省份块，也不是连接线上的元素，则清除连接线和省份标签
             if (target.tagName !== 'path' && !isConnector) {
                 clearConnectors(svgDoc);
+                hideProvinceLabel();
             }
         });
 
@@ -630,6 +652,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (events && events.length > 0) {
                         path.style.cursor = 'pointer';
+                        // 标记有事件的省份，用于样式强调
+                        path.classList.add('has-events');
 
                         var center = provinceCenters[mapEngName] || provinceCenters[mapChineseName];
                         if (!center) {
@@ -641,6 +665,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         // 传递点击回调，使圆点点击也能触发连接线
                         drawCircleMarker(svgDoc, center.x, center.y, function() {
                             console.log('点击圆点:', mapChineseName);
+                            // 获取省份 ID 用于显示省份名
+                            var provinceId = path.getAttribute('id');
+                            if (provinceId) {
+                                showProvinceLabel(svgDoc, provinceId);
+                            }
+                            // 点凼dot时也高亮对应的省份
+                            path.style.fill = 'url(#mapHoverGradient)';
+                            path.style.stroke = COLORS.goldLight;
+                            path.style.strokeWidth = '3';
+                            path.style.filter = 'drop-shadow(0 4px 12px rgba(201,162,39,0.5)) brightness(1.1)';
+                            
                             drawEventConnectors(svgDoc, center.x, center.y, events);
                         });
 
@@ -648,6 +683,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         path.addEventListener('click', function (e) {
                             e.stopPropagation();
                             console.log('点击:', mapChineseName, '事件数:', events.length);
+                            // 显示省份名
+                            var provinceId = path.getAttribute('id');
+                            if (provinceId) {
+                                showProvinceLabel(svgDoc, provinceId);
+                            }
+                            // 点击时高亮省份
+                            this.style.fill = 'url(#mapHoverGradient)';
+                            this.style.stroke = COLORS.goldLight;
+                            this.style.strokeWidth = '3';
+                            this.style.filter = 'drop-shadow(0 4px 12px rgba(201,162,39,0.5)) brightness(1.1)';
                             // 绘制连接线
                             drawEventConnectors(svgDoc, center.x, center.y, events);
                         });
@@ -672,11 +717,57 @@ document.addEventListener('DOMContentLoaded', function () {
                 stroke-width: 1.2; 
                 stroke-linejoin: round; 
                 stroke-linecap: round; 
+                fill: url(#mapFillGradient);
             }
+            #features path.has-events { stroke-width: 1.6; }
+            #features path.has-events:hover { stroke-width: 2.2; }
             #label_points circle { fill: none; stroke: none; }
             #points circle { fill: ${COLORS.redPrimary}; stroke: ${COLORS.textLight}; stroke-width: 1.5; }
         `;
         defs.appendChild(style);
+
+        // 渐变：增强层次，采用低饱和暗红系避免刺眼
+        var gradFill = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        gradFill.setAttribute('id', 'mapFillGradient');
+        gradFill.setAttribute('x1', '0%');
+        gradFill.setAttribute('y1', '0%');
+        gradFill.setAttribute('x2', '0%');
+        gradFill.setAttribute('y2', '100%');
+
+        var stop1 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop1.setAttribute('offset', '0%');
+        stop1.setAttribute('stop-color', COLORS.mapRedTop);
+        stop1.setAttribute('stop-opacity', '0.95');
+        gradFill.appendChild(stop1);
+
+        var stop2 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        stop2.setAttribute('offset', '100%');
+        stop2.setAttribute('stop-color', COLORS.mapRedBottom);
+        stop2.setAttribute('stop-opacity', '0.95');
+        gradFill.appendChild(stop2);
+
+        defs.appendChild(gradFill);
+
+        var gradHover = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+        gradHover.setAttribute('id', 'mapHoverGradient');
+        gradHover.setAttribute('x1', '0%');
+        gradHover.setAttribute('y1', '0%');
+        gradHover.setAttribute('x2', '0%');
+        gradHover.setAttribute('y2', '100%');
+
+        var h1 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        h1.setAttribute('offset', '0%');
+        h1.setAttribute('stop-color', COLORS.mapRedHoverTop);
+        h1.setAttribute('stop-opacity', '0.98');
+        gradHover.appendChild(h1);
+
+        var h2 = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'stop');
+        h2.setAttribute('offset', '100%');
+        h2.setAttribute('stop-color', COLORS.mapRedHoverBottom);
+        h2.setAttribute('stop-opacity', '0.98');
+        gradHover.appendChild(h2);
+
+        defs.appendChild(gradHover);
     }
 
     var obj = document.getElementById('china-map-object');
