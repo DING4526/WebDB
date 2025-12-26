@@ -7,18 +7,23 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = '用户注册';
-$this->params['breadcrumbs'][] = $this->title;
+// $this->title = '用户注册';
+// $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <style>
 /* 注册页面样式 - 深色主题 */
 .site-signup {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 70vh;
-    padding: 40px 0;
+    overflow-y: auto;
+    padding: 20px 0;
 }
 
 .signup-container {
