@@ -800,8 +800,8 @@ a.desc:after { content: "\e152"; }
 /* === 动态时间标签样式 === */
 .timeline-label {
     position: fixed;
-    right: 40px;
-    bottom: 80px;
+    right: 100px;
+    bottom: 55px;
     background: linear-gradient(
         135deg,
         rgba(30, 25, 20, 0.95) 0%,
@@ -810,7 +810,7 @@ a.desc:after { content: "\e152"; }
     border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 20px 25px;
-    min-width: 200px;
+    min-width: 260px;
     max-width: 320px;
     z-index: 100;
     opacity: 0;
@@ -832,7 +832,7 @@ a.desc:after { content: "\e152"; }
 
 .timeline-label-year {
     font-family: "Georgia", "Times New Roman", serif;
-    font-size: 42px;
+    font-size: 46px;
     font-weight: bold;
     color: var(--gold-primary);
     line-height: 1;
@@ -842,7 +842,7 @@ a.desc:after { content: "\e152"; }
 }
 
 .timeline-label-date {
-    font-size: 16px;
+    font-size: 18px;
     color: var(--gold-muted);
     margin-bottom: 12px;
     font-weight: 500;
@@ -850,7 +850,7 @@ a.desc:after { content: "\e152"; }
 }
 
 .timeline-label-event {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-light);
     opacity: 0.9;
     line-height: 1.5;
@@ -886,7 +886,7 @@ a.desc:after { content: "\e152"; }
 /* === 动画控制按钮 === */
 .animation-controls {
     position: fixed;
-    left: 40px;
+    left: 100px;
     bottom: 80px;
     display: flex;
     flex-direction: column;

@@ -30,22 +30,26 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
         </div>
 
         <!-- 右侧竖排内容区 -->
-        <div class="right-side-content">
-            <!-- 主标题 -->
-            <div class="hero-title hero-text">
-                <div class="title-line">纪念</div>
-                <div class="title-line title-highlight">抗日战争</div>
-                <div class="title-line">胜利</div>
-                <div class="title-line title-number">80</div>
-                <div class="title-line">周年</div>
-            </div>
+<!-- 右侧三列竖排铭文 -->
+<div class="right-side-content right-columns">
 
-            <!-- 铭句 -->
-            <div class="vertical-slogan hero-text">
-                <div class="slogan-line">以时间作证，</div>
-                <div class="slogan-line">以数据铭记。</div>
-            </div>
-        </div>
+    <!-- 第一列：以数据铭记 -->
+    <div class="right-col col-main hero-text">
+        <div class="col-text">以数据铭记</div>
+    </div>
+
+    <!-- 第二列：以时间作证 -->
+    <div class="right-col col-main hero-text">
+        <div class="col-text">以时间作证</div>
+    </div>
+
+
+    <!-- 第三列：纪念说明 -->
+    <div class="right-col col-commem hero-text">
+        <div class="col-text">纪念中国人民抗日战争胜利80周年</div>
+    </div>
+
+</div>
 
         <!-- 动态时间标签 -->
         <div id="timeline-label" class="timeline-label">
