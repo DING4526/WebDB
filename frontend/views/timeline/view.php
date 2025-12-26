@@ -5,6 +5,7 @@ use yii\helpers\Url;
 /**
  * liyu 2311591
  * 详情页视图 - 深色主题优化版
+ * 注意：主题色变量定义在 site.css 中
  */
 
 /* @var $this yii\web\View */
@@ -19,18 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 // 注册深色主题样式
 $this->registerCss("
-    :root {
-        --gold-primary: #C9A227;
-        --gold-light: #D4AF37;
-        --gold-muted: #A88B2A;
-        --red-primary: #8B1A1A;
-        --red-hover: #A52A2A;
-        --text-light: #F5E6C8;
-        --text-dark: #1A1A1A;
-        --card-bg: rgba(30, 25, 20, 0.9);
-        --card-border: rgba(201, 162, 39, 0.2);
-    }
-
     .event-detail-container {
         background: var(--card-bg) !important;
         padding: 25px;
