@@ -35,6 +35,11 @@ $mediaForm    = $mediaForm ?? null;
 
 $imageList = array_filter($mediaList, fn($m) => $m->type === 'image');
 $docList   = array_filter($mediaList, fn($m) => $m->type === 'document');
+// Separate local files from links
+$isLink = fn($m) => preg_match('/^https?:\/\//i', $m->path);
+$linkList = array_filter($mediaList, fn($m) => $isLink($m));
+$localImageList = array_filter($imageList, fn($m) => !$isLink($m));
+$localDocList = array_filter($docList, fn($m) => !$isLink($m));
 $uploadsBase = '/advanced/frontend/web';
 
 $titleText = $isCreate ? '新增事件' : $model->title;
@@ -316,7 +321,7 @@ $subText = $isCreate
     <div class="we3-panel we3-panel-media">
       <div class="we3-panel-hd">
         <div class="we3-panel-title">媒资</div>
-        <div class="we3-panel-meta">图片 <?= count($imageList) ?> · 文档 <?= count($docList) ?></div>
+        <div class="we3-panel-meta">图片 <?= count($localImageList) ?> · 文档 <?= count($localDocList) ?> · 链接 <?= count($linkList) ?></div>
       </div>
 
       <div class="we3-panel-bd">
@@ -329,7 +334,7 @@ $subText = $isCreate
             ]) ?>
               <div class="we3-upload-modern">
                 <div class="we3-upload-hint">
-                  <span class="we3-upload-icon">🔗</span>
+                  <span class="we3-upload-icon">📁</span>
                   <div>
                     <div class="we3-upload-hint-title">上传媒资文件</div>
                     <div class="we3-upload-hint-desc">上传后自动识别类型，支持图片 / PDF / DOC 等</div>
@@ -345,6 +350,53 @@ $subText = $isCreate
                 </div>
               </div>
             <?= Html::endForm() ?> 
+          </div>
+
+          <!-- Link upload form -->
+          <div class="we3-editable-inline">
+            <?= Html::beginForm(['add-link', 'id' => $model->id], 'post', [
+              'id' => 'we3-link-form',
+            ]) ?>
+              <div class="we3-upload-modern we3-link-upload">
+                <div class="we3-upload-hint">
+                  <span class="we3-upload-icon">🔗</span>
+                  <div>
+                    <div class="we3-upload-hint-title">添加外部链接</div>
+                    <div class="we3-upload-hint-desc">添加文章、资料、视频等外部链接</div>
+                  </div>
+                </div>
+              </div>
+              <div class="we3-link-form-fields">
+                <div class="we3-miniGrid we3-miniGrid-link">
+                  <div class="we3-miniCol we3-miniCol-url">
+                    <div class="form-group">
+                      <label class="control-label">链接地址</label>
+                      <input type="url" name="link_url" class="form-control" placeholder="https://example.com/article" required>
+                    </div>
+                  </div>
+                  <div class="we3-miniCol">
+                    <div class="form-group">
+                      <label class="control-label">标题（可选）</label>
+                      <input type="text" name="link_title" class="form-control" placeholder="自动从链接提取">
+                    </div>
+                  </div>
+                  <div class="we3-miniCol">
+                    <div class="form-group">
+                      <label class="control-label">类型</label>
+                      <select name="link_type" class="form-control">
+                        <option value="document">文档/文章</option>
+                        <option value="image">图片</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="we3-miniCol we3-miniColBtn">
+                    <?= Html::submitButton('添加链接', [
+                      'class' => 'btn btn-soft-primary we3-btn we3-btn-block',
+                    ]) ?>
+                  </div>
+                </div>
+              </div>
+            <?= Html::endForm() ?>
           </div> 
 
 
@@ -403,7 +455,7 @@ $subText = $isCreate
             </div>
 
             <div class="we3-media-grid">
-              <?php foreach ($imageList as $m): ?>
+              <?php foreach ($localImageList as $m): ?>
                 <?php $url = $uploadsBase . '/' . ltrim($m->path, '/'); ?>
                 <div class="we3-media-card">
                   <a class="we3-media-thumb" href="<?= Html::encode($url) ?>" target="_blank" title="打开原图">
@@ -425,7 +477,7 @@ $subText = $isCreate
                   </div>
                 </div>
               <?php endforeach; ?>
-              <?php if (empty($imageList)): ?><div class="we3-empty">暂无图片</div><?php endif; ?>
+              <?php if (empty($localImageList)): ?><div class="we3-empty">暂无图片</div><?php endif; ?>
             </div>
           </div>
 
@@ -436,7 +488,7 @@ $subText = $isCreate
             </div>
 
             <div class="we3-media-grid">
-              <?php foreach ($docList as $m): ?>
+              <?php foreach ($localDocList as $m): ?>
                 <?php $url = $uploadsBase . '/' . ltrim($m->path, '/'); ?>
                 <div class="we3-media-card we3-media-card-doc">
                   <div class="we3-docicon">PDF</div>
@@ -456,7 +508,39 @@ $subText = $isCreate
                   </div>
                 </div>
               <?php endforeach; ?>
-              <?php if (empty($docList)): ?><div class="we3-empty">暂无文档</div><?php endif; ?>
+              <?php if (empty($localDocList)): ?><div class="we3-empty">暂无文档</div><?php endif; ?>
+            </div>
+          </div>
+
+          <!-- Links -->
+          <div class="we3-media-sec">
+            <div class="we3-media-sec-hd">
+              <div class="we3-mini">外部链接</div>
+            </div>
+
+            <div class="we3-media-grid">
+              <?php foreach ($linkList as $m): ?>
+                <?php $url = $m->path; ?>
+                <div class="we3-media-card we3-media-card-link">
+                  <div class="we3-linkicon">🔗</div>
+                  <div class="we3-media-main">
+                    <div class="we3-media-title">
+                      <?= Html::encode($m->title ?: '外部链接') ?>
+                    </div>
+                    <div class="we3-media-url"><?= Html::encode(mb_strlen($url) > 40 ? mb_substr($url, 0, 40) . '...' : $url) ?></div>
+                    <div class="we3-media-links">
+                      <?= Html::a('访问链接', $url, ['target' => '_blank', 'class' => 'we3-link', 'rel' => 'noopener noreferrer']) ?>
+                    </div>
+                  </div>
+                  <div class="we3-media-op we3-editable-inline">
+                    <?= Html::beginForm(['delete-media', 'id' => $model->id], 'post', ['class' => 'we3-miniop']) .
+                        Html::hiddenInput('media_id', $m->id) .
+                        Html::submitButton('删除', ['class' => 'btn btn-xs btn-soft-danger']) .
+                        Html::endForm(); ?>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+              <?php if (empty($linkList)): ?><div class="we3-empty">暂无外部链接</div><?php endif; ?>
             </div>
           </div>
         </div>
