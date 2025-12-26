@@ -487,12 +487,156 @@ a.desc:after { content: "\e152"; }
     }
 }
 
-/* --- 首页右侧竖排艺术字 - 优化视觉权重 --- */
-.vertical-slogan {
+/* ========================================
+   首页文案与标题系统
+   ======================================== */
+
+/* --- 页面加载遮罩 --- */
+.intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        rgba(25, 18, 12, 0.97) 0%,
+        rgba(15, 10, 5, 0.99) 100%
+    );
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    transition: opacity 1.2s ease-out;
+    pointer-events: auto;
+}
+
+.intro-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.intro-overlay.hidden {
+    display: none;
+}
+
+.intro-content {
+    text-align: center;
+    animation: intro-scale-in 0.8s var(--ease-out-quart) forwards;
+}
+
+@keyframes intro-scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.intro-title {
+    font-family: "STKaiti", "KaiTi", "楷体", "SimSun", serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--gold-primary);
+    letter-spacing: 0.5rem;
+    margin-bottom: 20px;
+    text-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(201, 162, 39, 0.3);
+}
+
+.intro-subtitle {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 1.8rem;
+    color: var(--gold-muted);
+    letter-spacing: 1rem;
+    opacity: 0.85;
+}
+
+/* --- 地图图注 (左上角) --- */
+.map-caption {
     position: absolute;
-    right: 6%;
+    left: 3%;
+    top: 80px;
+    z-index: 5;
+    font-family: "Microsoft YaHei", "SimHei", sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.map-caption .caption-label {
+    color: var(--gold-muted);
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.map-caption .caption-text {
+    opacity: 0.85;
+    letter-spacing: 0.1rem;
+}
+
+/* --- 右侧内容区 --- */
+.right-side-content {
+    position: absolute;
+    right: 4%;
     top: 50%;
     transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 40px;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* --- 主标题 (竖排) --- */
+.hero-title {
+    writing-mode: vertical-rl;
+    font-family: "STKaiti", "KaiTi", "楷体", "SimSun", serif;
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.hero-title .title-line {
+    font-size: 2rem;
+    color: var(--gold-primary);
+    letter-spacing: 0.3rem;
+    line-height: 1.4;
+    text-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(201, 162, 39, 0.2);
+    margin: 0 4px;
+}
+
+.hero-title .title-highlight {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--gold-light);
+}
+
+.hero-title .title-number {
+    font-family: "Georgia", "Times New Roman", serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    text-shadow: 
+        0 3px 8px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(201, 162, 39, 0.35);
+}
+
+/* --- 首页右侧竖排艺术字（铭句） --- */
+.vertical-slogan {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
     writing-mode: vertical-rl;
     font-family: "KaiTi", "STKaiti", "楷体", "SimSun", "宋体", serif;
     font-weight: 600;
@@ -501,25 +645,55 @@ a.desc:after { content: "\e152"; }
     user-select: none;
     cursor: default;
     opacity: 0;
-    animation: slogan-fade-in 1.5s var(--ease-out-quart) 0.5s forwards;
+    transform: translateX(20px);
 }
 
-@keyframes slogan-fade-in {
+/* 移除原来的动画,改用 JS 控制 */
+.vertical-slogan.hero-text {
+    animation: none;
+}
+
+/* 文案淡入动画 (通过 JS 添加 class) */
+.hero-text.animate-in {
+    animation: hero-fade-in 1s var(--ease-out-quart) forwards;
+}
+
+.hero-text.animate-in.delay-1 { animation-delay: 0.2s; }
+.hero-text.animate-in.delay-2 { animation-delay: 0.4s; }
+.hero-text.animate-in.delay-3 { animation-delay: 0.6s; }
+
+@keyframes hero-fade-in {
     from {
         opacity: 0;
-        transform: translateY(-50%) translateX(20px);
+        transform: translateX(20px);
     }
     to {
         opacity: 1;
-        transform: translateY(-50%) translateX(0);
+        transform: translateX(0);
+    }
+}
+
+/* 图注单独动画 */
+.map-caption.animate-in {
+    animation: caption-fade-in 0.8s var(--ease-out-quart) forwards;
+}
+
+@keyframes caption-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 0.9;
+        transform: translateY(0);
     }
 }
 
 .vertical-slogan .slogan-line {
-    font-size: 3.5rem;
+    font-size: 2.2rem;
     color: var(--gold-primary);
-    letter-spacing: 0.4rem;
-    margin: 0 12px;
+    letter-spacing: 0.3rem;
+    margin: 0 8px;
     line-height: 1.3;
     text-shadow: 
         0 2px 4px rgba(0, 0, 0, 0.4),
@@ -538,16 +712,28 @@ a.desc:after { content: "\e152"; }
 
 /* 响应式调整 */
 @media (max-width: 1400px) {
-    .vertical-slogan { right: 2%; }
-    .vertical-slogan .slogan-line { font-size: 2.5rem; }
+    .right-side-content { right: 2%; gap: 30px; }
+    .hero-title .title-line { font-size: 1.6rem; }
+    .hero-title .title-highlight { font-size: 2rem; }
+    .hero-title .title-number { font-size: 2.8rem; }
+    .vertical-slogan .slogan-line { font-size: 1.8rem; }
+    .intro-title { font-size: 2.8rem; }
 }
 
 @media (max-width: 1100px) {
-    .vertical-slogan .slogan-line { font-size: 2rem; }
+    .hero-title .title-line { font-size: 1.4rem; }
+    .hero-title .title-number { font-size: 2.4rem; }
+    .vertical-slogan .slogan-line { font-size: 1.5rem; }
+    .map-caption { font-size: 0.85rem; }
+    .intro-title { font-size: 2.2rem; letter-spacing: 0.3rem; }
+    .intro-subtitle { font-size: 1.4rem; letter-spacing: 0.6rem; }
 }
 
 @media (max-width: 992px) {
-    .vertical-slogan { display: none; }
+    .right-side-content { display: none; }
+    .map-caption { display: none; }
+    .intro-title { font-size: 1.8rem; }
+    .intro-subtitle { font-size: 1.1rem; }
 }
 
 /* === 弹窗遮罩背景 === */

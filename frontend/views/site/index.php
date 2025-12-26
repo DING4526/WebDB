@@ -5,9 +5,23 @@ use yii\helpers\Html;
 $this->title = '烽火记忆 · 抗战胜利80周年';
 ?>
 
+<!-- 页面加载遮罩层 -->
+<div id="intro-overlay" class="intro-overlay">
+    <div class="intro-content">
+        <h1 class="intro-title">纪念抗日战争胜利80周年</h1>
+        <p class="intro-subtitle">1945 — 2025</p>
+    </div>
+</div>
+
 <div class="site-index">
     <div class="body-content" style="position: fixed; top: 50px; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; margin: 0;">
         
+        <!-- 地图图注 - 左上角 -->
+        <div class="map-caption hero-text">
+            <span class="caption-label">【图注】</span>
+            <span class="caption-text">抗战历史地图（1931—1945）</span>
+        </div>
+
         <div id="china-map-wrapper" style="width: 100%; height: 100%; max-width: 1200px; display: flex; justify-content: center; align-items: center;">
             
             <object id="china-map-object" type="image/svg+xml" data="<?= \yii\helpers\BaseUrl::base(true) . '/images/china-map.svg' ?>" style="width:100%; height:100%; display:block;">
@@ -15,10 +29,22 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
             </object>
         </div>
 
-        <!-- 右侧竖排艺术字 -->
-        <div class="vertical-slogan">
-            <div class="slogan-line">以时间作证，</div>
-            <div class="slogan-line">以数据铭记。</div>
+        <!-- 右侧竖排内容区 -->
+        <div class="right-side-content">
+            <!-- 主标题 -->
+            <div class="hero-title hero-text">
+                <div class="title-line">纪念</div>
+                <div class="title-line title-highlight">抗日战争</div>
+                <div class="title-line">胜利</div>
+                <div class="title-line title-number">80</div>
+                <div class="title-line">周年</div>
+            </div>
+
+            <!-- 铭句 -->
+            <div class="vertical-slogan hero-text">
+                <div class="slogan-line">以时间作证，</div>
+                <div class="slogan-line">以数据铭记。</div>
+            </div>
         </div>
 
         <!-- 动态时间标签 -->
@@ -91,6 +117,7 @@ $baseWebUrl = \yii\helpers\BaseUrl::base(true);
 $this->registerJs("
     window._EVENT_INDEX_URL = " . json_encode($eventUrl) . ";
     window._BASE_WEB_URL = " . json_encode($baseWebUrl) . ";
+    window._AUTO_START_ANIMATION = true;  // 标记自动启动动画
 ", \yii\web\View::POS_HEAD);
 
 // 注册地图 JS

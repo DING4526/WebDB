@@ -1673,6 +1673,53 @@
                 stopAnimation();
             });
         }
+        
+        // 首次加载时自动启动动画序列
+        if (window._AUTO_START_ANIMATION) {
+            window._AUTO_START_ANIMATION = false; // 防止重复触发
+            runIntroSequence(svgDoc, activeData);
+        }
+    }
+
+    // 运行首页开场序列
+    function runIntroSequence(svgDoc, activeData) {
+        var introOverlay = document.getElementById('intro-overlay');
+        var heroTexts = document.querySelectorAll('.hero-text');
+        var mapCaption = document.querySelector('.map-caption');
+        
+        // 第一步: 显示开场遮罩 2.5 秒
+        setTimeout(function() {
+            // 开始淡出遮罩
+            if (introOverlay) {
+                introOverlay.classList.add('fade-out');
+            }
+            
+            // 淡出后显示文案
+            setTimeout(function() {
+                // 移除遮罩
+                if (introOverlay) {
+                    introOverlay.classList.add('hidden');
+                }
+                
+                // 错落显示文案元素
+                heroTexts.forEach(function(el, index) {
+                    el.classList.add('animate-in', 'delay-' + (index + 1));
+                });
+                
+                // 图注稍后显示
+                setTimeout(function() {
+                    if (mapCaption) {
+                        mapCaption.classList.add('animate-in');
+                    }
+                }, 400);
+                
+                // 文案显示后自动开始历史动画
+                setTimeout(function() {
+                    startAnimation(svgDoc, activeData);
+                }, 1200);
+                
+            }, 1000); // 遮罩淡出动画时长
+        }, 2500); // 遮罩显示时长
     }
 
     var obj = document.getElementById('china-map-object');
