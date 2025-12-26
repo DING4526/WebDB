@@ -34,38 +34,80 @@ $activeCtl = function($id) use ($cur) { return $cur === $id; };
   <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
   <?php $this->head() ?>
   <style>
-    /* 删除或注释掉下面这行，因为它会覆盖背景图片 */
-    /* body { background:#f7f9fb; } */
+    /* 导航栏样式优化 */
+    .navbar-inverse {
+      background: rgba(20, 15, 10, 0.95) !important;
+      border-bottom: 1px solid rgba(201, 162, 39, 0.2) !important;
+    }
+    .navbar-inverse .navbar-brand {
+      color: #C9A227 !important;
+    }
+    .navbar-inverse .navbar-brand b {
+      color: #F5E6C8 !important;
+    }
+    .navbar-inverse .navbar-nav > li > a {
+      color: #F5E6C8 !important;
+      transition: color 0.2s ease;
+    }
+    .navbar-inverse .navbar-nav > li > a:hover,
+    .navbar-inverse .navbar-nav > li > a:focus {
+      color: #C9A227 !important;
+      background: transparent !important;
+    }
+    .navbar-inverse .navbar-nav > .active > a,
+    .navbar-inverse .navbar-nav > .active > a:hover,
+    .navbar-inverse .navbar-nav > .active > a:focus {
+      color: #C9A227 !important;
+      background: rgba(201, 162, 39, 0.15) !important;
+    }
     
     .navbar-brand b { letter-spacing: .5px; }
-    .hero {
-      margin-top: 70px;
-      background: #ffffff;
-      border: 1px solid #eef1f5;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.04);
-      padding: 18px 18px;
+    .content-wrap { 
+      margin-top: 120px; 
+      position: relative;
+      z-index: 2;
     }
-    .hero h3 { margin-top:0; font-weight:800; }
-    .hero .btn { margin-right:8px; }
-    .content-wrap { margin-top: 120px; }
-    .footer { background:#fff; border-top:1px solid #eef1f5; }
+    .footer { 
+      background: rgba(20, 15, 10, 0.95) !important; 
+      border-top: 1px solid rgba(201, 162, 39, 0.2) !important;
+      color: #F5E6C8 !important;
+    }
+    
+    /* 面包屑导航样式 */
+    .breadcrumb {
+      background: rgba(30, 25, 20, 0.9) !important;
+      border: 1px solid rgba(201, 162, 39, 0.2) !important;
+      border-radius: 10px;
+    }
+    .breadcrumb > li + li:before {
+      color: #A88B2A;
+    }
+    .breadcrumb > li > a {
+      color: #C9A227;
+    }
+    .breadcrumb > .active {
+      color: #F5E6C8;
+    }
   </style>
 </head>
 <body>
 <?php $this->beginBody() ?>
 
+<!-- 全局背景遮罩层 -->
+<div class="background-overlay"></div>
+<div class="vignette-overlay"></div>
+
 <?php
 NavBar::begin([
   'brandLabel' => '<b>烽火记忆</b> · 抗战胜利80周年',
   'brandUrl' => Url::to(['/site/index']),
-  'options' => ['class' => 'navbar-inverse navbar-fixed-top'],
+  'options' => ['class' => 'navbar-inverse navbar-fixed-top', 'style' => 'background: rgba(20, 15, 10, 0.95); border-bottom: 1px solid rgba(201, 162, 39, 0.2);'],
 ]);
 
 $menuItemsLeft = [
   ['label' => '时间轴', 'url' => ['/timeline/index'], 'active' => $activeCtl('timeline')],
   ['label' => '人物库', 'url' => ['/person/index'], 'active' => $activeCtl('person')],
-  ['label' => '纪念留言', 'url' => ['/message/index'], 'active' => $activeCtl('message')],
+  // ['label' => '纪念留言', 'url' => ['/message/index'], 'active' => $activeCtl('message')],
 ];
 
 $menuItemsRight = [];
@@ -77,7 +119,7 @@ if (Yii::$app->user->isGuest) {
     . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
     . Html::submitButton('退出 (' . Html::encode(Yii::$app->user->identity->username) . ')', [
         'class' => 'btn btn-link',
-        'style' => 'color:#ddd;text-decoration:none;',
+        'style' => 'color:#C9A227;text-decoration:none;',
     ])
     . Html::endForm()
     . '</li>';
@@ -95,7 +137,7 @@ echo Nav::widget([
 NavBar::end();
 ?>
 
-<div class="container">
+<div class="container" style="position: relative; z-index: 2;">
          <!-- 顶部专题横幅（可留可删）  -->
   <!-- <div class="hero">
     <h3>抗战史实时间轴 · 人物群像数据库</h3>

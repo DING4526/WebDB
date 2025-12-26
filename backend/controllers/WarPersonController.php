@@ -35,6 +35,7 @@ class WarPersonController extends Controller
                             'publish', 'offline', 'toggle-status',
                             'attach-event', 'detach-event',
                             'add-media', 'delete-media', 'upload-media',
+                            'add-link',
                         ],
                         'matchCallback' => function () {
                             $user = Yii::$app->user->getUser();
@@ -55,6 +56,7 @@ class WarPersonController extends Controller
                     'add-media' => ['POST'],
                     'delete-media' => ['POST'],
                     'upload-media' => ['POST'],
+                    'add-link' => ['POST'],
                 ],
             ],
         ];
@@ -226,11 +228,57 @@ class WarPersonController extends Controller
         ]);
     }
 
+    public function actionAddLink($id)
+    {
+        $post = Yii::$app->request->post();
+        $url = trim($post['link_url'] ?? '');
+        $title = trim($post['link_title'] ?? '');
+        $type = trim($post['link_type'] ?? 'document');
+
+        if (empty($url)) {
+            Yii::$app->session->setFlash('error', '请输入链接地址');
+            return $this->redirect(['update', 'id' => $id]);
+        }
+
+        // Validate URL format
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            Yii::$app->session->setFlash('error', '请输入有效的链接地址');
+            return $this->redirect(['update', 'id' => $id]);
+        }
+
+        $media = new WarMedia();
+        $media->person_id = $id;
+        $media->type = $type;
+        $media->path = $url;
+        $media->title = $title ?: $this->extractTitleFromUrl($url);
+        $media->uploaded_at = time();
+
+        if ($media->save()) {
+            Yii::$app->session->setFlash('success', '链接已添加');
+        } else {
+            Yii::$app->session->setFlash('error', '链接保存失败');
+        }
+        return $this->redirect(['update', 'id' => $id]);
+    }
+
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
         Yii::$app->session->setFlash('success', '人物已删除');
         return $this->redirect(['index']);
+    }
+
+    protected function extractTitleFromUrl(string $url): string
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path && is_string($path)) {
+            $basename = basename($path);
+            if ($basename && $basename !== '/') {
+                return urldecode($basename);
+            }
+        }
+        $host = parse_url($url, PHP_URL_HOST);
+        return ($host && is_string($host)) ? $host : '外部链接';
     }
 
     protected function findModel($id)
@@ -325,6 +373,10 @@ class WarPersonController extends Controller
 
     protected function removePhysicalFile(string $relativePath): void
     {
+        // Skip URLs (external links)
+        if (preg_match('/^https?:\/\//i', $relativePath)) {
+            return;
+        }
         $suffix = ltrim(str_replace('uploads/war/', '', $relativePath), '/');
         $fullPath = Yii::getAlias('@uploadsWarRoot') . '/' . $suffix;
         if (is_file($fullPath)) {
