@@ -48,9 +48,9 @@ body {
     inset: 0;
     background: radial-gradient(
         ellipse 120% 100% at 50% 50%,
-        rgba(20, 10, 5, 0.55) 0%,
-        rgba(10, 5, 2, 0.8) 70%,
-        rgba(5, 2, 1, 0.9) 100%
+        rgba(20, 10, 5, 0.40) 0%,
+        rgba(10, 5, 2, 0.65) 70%,
+        rgba(5, 2, 1, 0.75) 100%
     );
     pointer-events: none;
     z-index: 0;
@@ -63,7 +63,7 @@ body {
     background: radial-gradient(
         ellipse 80% 70% at 50% 45%,
         transparent 30%,
-        rgba(0, 0, 0, 0.4) 100%
+        rgba(0, 0, 0, 0.25) 100%
     );
     pointer-events: none;
     z-index: 1;
@@ -461,7 +461,7 @@ a.desc:after { content: "\e152"; }
 
 /* 地图容器 - 减轻阴影 */
 #china-map-object {
-    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8));
     transition: filter var(--transition-slow) var(--ease-out-quart);
 }
 
