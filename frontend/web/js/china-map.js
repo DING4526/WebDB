@@ -115,13 +115,15 @@ document.addEventListener('DOMContentLoaded', function () {
         innerCircle.style.filter = 'drop-shadow(0 0 2px rgba(201, 162, 39, 0.6))';
         innerCircle.style.transition = transitionStyle;
         
-        // 添加柔和的呼吸动画
-        var breatheAnimation = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'animate');
-        breatheAnimation.setAttribute('attributeName', 'opacity');
-        breatheAnimation.setAttribute('values', '0.15;0.3;0.15');
-        breatheAnimation.setAttribute('dur', '3s');
-        breatheAnimation.setAttribute('repeatCount', 'indefinite');
-        outerCircle.appendChild(breatheAnimation);
+        // 添加柔和的呼吸动画 (检查 svgDoc 有效性)
+        if (svgDoc && svgDoc.createElementNS) {
+            var breatheAnimation = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'animate');
+            breatheAnimation.setAttribute('attributeName', 'opacity');
+            breatheAnimation.setAttribute('values', '0.15;0.3;0.15');
+            breatheAnimation.setAttribute('dur', '3s');
+            breatheAnimation.setAttribute('repeatCount', 'indefinite');
+            outerCircle.appendChild(breatheAnimation);
+        }
         
         // 添加圆点（从外到内）
         g.appendChild(outerCircle);
@@ -321,9 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
             itemG.style.transition = `opacity ${TIMING.normal}ms ${TIMING.easeOutQuart}`;
             
             // 延迟入场动画 - 依次展开
-            setTimeout(function(g) {
-                return function() { g.style.opacity = '1'; };
-            }(itemG), index * 60);
+            setTimeout(function() { itemG.style.opacity = '1'; }, index * 60);
             
             // 点击事件：打开详情弹窗
             itemG.onclick = function(e) {

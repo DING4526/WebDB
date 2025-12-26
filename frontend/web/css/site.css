@@ -506,6 +506,13 @@ a.desc:after { content: "\e152"; }
                 visibility var(--transition-normal) ease;
 }
 
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(3px)) {
+    .modal-backdrop-overlay {
+        background: rgba(0, 0, 0, 0.7);
+    }
+}
+
 .modal-backdrop-overlay.show {
     opacity: 1;
     visibility: visible;
