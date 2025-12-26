@@ -75,13 +75,61 @@ document.addEventListener('DOMContentLoaded', function () {
     var currentHighlightedPath = null;  // 跟踪当前高亮的省份
     var currentEventId = null;  // 跟踪当前打开弹窗的事件ID
 
+    // 特殊地名到省份的映射（硬编码）
+    var specialLocationMap = {
+        '北京': ['北京市'],
+        '北平': ['北京市'],
+        '宛平': ['北京市'],
+        '北京宛平': ['北京市'],
+        '卢沟桥': ['北京市'],
+        '天津': ['天津市'],
+        '北平/天津': ['北京市', '天津市'],
+        '西安': ['陕西省'],
+        '南京': ['江苏省'],
+        '沈阳': ['辽宁省'],
+        '太行山区': ['山西省', '河北省', '河南省'],
+        '太行山': ['山西省', '河北省', '河南省'],
+        '华北': ['北京市', '天津市', '河北省', '山西省', '内蒙古自治区'],
+    };
+
+
     function getEventsForMapName(mapName, data) {
-        for (var dbName in data) {
-            if (dbName === mapName || mapName.indexOf(dbName) > -1 || dbName.indexOf(mapName) > -1) {
-                return data[dbName];
+
+        var result = [];
+        var seenEventIds = new Set();   // ⭐ 去重核心
+
+        // 1️⃣ 直接拿该省已有事件
+        if (data[mapName] && Array.isArray(data[mapName])) {
+            data[mapName].forEach(function (ev) {
+                var id = ev.id || ev._id || JSON.stringify(ev);
+                if (!seenEventIds.has(id)) {
+                    seenEventIds.add(id);
+                    result.push(ev);
+                }
+            });
+        }
+
+        // 2️⃣ 扫描所有事件，检查是否有“特殊地名”应归属到该省
+        for (var locationKey in specialLocationMap) {
+            var provinces = specialLocationMap[locationKey];
+            if (!provinces.includes(mapName)) continue;
+
+            for (var province in data) {
+                if (!Array.isArray(data[province])) continue;
+
+                data[province].forEach(function (ev) {
+                    if (ev.location && ev.location.indexOf(locationKey) > -1) {
+                        var id = ev.id || ev._id || JSON.stringify(ev);
+                        if (!seenEventIds.has(id)) {
+                            seenEventIds.add(id);
+                            result.push(ev);
+                        }
+                    }
+                });
             }
         }
-        return null;
+
+        return result.length > 0 ? result : null;
     }
 
     // --- 绘制三层同心圆点 (带呼吸动画效果) ---
@@ -137,27 +185,34 @@ document.addEventListener('DOMContentLoaded', function () {
         g.appendChild(middleCircle);
         g.appendChild(innerCircle);
         
-        // --- 交互事件监听 - 使用更柔和的变化 ---
+        // 状态跟踪：记录是否处于 hover 状态
+        var isHovering = false;
+        
+        // --- 交互事件监听 - 增强交互效果 ---
         g.addEventListener('mouseenter', function() {
-            // 悬浮：温和放大，颜色变亮
-            innerCircle.setAttribute('r', '4');
-            innerCircle.setAttribute('fill', COLORS.goldLight);
+            isHovering = true;
+            // 悬浮：明显放大，颜色变亮，增加光晕
+            innerCircle.setAttribute('r', '5');  // 从4增加到5
+            innerCircle.setAttribute('fill', '#FFD700');  // 更亮的金色
             innerCircle.setAttribute('opacity', '1');
-            middleCircle.setAttribute('r', '8');
-            middleCircle.setAttribute('opacity', '0.6');
-            outerCircle.setAttribute('r', '14');
-            outerCircle.setAttribute('opacity', '0.35');
+            innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))';
+            middleCircle.setAttribute('r', '10');  // 从8增加到10
+            middleCircle.setAttribute('opacity', '0.7');  // 从0.6增加到0.7
+            outerCircle.setAttribute('r', '18');  // 从14增加到18
+            outerCircle.setAttribute('opacity', '0.45');  // 从0.35增加到0.45
         });
 
         g.addEventListener('mouseleave', function() {
+            isHovering = false;
             // 恢复原状
-            innerCircle.setAttribute('r', '2.5');
+            innerCircle.setAttribute('r', '3');
             innerCircle.setAttribute('fill', COLORS.goldLight);
-            innerCircle.setAttribute('opacity', '0.9');
-            middleCircle.setAttribute('r', '5');
-            middleCircle.setAttribute('opacity', '0.45');
-            outerCircle.setAttribute('r', '10');
-            outerCircle.setAttribute('opacity', '0.2');
+            innerCircle.setAttribute('opacity', '0.95');
+            innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(201, 162, 39, 0.7))';
+            middleCircle.setAttribute('r', '6');
+            middleCircle.setAttribute('opacity', '0.5');
+            outerCircle.setAttribute('r', '12');
+            outerCircle.setAttribute('opacity', '0.25');
         });
 
         g.addEventListener('click', function(e) {
@@ -168,12 +223,30 @@ document.addEventListener('DOMContentLoaded', function () {
             middleCircle.setAttribute('r', '12');
             outerCircle.setAttribute('r', '20');
             outerCircle.setAttribute('opacity', '0.6');
+            
             setTimeout(function() {
-                innerCircle.setAttribute('r', '5');
-                innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))';
-                middleCircle.setAttribute('r', '10');
-                outerCircle.setAttribute('r', '18');
-                outerCircle.setAttribute('opacity', '0.45');
+                // 恢复时检查是否还在 hover 状态
+                if (isHovering) {
+                    // 恢复到 hover 状态
+                    innerCircle.setAttribute('r', '5');
+                    innerCircle.setAttribute('fill', '#FFD700');
+                    innerCircle.setAttribute('opacity', '1');
+                    innerCircle.style.filter = 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.9))';
+                    middleCircle.setAttribute('r', '10');
+                    middleCircle.setAttribute('opacity', '0.7');
+                    outerCircle.setAttribute('r', '18');
+                    outerCircle.setAttribute('opacity', '0.45');
+                } else {
+                    // 恢复到初始状态
+                    innerCircle.setAttribute('r', '3');
+                    innerCircle.setAttribute('fill', COLORS.goldLight);
+                    innerCircle.setAttribute('opacity', '0.95');
+                    innerCircle.style.filter = 'drop-shadow(0 0 3px rgba(201, 162, 39, 0.7))';
+                    middleCircle.setAttribute('r', '6');
+                    middleCircle.setAttribute('opacity', '0.5');
+                    outerCircle.setAttribute('r', '12');
+                    outerCircle.setAttribute('opacity', '0.25');
+                }
             }, 200);  // 从150增加到200
 
             if (onClickCallback) onClickCallback(e);
@@ -275,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 angle = start + step * index;
             }
             
-            var fontSize = 13;  // 从18减少到13，减弱强调
+            var fontSize = 16;  // 从18减少到16，减弱强调
             var textStr = ev.title || '未命名事件';
             // 限制文字长度，超过10个字符截断
             if (textStr.length > 12) {
@@ -285,8 +358,11 @@ document.addEventListener('DOMContentLoaded', function () {
             for(var i=0; i<textStr.length; i++) {
                 textLen += (textStr.charCodeAt(i) > 255 ? 1 : 0.55);
             }
-            var rectWidth = textLen * fontSize + 16;  // 减少padding
-            var rectHeight = 26;  // 从36减少到26
+            // 定义内边距，让文字和矩形更协调
+            var paddingX = 10;
+            var paddingY = 8;
+            var rectWidth = textLen * fontSize + paddingX * 2;
+            var rectHeight = fontSize + paddingY * 2;
 
             var currentRadius = baseRadius;
             var endX, endY, rectX, rectY;
@@ -392,7 +468,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // 3. 矩形标签 - 使用深色背景
             var rect = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', rectX);
-            rect.setAttribute('y', rectY); 
+            rect.setAttribute('y', rectY);
+            rect.setAttribute('padding', '8'); 
             rect.setAttribute('width', rectWidth);
             rect.setAttribute('height', rectHeight);
             rect.setAttribute('fill', 'rgba(30, 25, 20, 0.9)');
@@ -402,9 +479,9 @@ document.addEventListener('DOMContentLoaded', function () {
             rect.style.filter = 'drop-shadow(1px 2px 3px rgba(0,0,0,0.3))';
             rect.style.transition = `fill ${TIMING.fast}ms ease, stroke ${TIMING.fast}ms ease`;
             
-            // 4. 文字 - 使用温暖的浅色
-            var textX = rectX + 9;
-            var textY = rectY + (rectHeight / 2) + (fontSize / 3);
+            // 4. 文字 - 使用温暖的浅色，位置基于内边距
+            var textX = rectX + paddingX;
+            var textY = rectY + paddingY + fontSize * 0.75;  // 基线对齐
             
             var text = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', textX);
@@ -469,20 +546,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!provinceLabel) {
             provinceLabel = svgDoc.createElementNS('http://www.w3.org/2000/svg', 'text');
             provinceLabel.setAttribute('id', 'province-label');
-            provinceLabel.setAttribute('font-size', '24');  // 从22增加到24
-            provinceLabel.setAttribute('font-weight', '700');  // 从500增加到700，更粗
+            provinceLabel.setAttribute('font-size', '26');
+            provinceLabel.setAttribute('font-weight', '600');
             provinceLabel.setAttribute('fill', COLORS.goldLight);
             provinceLabel.setAttribute('text-anchor', 'start');
             provinceLabel.setAttribute('font-family', '"STKaiti", "KaiTi", "STSong", "SimSun", serif');
-            provinceLabel.setAttribute('letter-spacing', '3');  // 从2增加到3
+            provinceLabel.setAttribute('letter-spacing', '2');
             provinceLabel.style.pointerEvents = 'none';
             provinceLabel.style.opacity = '0';
             provinceLabel.style.transition = `opacity ${TIMING.normal}ms ${TIMING.easeOutQuart}`;
-            // 增强文字描边和阴影，使其更清晰
-            provinceLabel.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.9)) drop-shadow(0 0 15px rgba(201,162,39,0.4))';
-            provinceLabel.setAttribute('stroke', '#000000');
-            provinceLabel.setAttribute('stroke-width', '0.5');
+            // 金字+白边+多层阴影，增强对比度
+            provinceLabel.setAttribute('stroke', '#FFFFFF');
+            provinceLabel.setAttribute('stroke-width', '1.5');
+            provinceLabel.setAttribute('stroke-linejoin', 'round');
+            provinceLabel.setAttribute('stroke-linecap', 'round');
             provinceLabel.setAttribute('paint-order', 'stroke fill');
+            provinceLabel.style.filter = 'drop-shadow(0 3px 5px rgba(0,0,0,0.9)) drop-shadow(0 0 8px rgba(0,0,0,0.7)) drop-shadow(0 0 15px rgba(201,162,39,0.4))';
             svgDoc.documentElement.appendChild(provinceLabel);
         }
         return provinceLabel;
