@@ -263,6 +263,49 @@ a.desc:after { content: "\e152"; }
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    cursor: pointer;
+    position: relative;
+    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+    border-radius: 12px;
+    padding: 8px;
+    margin: -8px;
+}
+
+#event-detail-modal .modal-content:hover {
+    transform: translateY(-2px);
+}
+
+#event-detail-modal .modal-content:active {
+    transform: translateY(0);
+}
+
+/* 点击提示 */
+#event-detail-modal .modal-click-hint {
+    position: absolute;
+    bottom: -8px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--gold-muted);
+    font-size: 12px;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast) ease, color var(--transition-fast) ease;
+}
+
+#event-detail-modal .modal-content:hover .modal-click-hint {
+    opacity: 1;
+    color: var(--gold-light);
+}
+
+#event-detail-modal .modal-click-hint .hint-icon {
+    font-size: 14px;
+    animation: hint-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes hint-arrow {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
 }
 
 /* 左侧图片区域 */
@@ -332,17 +375,13 @@ a.desc:after { content: "\e152"; }
     font-weight: 600;
     color: var(--text-light);
     margin-bottom: 8px;
-    cursor: pointer;
     transition: color var(--transition-fast) ease;
     font-family: "SimHei", "Microsoft YaHei", sans-serif;
     line-height: 1.3;
 }
 
-#event-detail-modal .event-title:hover {
+#event-detail-modal .modal-content:hover .event-title {
     color: var(--gold-light);
-    text-decoration: underline;
-    text-decoration-color: rgba(201, 162, 39, 0.5);
-    text-underline-offset: 3px;
 }
 
 #event-detail-modal .event-meta {

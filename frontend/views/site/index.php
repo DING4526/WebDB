@@ -32,8 +32,8 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
 
 <!-- 事件详情弹窗 -->
 <div id="event-detail-modal">
-    <div class="modal-close" onclick="closeEventModal()" title="关闭">×</div>
-    <div class="modal-content">
+    <div class="modal-close" onclick="event.stopPropagation(); closeEventModal();" title="关闭">×</div>
+    <div class="modal-content" onclick="navigateToEvent()">
         <!-- 左侧单图 -->
         <div class="modal-image-container">
             <img id="modal-image" src="" alt="事件图片">
@@ -60,6 +60,11 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
                 </div>
             </div>
         </div>
+        <!-- 点击提示 -->
+        <div class="modal-click-hint">
+            <span class="hint-icon">→</span>
+            <span class="hint-text">点击查看详情</span>
+        </div>
     </div>
 </div>
 
@@ -83,6 +88,24 @@ function closeEventModal() {
     var backdrop = document.getElementById('modal-backdrop');
     modal.classList.remove('show');
     if (backdrop) backdrop.classList.remove('show');
+}
+
+// 导航到事件详情页
+function navigateToEvent() {
+    var modal = document.getElementById('event-detail-modal');
+    var eventId = modal.getAttribute('data-event-id');
+    if (!eventId) return;
+    
+    var url = window._EVENT_INDEX_URL || '/event/index';
+    if (url.indexOf('event%2Findex') > -1) {
+        url = url.replace('event%2Findex', 'timeline%2Fview') + '&id=' + eventId;
+    } else if (url.indexOf('event/index') > -1) {
+        url = url.replace('event/index', 'timeline/view');
+        url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + eventId;
+    } else {
+        url += (url.indexOf('?') > -1 ? '&' : '?') + 'id=' + eventId;
+    }
+    window.open(url, '_blank');
 }
 
 // ESC 键关闭弹窗
