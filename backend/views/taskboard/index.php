@@ -159,8 +159,8 @@ $p2 = [
     </div>
   </div>
 
-  <div class="alert alert-info" style="margin-top:14px;border-radius:18px;">
+  <!-- <div class="alert alert-info" style="margin-top:14px;border-radius:18px;">
     <strong>用法建议：</strong>每次开会只更新两处：①里程碑状态 ②每个人的"本周交付/阻塞"。其余不改。
-  </div>
+  </div> -->
 
 </div>
