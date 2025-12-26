@@ -15,8 +15,8 @@ use yii\helpers\Url;
 /* @var $articles common\models\WarMedia[] */
 
 $this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => '时间轴', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+// $this->params['breadcrumbs'][] = ['label' => '时间轴', 'url' => ['index']];
+// $this->params['breadcrumbs'][] = $this->title;
 
 // 注册深色主题样式（统一风格）
 $this->registerCss("
