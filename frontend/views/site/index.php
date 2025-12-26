@@ -8,8 +8,9 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
 <!-- 页面加载遮罩层 -->
 <div id="intro-overlay" class="intro-overlay">
     <div class="intro-content">
-        <h1 class="intro-title">纪念抗日战争胜利80周年</h1>
-        <p class="intro-subtitle">1945 — 2025</p>
+        <h1 class="intro-title">纪念中国人民抗日战争胜利80周年</h1>
+        <!-- <h2 class="intro-subtitle">暨世界反法西斯战争胜利80周年</h2> -->
+        <p class="intro-subsubtitle">1945 — 2025</p>
     </div>
 </div>
 
@@ -27,17 +28,12 @@ $this->title = '烽火记忆 · 抗战胜利80周年';
         <div class="homepage-text-area">
             <!-- 铭句 - 主视觉效果，偏左，大字 -->
             <div class="motto-text hero-text" id="motto-text">
-                <div class="motto-line">以时间作证</div>
                 <div class="motto-line">以数据铭记</div>
+                <div class="motto-line">以时间作证</div>
             </div>
 
-            <!-- 标题 - 标注效果，偏右，小字 -->
-            <div class="commem-text hero-text" id="commem-text">
-                <div class="commem-line">纪念</div>
-                <div class="commem-line">抗日战争胜利</div>
-                <div class="commem-line commem-number">80</div>
-                <div class="commem-line">周年</div>
-            </div>
+            <!-- 分隔竖线 -->
+            <div class="vertical-divider"></div>
 
             <!-- 图注 - 大标题，最右侧 -->
             <div class="map-title hero-text" id="map-title">

@@ -1688,28 +1688,91 @@
         var commemText = document.getElementById('commem-text');
         var mapTitle = document.getElementById('map-title');
         
+        var skipIntro = false;
+        var introTimeout;
+        var fadeTimeout;
+        
+        // 跳过开场动画的函数
+        function skipToMainContent() {
+            if (skipIntro) return;
+            skipIntro = true;
+            
+            // 清除所有定时器
+            if (introTimeout) clearTimeout(introTimeout);
+            if (fadeTimeout) clearTimeout(fadeTimeout);
+            
+            // 立即隐藏遮罩
+            if (introOverlay) {
+                introOverlay.classList.add('fade-out');
+                setTimeout(function() {
+                    introOverlay.classList.add('hidden');
+                }, 300);
+            }
+            
+            // 获取竖线元素
+            var verticalDivider = document.querySelector('.vertical-divider');
+            
+            // 立即显示所有文案元素
+            if (mottoText) {
+                mottoText.classList.add('animate-in', 'delay-1');
+            }
+            if (verticalDivider) {
+                setTimeout(function() {
+                    verticalDivider.classList.add('animate-in');
+                }, 350);
+            }
+            if (mapTitle) {
+                mapTitle.classList.add('animate-in', 'delay-3');
+            }
+            
+            // 短暂延迟后开始历史动画
+            setTimeout(function() {
+                startAnimation(svgDoc, activeData);
+            }, 800);
+        }
+        
+        // 点击或按键跳过
+        if (introOverlay) {
+            introOverlay.style.cursor = 'pointer';
+            introOverlay.addEventListener('click', skipToMainContent);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                    skipToMainContent();
+                }
+            }, { once: true });
+        }
+        
         // 第一步: 显示开场遮罩 2.5 秒
-        setTimeout(function() {
+        introTimeout = setTimeout(function() {
+            if (skipIntro) return;
+            
             // 开始淡出遮罩
             if (introOverlay) {
                 introOverlay.classList.add('fade-out');
             }
             
             // 淡出后显示文案
-            setTimeout(function() {
+            fadeTimeout = setTimeout(function() {
+                if (skipIntro) return;
+                
                 // 移除遮罩
                 if (introOverlay) {
                     introOverlay.classList.add('hidden');
                 }
+                
+                // 获取竖线元素
+                var verticalDivider = document.querySelector('.vertical-divider');
                 
                 // 错落显示文案元素 - 按特定顺序
                 // 1. 铭句（主视觉）先显示
                 if (mottoText) {
                     mottoText.classList.add('animate-in', 'delay-1');
                 }
-                // 2. 标题（标注）
-                if (commemText) {
-                    commemText.classList.add('animate-in', 'delay-2');
+                // 2. 竖线分隔符
+                if (verticalDivider) {
+                    setTimeout(function() {
+                        verticalDivider.classList.add('animate-in');
+                    }, 350);
                 }
                 // 3. 图注（大标题）
                 if (mapTitle) {
