@@ -5,10 +5,6 @@ use yii\helpers\Html;
 $this->title = '烽火记忆 · 抗战胜利80周年';
 ?>
 
-<!-- 背景遮罩层 - 压低背景对比度 -->
-<div class="background-overlay"></div>
-<div class="vignette-overlay"></div>
-
 <div class="site-index">
     <div class="body-content" style="position: fixed; top: 50px; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; padding: 0; margin: 0;">
         

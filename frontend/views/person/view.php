@@ -2,7 +2,7 @@
 
 /**
  * 苏奕扬 2311330
- * 前台人物详情视图
+ * 前台人物详情视图 - 深色主题优化版
  */
 
 use yii\helpers\Html;
@@ -11,8 +11,21 @@ use yii\helpers\Url;
 /** @var \common\models\WarPerson $model */
 $this->title = $model->name . ' - 抗战人物志';
 
-// 注册 CSS
+// 注册深色主题 CSS
 $this->registerCss("
+    /* === 主题色变量 === */
+    :root {
+        --gold-primary: #C9A227;
+        --gold-light: #D4AF37;
+        --gold-muted: #A88B2A;
+        --red-primary: #8B1A1A;
+        --red-hover: #A52A2A;
+        --text-light: #F5E6C8;
+        --text-dark: #1A1A1A;
+        --card-bg: rgba(30, 25, 20, 0.9);
+        --card-border: rgba(201, 162, 39, 0.2);
+    }
+
     /* 页面头部 */
     .page-header {
         margin: 20px 0 30px;
@@ -20,33 +33,37 @@ $this->registerCss("
         text-align: center;
     }
     .page-title {
-        color: #8b0000;
+        color: var(--gold-primary) !important;
         font-weight: bold;
         margin-bottom: 10px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     .page-subtitle {
-        color: #a94442;
+        color: var(--text-dark) !important;
         font-size: 18px;
-        background: #fff5f5;
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted)) !important;
         display: inline-block;
-        padding: 5px 15px;
+        padding: 5px 20px;
         border-radius: 20px;
+        font-weight: 600;
     }
 
     /* 通用卡片样式 */
     .content-card {
-        background: #fff;
-        border: 1px solid #e1e4e8;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         padding: 25px;
         margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
     .section-title {
-        color: #8b0000;
+        color: var(--gold-primary) !important;
         font-size: 20px;
         font-weight: bold;
-        border-left: 5px solid #a94442;
+        border-left: 5px solid var(--gold-primary) !important;
         padding-left: 15px;
         margin-bottom: 20px;
         margin-top: 0;
@@ -54,11 +71,11 @@ $this->registerCss("
 
     /* 人物信息区 */
     .person-image-box {
-        border-radius: 8px;
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         margin-bottom: 20px;
-        border: 4px solid #fff;
+        border: 3px solid var(--gold-muted) !important;
     }
     .person-image-box img {
         width: 100%;
@@ -68,8 +85,21 @@ $this->registerCss("
     .person-intro-text {
         font-size: 16px;
         line-height: 1.8;
-        color: #444;
+        color: var(--text-light) !important;
         text-indent: 2em;
+        opacity: 0.9;
+    }
+    .person-intro-text p {
+        color: var(--text-light) !important;
+    }
+
+    /* 简介文字 */
+    .content-card p {
+        color: var(--text-light) !important;
+        opacity: 0.85;
+    }
+    .content-card .text-muted {
+        color: rgba(245, 230, 200, 0.6) !important;
     }
 
     /* 事件列表 */
@@ -80,7 +110,7 @@ $this->registerCss("
     .event-item {
         position: relative;
         padding: 15px 15px 15px 30px;
-        border-bottom: 1px dashed #eee;
+        border-bottom: 1px dashed var(--card-border);
         transition: all 0.3s;
     }
     .event-item:last-child {
@@ -93,44 +123,134 @@ $this->registerCss("
         top: 22px;
         width: 10px;
         height: 10px;
-        background: #a94442;
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted));
         border-radius: 50%;
+        box-shadow: 0 0 8px rgba(201, 162, 39, 0.4);
     }
     .event-item:hover {
-        background-color: #fff9f9;
+        background-color: rgba(201, 162, 39, 0.08);
+        border-radius: 8px;
     }
     .event-date {
         font-weight: bold;
-        color: #a94442;
+        color: var(--gold-primary) !important;
         margin-right: 10px;
     }
     .event-title {
-        color: #333;
+        color: var(--text-light) !important;
+    }
+    .event-item .text-danger {
+        color: var(--gold-muted) !important;
+    }
+    .event-item .text-danger:hover {
+        color: var(--gold-light) !important;
+    }
+
+    /* 相关文章列表 */
+    .list-group {
+        margin-bottom: 0;
+    }
+    .list-group-item {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1px solid var(--card-border) !important;
+        color: var(--text-light) !important;
+        padding: 12px 20px;
+        transition: all 0.2s ease;
+    }
+    .list-group-item:last-child {
+        border-bottom: none !important;
+    }
+    .list-group-item:hover {
+        background: rgba(201, 162, 39, 0.1) !important;
+        color: var(--gold-light) !important;
+        padding-left: 25px;
+    }
+    .list-group-item .glyphicon {
+        color: var(--gold-muted);
+    }
+    .list-group-item .glyphicon-new-window {
+        color: rgba(245, 230, 200, 0.3) !important;
     }
 
     /* 留言区 */
     .comment-item {
-        border-bottom: 1px solid #f0f0f0;
+        border-bottom: 1px solid var(--card-border) !important;
         padding: 15px 0;
     }
     .comment-item:last-child {
-        border-bottom: none;
+        border-bottom: none !important;
     }
     .comment-header {
         margin-bottom: 8px;
     }
     .comment-user {
         font-weight: bold;
-        color: #8b0000;
+        color: var(--gold-primary) !important;
     }
     .comment-time {
-        color: #999;
+        color: rgba(245, 230, 200, 0.5) !important;
         font-size: 12px;
         float: right;
     }
     .comment-content {
-        color: #555;
+        color: var(--text-light) !important;
         line-height: 1.6;
+        opacity: 0.9;
+    }
+
+    /* 提示框 */
+    .alert-warning {
+        background: rgba(201, 162, 39, 0.15) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-light) !important;
+    }
+
+    /* 留言表单 */
+    .comment-form {
+        background: rgba(20, 15, 10, 0.6) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 12px;
+    }
+    .comment-form h4 {
+        color: var(--gold-primary) !important;
+    }
+    .comment-form .form-control {
+        background: rgba(30, 25, 20, 0.8) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-light) !important;
+        border-radius: 8px;
+    }
+    .comment-form .form-control::placeholder {
+        color: rgba(245, 230, 200, 0.4);
+    }
+    .comment-form .form-control:focus {
+        border-color: var(--gold-muted) !important;
+        box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.1) !important;
+    }
+    .comment-form .btn-danger {
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted)) !important;
+        border: none !important;
+        color: var(--text-dark) !important;
+        font-weight: 600;
+    }
+    .comment-form .btn-danger:hover {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold-primary)) !important;
+    }
+
+    /* 滚动条 */
+    .comments-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    .comments-list::-webkit-scrollbar-track {
+        background: rgba(201, 162, 39, 0.05);
+    }
+    .comments-list::-webkit-scrollbar-thumb {
+        background: rgba(201, 162, 39, 0.25);
+        border-radius: 3px;
+    }
+    .comments-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(201, 162, 39, 0.4);
     }
 ");
 ?>

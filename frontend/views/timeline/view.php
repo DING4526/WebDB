@@ -4,7 +4,7 @@ use yii\helpers\Url;
 
 /**
  * liyu 2311591
- * 详情页视图
+ * 详情页视图 - 深色主题优化版
  */
 
 /* @var $this yii\web\View */
@@ -16,6 +16,211 @@ use yii\helpers\Url;
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => '时间轴', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+// 注册深色主题样式
+$this->registerCss("
+    :root {
+        --gold-primary: #C9A227;
+        --gold-light: #D4AF37;
+        --gold-muted: #A88B2A;
+        --red-primary: #8B1A1A;
+        --red-hover: #A52A2A;
+        --text-light: #F5E6C8;
+        --text-dark: #1A1A1A;
+        --card-bg: rgba(30, 25, 20, 0.9);
+        --card-border: rgba(201, 162, 39, 0.2);
+    }
+
+    .event-detail-container {
+        background: var(--card-bg) !important;
+        padding: 25px;
+        border-radius: 16px;
+        border: 1px solid var(--card-border);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .event-detail-container .page-header {
+        margin: 10px 0 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--card-border) !important;
+    }
+
+    .event-detail-container .page-header h2 {
+        color: var(--gold-primary) !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .event-detail-container .page-header .glyphicon {
+        color: var(--gold-muted) !important;
+    }
+
+    .event-detail-container .page-header > div {
+        color: var(--text-light) !important;
+        opacity: 0.8;
+    }
+
+    .event-detail-container .article-body {
+        color: var(--text-light) !important;
+        opacity: 0.9;
+    }
+
+    /* 轮播图 */
+    #event-carousel {
+        border: 1px solid var(--card-border);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .carousel-indicators li {
+        border-color: var(--gold-primary) !important;
+    }
+
+    .carousel-indicators .active {
+        background-color: var(--gold-primary) !important;
+    }
+
+    /* 侧边栏面板 */
+    .panel-default {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-top: 3px solid var(--gold-primary) !important;
+    }
+
+    .panel-heading {
+        background: transparent !important;
+        border-bottom: 1px solid var(--card-border) !important;
+    }
+
+    .panel-title {
+        color: var(--gold-primary) !important;
+    }
+
+    .panel-body {
+        color: var(--text-light);
+    }
+
+    .panel-body .text-muted {
+        color: rgba(245, 230, 200, 0.6) !important;
+    }
+
+    .panel-body a {
+        color: var(--text-light) !important;
+        transition: color 0.2s ease;
+    }
+
+    .panel-body a:hover {
+        color: var(--gold-light) !important;
+    }
+
+    .img-thumbnail {
+        background: var(--card-bg) !important;
+        border-color: var(--gold-muted) !important;
+    }
+
+    /* 列表项 */
+    .list-group-item {
+        background: transparent !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-light) !important;
+        transition: all 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        background: rgba(201, 162, 39, 0.1) !important;
+        color: var(--gold-light) !important;
+    }
+
+    .list-group-item .glyphicon {
+        color: var(--gold-muted);
+    }
+
+    /* 提示框 */
+    .alert-warning {
+        background: rgba(201, 162, 39, 0.15) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-light) !important;
+    }
+
+    .alert-info {
+        background: rgba(30, 25, 20, 0.8) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-light) !important;
+    }
+
+    /* 留言区 */
+    .content-card {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+    }
+
+    .section-title {
+        color: var(--gold-primary) !important;
+        border-left-color: var(--gold-primary) !important;
+    }
+
+    .section-title small {
+        color: rgba(245, 230, 200, 0.6) !important;
+    }
+
+    .comment-item {
+        border-bottom-color: var(--card-border) !important;
+    }
+
+    .comment-user {
+        color: var(--gold-primary) !important;
+    }
+
+    .comment-time {
+        color: rgba(245, 230, 200, 0.5) !important;
+    }
+
+    .comment-content {
+        color: var(--text-light) !important;
+        opacity: 0.9;
+    }
+
+    /* 表单区域 */
+    .comment-form {
+        background: rgba(20, 15, 10, 0.6) !important;
+        border: 1px solid var(--card-border) !important;
+    }
+
+    .comment-form h4 {
+        color: var(--gold-primary) !important;
+    }
+
+    .comment-form .form-control {
+        background: rgba(30, 25, 20, 0.8) !important;
+        border-color: var(--card-border) !important;
+        color: var(--text-light) !important;
+    }
+
+    .comment-form .form-control::placeholder {
+        color: rgba(245, 230, 200, 0.4);
+    }
+
+    .comment-form .form-control:focus {
+        border-color: var(--gold-muted) !important;
+        box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.1) !important;
+    }
+
+    .comment-form .btn-danger {
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-muted)) !important;
+        border: none !important;
+        color: var(--text-dark) !important;
+        font-weight: 600;
+    }
+
+    .comment-form .btn-danger:hover {
+        background: linear-gradient(135deg, var(--gold-light), var(--gold-primary)) !important;
+    }
+
+    .comment-form .text-muted {
+        color: rgba(245, 230, 200, 0.5) !important;
+    }
+");
 ?>
 
 <div class="event-detail-container" style="background: #fff; padding: 20px; border-radius: 8px;">
