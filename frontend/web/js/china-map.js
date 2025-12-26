@@ -1095,13 +1095,15 @@
     
     var animationState = {
         isPlaying: false,
+        isPaused: false,  // 新增：暂停状态
         currentStep: 0,
         allEvents: [],
         timeouts: [],
         svgDoc: null,
         arrowLayer: null,
         previousLocation: null,
-        interactionBlocked: false  // 动画期间阻止其他交互
+        interactionBlocked: false,  // 动画期间阻止其他交互
+        activeData: null  // 新增：保存数据用于恢复播放
     };
 
     // 根据事件的location解析对应的省份名（用于动画时匹配省份路径）
@@ -1460,16 +1462,22 @@
 
     // 开始播放动画
     function startAnimation(svgDoc, activeData) {
-        if (animationState.isPlaying) return;
+        if (animationState.isPlaying && !animationState.isPaused) return;
         
         animationState.isPlaying = true;
+        animationState.isPaused = false;
         animationState.interactionBlocked = true;  // 阻止其他交互
         animationState.svgDoc = svgDoc;
-        animationState.currentStep = 0;
-        animationState.previousLocation = null;
-        animationState.allEvents = getAllEventsSorted(activeData);
+        animationState.activeData = activeData;  // 保存数据
         
-        console.log('[Animation] 开始播放，共 ' + animationState.allEvents.length + ' 个事件');
+        // 如果不是从暂停恢复，重置状态
+        if (animationState.currentStep === 0 || !animationState.allEvents || animationState.allEvents.length === 0) {
+            animationState.currentStep = 0;
+            animationState.previousLocation = null;
+            animationState.allEvents = getAllEventsSorted(activeData);
+        }
+        
+        console.log('[Animation] 开始播放，共 ' + animationState.allEvents.length + ' 个事件，当前步骤: ' + animationState.currentStep);
         
         // 更新按钮状态
         var playBtn = document.getElementById('btn-play-animation');
@@ -1483,8 +1491,10 @@
         // 添加交互阻止遮罩
         addInteractionBlocker();
         
-        // 创建箭头图层
-        createArrowLayer(svgDoc);
+        // 创建箭头图层（如果还没有）
+        if (!svgDoc.getElementById('arrow-layer')) {
+            createArrowLayer(svgDoc);
+        }
         
         // 开始播放
         playNextEvent();
@@ -1492,7 +1502,7 @@
 
     // 播放下一个事件
     function playNextEvent() {
-        if (!animationState.isPlaying) return;
+        if (!animationState.isPlaying || animationState.isPaused) return;
         
         if (animationState.currentStep >= animationState.allEvents.length) {
             // 动画结束
@@ -1548,9 +1558,48 @@
         }
     }
 
+    // 暂停动画
+    function pauseAnimation() {
+        if (!animationState.isPlaying || animationState.isPaused) return;
+        
+        console.log('[Animation] 暂停于步骤 ' + animationState.currentStep);
+        animationState.isPaused = true;
+        
+        // 清除所有定时器
+        animationState.timeouts.forEach(function(t) {
+            clearTimeout(t);
+        });
+        animationState.timeouts = [];
+        
+        // 更新按钮状态
+        var playBtn = document.getElementById('btn-play-animation');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="glyphicon glyphicon-play"></i><span>继续</span>';
+        }
+    }
+    
+    // 恢复动画
+    function resumeAnimation() {
+        if (!animationState.isPlaying || !animationState.isPaused) return;
+        
+        console.log('[Animation] 从步骤 ' + animationState.currentStep + ' 继续');
+        animationState.isPaused = false;
+        
+        // 更新按钮状态
+        var playBtn = document.getElementById('btn-play-animation');
+        if (playBtn) {
+            playBtn.innerHTML = '<i class="glyphicon glyphicon-pause"></i><span>暂停</span>';
+        }
+        
+        // 继续播放
+        playNextEvent();
+    }
+
     // 停止动画
     function stopAnimation() {
+        console.log('[Animation] 停止动画');
         animationState.isPlaying = false;
+        animationState.isPaused = false;
         animationState.interactionBlocked = false;  // 恢复交互
         
         // 清除所有定时器
@@ -1561,6 +1610,11 @@
         
         // 移除交互阻止遮罩
         removeInteractionBlocker();
+        
+        // 重置状态
+        animationState.currentStep = 0;
+        animationState.allEvents = [];
+        animationState.activeData = null;
         
         // 恢复UI
         var playBtn = document.getElementById('btn-play-animation');
@@ -1601,9 +1655,14 @@
         
         if (playBtn) {
             playBtn.addEventListener('click', function() {
-                if (animationState.isPlaying) {
-                    stopAnimation();
+                if (animationState.isPlaying && !animationState.isPaused) {
+                    // 正在播放 -> 暂停
+                    pauseAnimation();
+                } else if (animationState.isPaused) {
+                    // 已暂停 -> 继续
+                    resumeAnimation();
                 } else {
+                    // 未开始 -> 开始播放
                     startAnimation(svgDoc, activeData);
                 }
             });
