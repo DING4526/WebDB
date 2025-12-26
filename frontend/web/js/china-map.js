@@ -1104,22 +1104,53 @@
         interactionBlocked: false  // 动画期间阻止其他交互
     };
 
+    // 根据事件的location解析对应的省份名（用于动画时匹配省份路径）
+    function resolveProvinceForEvent(event, dataKey) {
+        var location = event.location || '';
+        
+        // 1. 首先检查事件的location是否匹配特殊地名
+        for (var locationKey in specialLocationMap) {
+            if (location.indexOf(locationKey) > -1) {
+                // 返回第一个匹配的省份（对于跨省事件取第一个）
+                return specialLocationMap[locationKey][0];
+            }
+        }
+        
+        // 2. 如果dataKey本身就是省份名，直接返回
+        // 检查是否在provinceMap的值中
+        for (var engName in provinceMap) {
+            if (provinceMap[engName] === dataKey) {
+                return dataKey;
+            }
+        }
+        
+        // 3. 如果dataKey是特殊地名，解析为省份
+        if (specialLocationMap[dataKey]) {
+            return specialLocationMap[dataKey][0];
+        }
+        
+        // 4. 默认返回dataKey（可能是未识别的省份名）
+        return dataKey;
+    }
+
     // 获取所有事件并按时间排序
     function getAllEventsSorted(activeData) {
         var allEvents = [];
         var seenIds = new Set();
         
-        for (var province in activeData) {
-            if (!Array.isArray(activeData[province])) continue;
-            activeData[province].forEach(function(event) {
+        for (var dataKey in activeData) {
+            if (!Array.isArray(activeData[dataKey])) continue;
+            activeData[dataKey].forEach(function(event) {
                 // Use event id, _id, or a composite key based on title+date+location
                 var id = event.id || event._id || 
                     (event.title || '') + '_' + (event.event_date || '') + '_' + (event.location || '');
                 if (!seenIds.has(id)) {
                     seenIds.add(id);
+                    // 解析事件对应的省份名，确保能匹配到地图路径
+                    var resolvedProvince = resolveProvinceForEvent(event, dataKey);
                     allEvents.push({
                         event: event,
-                        province: province,
+                        province: resolvedProvince,
                         date: event.event_date || '1931-01-01'
                     });
                 }
