@@ -26,6 +26,13 @@ document.addEventListener('DOMContentLoaded', function () {
         easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
     };
 
+    // === 几何常量 ===
+    var GEOMETRY = {
+        minArrowDistance: 20,  // 绘制箭头的最小距离
+        arrowStartOffset: 15,  // 箭头起点偏移
+        arrowEndOffset: 20     // 箭头终点偏移
+    };
+
     var baseUrl = window._EVENT_INDEX_URL || '/event/index';
 
     
@@ -908,7 +915,9 @@ document.addEventListener('DOMContentLoaded', function () {
         for (var province in activeData) {
             if (!Array.isArray(activeData[province])) continue;
             activeData[province].forEach(function(event) {
-                var id = event.id || event._id || JSON.stringify(event);
+                // Use event id, _id, or a composite key based on title+date+location
+                var id = event.id || event._id || 
+                    (event.title || '') + '_' + (event.event_date || '') + '_' + (event.location || '');
                 if (!seenIds.has(id)) {
                     seenIds.add(id);
                     allEvents.push({
@@ -989,19 +998,17 @@ document.addEventListener('DOMContentLoaded', function () {
         var dy = toCenter.y - fromCenter.y;
         var distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance < 20) return null; // 距离太近不画箭头
+        if (distance < GEOMETRY.minArrowDistance) return null; // 距离太近不画箭头
         
         // 归一化方向
         var nx = dx / distance;
         var ny = dy / distance;
         
         // 起点和终点偏移（避免覆盖圆点）
-        var startOffset = 15;
-        var endOffset = 20;
-        var startX = fromCenter.x + nx * startOffset;
-        var startY = fromCenter.y + ny * startOffset;
-        var endX = toCenter.x - nx * endOffset;
-        var endY = toCenter.y - ny * endOffset;
+        var startX = fromCenter.x + nx * GEOMETRY.arrowStartOffset;
+        var startY = fromCenter.y + ny * GEOMETRY.arrowStartOffset;
+        var endX = toCenter.x - nx * GEOMETRY.arrowEndOffset;
+        var endY = toCenter.y - ny * GEOMETRY.arrowEndOffset;
         
         // 创建贝塞尔曲线控制点（弧形路径）
         var midX = (startX + endX) / 2;
