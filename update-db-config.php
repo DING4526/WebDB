@@ -23,29 +23,55 @@ if (!file_exists($configFile)) {
     exit(1);
 }
 
+// Validate inputs to prevent malformed configuration
+if (!preg_match('/^[a-zA-Z0-9._-]+$/', $dbHost)) {
+    echo "Error: Invalid host format. Only alphanumeric characters, dots, underscores, and hyphens are allowed.\n";
+    exit(1);
+}
+
+if (!preg_match('/^[0-9]+$/', $dbPort) || intval($dbPort) < 1 || intval($dbPort) > 65535) {
+    echo "Error: Invalid port number. Must be between 1 and 65535.\n";
+    exit(1);
+}
+
+if (!preg_match('/^[a-zA-Z0-9_]+$/', $dbName)) {
+    echo "Error: Invalid database name. Only alphanumeric characters and underscores are allowed.\n";
+    exit(1);
+}
+
+if (!preg_match('/^[a-zA-Z0-9_]+$/', $dbUser)) {
+    echo "Error: Invalid username. Only alphanumeric characters and underscores are allowed.\n";
+    exit(1);
+}
+
 $content = file_get_contents($configFile);
 
-// Build new DSN
+// Build new DSN (host, port, dbname are already validated)
 $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName";
+
+// Escape values for PHP string (escape single quotes with backslash)
+$escapedDsn = addcslashes($dsn, "'\\");
+$escapedUser = addcslashes($dbUser, "'\\");
+$escapedPass = addcslashes($dbPass, "'\\");
 
 // Update DSN
 $content = preg_replace(
     "/'dsn'\s*=>\s*'[^']*'/",
-    "'dsn' => '$dsn'",
+    "'dsn' => '$escapedDsn'",
     $content
 );
 
 // Update username
 $content = preg_replace(
     "/'username'\s*=>\s*'[^']*'/",
-    "'username' => '$dbUser'",
+    "'username' => '$escapedUser'",
     $content
 );
 
 // Update password
 $content = preg_replace(
     "/'password'\s*=>\s*'[^']*'/",
-    "'password' => '$dbPass'",
+    "'password' => '$escapedPass'",
     $content
 );
 
