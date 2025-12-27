@@ -3,10 +3,10 @@ setlocal EnableExtensions
 chcp 65001 >nul
 
 REM =========================================
-REM WebDB Ò»¼ü²¿ÊğÈë¿Ú
+REM WebDB ä¸€é”®éƒ¨ç½²å…¥å£
 REM 1. git clone
 REM 2. cd WebDB
-REM 3. Ö´ĞĞ deploy.bat
+REM 3. æ‰§è¡Œ deploy.bat
 REM =========================================
 
 set "REPO_URL=https://github.com/DING4526/WebDB.git"
@@ -14,41 +14,41 @@ set "PROJECT_DIR=WebDB"
 
 echo.
 echo =========================================
-echo   WebDB Ò»¼ü²¿Êğ£¨clone + deploy£©
+echo   WebDB ä¸€é”®éƒ¨ç½²ï¼ˆclone + deployï¼‰
 echo =========================================
 echo.
 
-REM 1) ¼ì²éÊÇ·ñÒÑ´æÔÚÄ¿Â¼
+REM 1) æ£€æŸ¥æ˜¯å¦å·²å­˜åœ¨ç›®å½•
 if exist "%PROJECT_DIR%" (
-    echo [!] ÒÑ¼ì²âµ½Ä¿Â¼ "%PROJECT_DIR%"
-    echo     ½«Ö±½Ó½øÈë²¢Ö´ĞĞ deploy.bat
+    echo [!] å·²æ£€æµ‹åˆ°ç›®å½• "%PROJECT_DIR%"
+    echo     å°†ç›´æ¥è¿›å…¥å¹¶æ‰§è¡Œ deploy.bat
 ) else (
-    echo [1/3] ÕıÔÚ¿ËÂ¡²Ö¿â...
+    echo [1/3] æ­£åœ¨å…‹éš†ä»“åº“...
     git clone "%REPO_URL%"
     if errorlevel 1 goto :error
-    echo [?] ²Ö¿â¿ËÂ¡Íê³É
+    echo [âœ“] ä»“åº“å…‹éš†å®Œæˆ
 )
 
 echo.
-echo [2/3] ½øÈëÏîÄ¿Ä¿Â¼...
+echo [2/3] è¿›å…¥é¡¹ç›®ç›®å½•...
 cd /d "%PROJECT_DIR%"
 if errorlevel 1 goto :error
 
-REM 3) ¼ì²é deploy.bat ÊÇ·ñ´æÔÚ
+REM 3) æ£€æŸ¥ deploy.bat æ˜¯å¦å­˜åœ¨
 if not exist "deploy.bat" (
-    echo [´íÎó] Î´ÕÒµ½ deploy.bat
-    echo        ÇëÈ·ÈÏ²Ö¿âÖĞ´æÔÚ deploy.bat
+    echo [é”™è¯¯] æœªæ‰¾åˆ° deploy.bat
+    echo        è¯·ç¡®è®¤ä»“åº“ä¸­å­˜åœ¨ deploy.bat
     goto :error
 )
 
 echo.
-echo [3/3] Ö´ĞĞ deploy.bat ...
+echo [3/3] æ‰§è¡Œ deploy.bat ...
 call deploy.bat
 if errorlevel 1 goto :error
 
 echo.
 echo =========================================
-echo   È«Á÷³ÌÍê³É£¡
+echo   å…¨æµç¨‹å®Œæˆï¼
 echo =========================================
 echo.
 pause
@@ -57,7 +57,7 @@ exit /b 0
 :error
 echo.
 echo =========================================
-echo   ²¿ÊğÊ§°Ü£¬Çë¼ì²éÉÏÃæµÄ´íÎóĞÅÏ¢
+echo   éƒ¨ç½²å¤±è´¥ï¼Œè¯·æ£€æŸ¥ä¸Šé¢çš„é”™è¯¯ä¿¡æ¯
 echo =========================================
 echo.
 pause
