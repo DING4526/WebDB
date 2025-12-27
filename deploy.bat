@@ -224,39 +224,33 @@ echo.
 :: 询问数据库配置
 echo   数据库配置信息（默认值适用于 XAMPP）:
 echo.
-set /p "DB_NAME=   数据库名 [%DB_NAME%]: " || set "DB_NAME=yii2advanced"
-set /p "DB_USER=   数据库用户名 [%DB_USER%]: " || set "DB_USER=root"
-set /p "DB_PASS=   数据库密码 [空]: "
-set /p "DB_HOST=   数据库主机 [localhost]: " || set "DB_HOST=localhost"
-set /p "DB_PORT=   数据库端口 [3306]: " || set "DB_PORT=3306"
+set /p "INPUT_DB_NAME=   数据库名 [yii2advanced]: "
+set /p "INPUT_DB_USER=   数据库用户名 [root]: "
+set /p "INPUT_DB_PASS=   数据库密码 [空]: "
+set /p "INPUT_DB_HOST=   数据库主机 [localhost]: "
+set /p "INPUT_DB_PORT=   数据库端口 [3306]: "
 
-:: 设置默认值
-if "%DB_HOST%"=="" set "DB_HOST=localhost"
-if "%DB_PORT%"=="" set "DB_PORT=3306"
+:: 设置默认值（如果用户直接回车）
+if "%INPUT_DB_NAME%"=="" (set "DB_NAME=yii2advanced") else (set "DB_NAME=%INPUT_DB_NAME%")
+if "%INPUT_DB_USER%"=="" (set "DB_USER=root") else (set "DB_USER=%INPUT_DB_USER%")
+if "%INPUT_DB_PASS%"=="" (set "DB_PASS=") else (set "DB_PASS=%INPUT_DB_PASS%")
+if "%INPUT_DB_HOST%"=="" (set "DB_HOST=localhost") else (set "DB_HOST=%INPUT_DB_HOST%")
+if "%INPUT_DB_PORT%"=="" (set "DB_PORT=3306") else (set "DB_PORT=%INPUT_DB_PORT%")
 
 :: 更新数据库配置文件
-set "DB_CONFIG_FILE=%INSTALL_DIR%\common\config\main-local.php"
-if not exist "%DB_CONFIG_FILE%" (
-    set "DB_CONFIG_FILE=common\config\main-local.php"
-)
+set "DB_CONFIG_FILE=common\config\main-local.php"
 
 echo.
 echo   正在更新数据库配置...
 
-:: 使用 PowerShell 更新配置文件（转义特殊字符）
-powershell -Command ^
-    "$dbName = '%DB_NAME%' -replace '([\\[\\]\\^\\$\\.\\|\\?\\*\\+\\(\\)])', '\\$1'; ^
-    $dbUser = '%DB_USER%' -replace '([\\[\\]\\^\\$\\.\\|\\?\\*\\+\\(\\)])', '\\$1'; ^
-    $dbPass = '%DB_PASS%' -replace \"'\", \"''\"; ^
-    $dbHost = '%DB_HOST%'; ^
-    $dbPort = '%DB_PORT%'; ^
-    $content = Get-Content '%DB_CONFIG_FILE%' -Raw; ^
-    $content = $content -replace \"'dsn' => 'mysql:host=[^;]+;port=[^;]+;dbname=[^']+'\", \"'dsn' => 'mysql:host=$dbHost;port=$dbPort;dbname=$dbName'\"; ^
-    $content = $content -replace \"'username' => '[^']*'\", \"'username' => '$dbUser'\"; ^
-    $content = $content -replace \"'password' => '[^']*'\", \"'password' => '$dbPass'\"; ^
-    Set-Content '%DB_CONFIG_FILE%' $content"
-
-echo   [✓] 数据库配置已更新
+:: 使用 PHP 辅助脚本更新配置（更安全的方式）
+php update-db-config.php "%DB_CONFIG_FILE%" "%DB_HOST%" "%DB_PORT%" "%DB_NAME%" "%DB_USER%" "%DB_PASS%"
+if %errorlevel% neq 0 (
+    echo [警告] 自动配置失败
+    echo        请手动编辑: %DB_CONFIG_FILE%
+) else (
+    echo   [✓] 数据库配置已更新
+)
 
 echo.
 echo   [重要] 请确保在 phpMyAdmin 中创建数据库: %DB_NAME%
