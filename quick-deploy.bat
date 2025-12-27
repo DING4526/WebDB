@@ -145,8 +145,11 @@ echo.
 echo [安装依赖]
 echo.
 
-echo   配置镜像加速...
-call composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/ 2>nul
+set /p "USE_MIRROR=   使用国内镜像加速？(适合中国大陆) (y/N): "
+if /i "%USE_MIRROR%"=="y" (
+    echo   配置 Composer 镜像加速...
+    call composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/ 2>nul
+)
 
 echo   安装 PHP 依赖（请耐心等待）...
 call composer install --no-interaction --no-progress

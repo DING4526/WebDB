@@ -181,9 +181,12 @@ echo.
 echo [步骤 4/7] 安装 Composer 依赖...
 echo.
 
-:: 配置国内镜像加速（可选）
-echo   配置 Composer 镜像加速...
-call composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/ 2>nul
+:: 配置国内镜像加速（可选，针对中国大陆用户）
+set /p "USE_MIRROR=   是否使用国内镜像加速？(适合中国大陆) (y/N): "
+if /i "%USE_MIRROR%"=="y" (
+    echo   配置 Composer 镜像加速...
+    call composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/ 2>nul
+)
 
 echo   正在安装依赖（可能需要几分钟）...
 call composer install --no-interaction
@@ -240,12 +243,17 @@ if not exist "%DB_CONFIG_FILE%" (
 echo.
 echo   正在更新数据库配置...
 
-:: 使用 PowerShell 更新配置文件
+:: 使用 PowerShell 更新配置文件（转义特殊字符）
 powershell -Command ^
-    "$content = Get-Content '%DB_CONFIG_FILE%' -Raw; ^
-    $content = $content -replace \"'dsn' => 'mysql:host=[^;]+;port=[^;]+;dbname=[^']+'\", \"'dsn' => 'mysql:host=%DB_HOST%;port=%DB_PORT%;dbname=%DB_NAME%'\"; ^
-    $content = $content -replace \"'username' => '[^']*'\", \"'username' => '%DB_USER%'\"; ^
-    $content = $content -replace \"'password' => '[^']*'\", \"'password' => '%DB_PASS%'\"; ^
+    "$dbName = '%DB_NAME%' -replace '([\\[\\]\\^\\$\\.\\|\\?\\*\\+\\(\\)])', '\\$1'; ^
+    $dbUser = '%DB_USER%' -replace '([\\[\\]\\^\\$\\.\\|\\?\\*\\+\\(\\)])', '\\$1'; ^
+    $dbPass = '%DB_PASS%' -replace \"'\", \"''\"; ^
+    $dbHost = '%DB_HOST%'; ^
+    $dbPort = '%DB_PORT%'; ^
+    $content = Get-Content '%DB_CONFIG_FILE%' -Raw; ^
+    $content = $content -replace \"'dsn' => 'mysql:host=[^;]+;port=[^;]+;dbname=[^']+'\", \"'dsn' => 'mysql:host=$dbHost;port=$dbPort;dbname=$dbName'\"; ^
+    $content = $content -replace \"'username' => '[^']*'\", \"'username' => '$dbUser'\"; ^
+    $content = $content -replace \"'password' => '[^']*'\", \"'password' => '$dbPass'\"; ^
     Set-Content '%DB_CONFIG_FILE%' $content"
 
 echo   [✓] 数据库配置已更新
