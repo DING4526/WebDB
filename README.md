@@ -2,24 +2,73 @@
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
     </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
+    <h1 align="center">WebDB - Yii 2 Advanced Project</h1>
     <br>
 </p>
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+基于 Yii 2 Advanced Template 的 Web 数据库项目。
 
-The template includes three tiers: front end, back end, and console, each of which
-is a separate Yii application.
+## 🚀 一键部署 (Windows)
 
-The template is designed to work in a team development environment. It supports
-deploying the application in different environments.
+### 方式一：快速部署（推荐新手）
 
-Documentation is at [docs/guide/README.md](docs/guide/README.md).
+1. **安装 XAMPP**
+   - 下载 [XAMPP](https://www.apachefriends.org/) 并安装到 `D:\xampp` 或 `C:\xampp`
+   - 启动 XAMPP 控制面板，开启 Apache 和 MySQL
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Build Status](https://travis-ci.com/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.com/yiisoft/yii2-app-advanced)
+2. **安装 Git**
+   - 下载 [Git for Windows](https://git-scm.com/download/win) 并安装
+
+3. **运行部署脚本**
+   ```powershell
+   # 下载并运行快速部署脚本
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/DING4526/WebDB/master/quick-deploy.bat" -OutFile "quick-deploy.bat"; .\quick-deploy.bat
+   ```
+   
+   或者手动下载 `quick-deploy.bat` 并双击运行。
+
+### 方式二：手动克隆后部署
+
+```bash
+# 1. 克隆仓库到 XAMPP htdocs 目录
+cd D:\xampp\htdocs
+git clone https://github.com/DING4526/WebDB.git
+cd WebDB
+
+# 2. 双击运行 deploy.bat
+```
+
+### 部署完成后访问
+
+- 前台: http://localhost/WebDB/frontend/web/
+- 后台: http://localhost/WebDB/backend/web/
+
+## 📋 手动部署步骤
+
+如果一键部署失败，可以参考以下手动步骤：
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/DING4526/WebDB.git
+cd WebDB
+
+# 2. 安装 Composer 依赖
+composer install
+
+# 3. 初始化 Yii2 环境
+php init --env=Development --overwrite=All
+
+# 4. 创建数据库 yii2advanced（在 phpMyAdmin 中）
+
+# 5. 配置数据库（编辑 common/config/main-local.php）
+
+# 6. 执行数据库迁移
+php yii migrate
+```
+
+详细部署说明请参考 [迁移部署手册.md](迁移部署手册.md) 和 [前置工作.md](前置工作.md)。
+
+## 📁 项目结构
 
 DIRECTORY STRUCTURE
 -------------------
