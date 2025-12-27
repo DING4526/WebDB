@@ -2,7 +2,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 chcp 65001 >nul
 
-REM ====== é…ç½® ======
+REM ====== ÅäÖÃ ======
 set "DB_NAME=yii2advanced"
 set "DB_HOST=127.0.0.1"
 set "DB_PORT=3306"
@@ -18,17 +18,17 @@ cd /d "%~dp0"
 
 echo.
 echo =========================================
-echo   WebDB ä¸€é”®éƒ¨ç½²ï¼ˆinit + import seedï¼‰
+echo   WebDB Ò»¼ü²¿Êğ£¨init + import seed£©
 echo =========================================
 echo.
 
-echo [1/3] Yii2 initï¼ˆDevelopmentï¼‰...
+echo [1/3] Yii2 init£¨Development£©...
 "%PHP_EXE%" init --env=Development --overwrite=All
 if errorlevel 1 goto :error
-echo [âœ“] init å®Œæˆ
+echo [?] init Íê³É
 echo.
 
-echo [2/3] åˆ›å»ºæ•°æ®åº“ï¼š%DB_NAME% ...
+echo [2/3] ´´½¨Êı¾İ¿â£º%DB_NAME% ...
 set "SQL_CREATE=CREATE DATABASE IF NOT EXISTS `%DB_NAME%` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 
 if "%DB_PASS%"=="" (
@@ -37,12 +37,12 @@ if "%DB_PASS%"=="" (
   "%MYSQL_EXE%" -h "%DB_HOST%" -P "%DB_PORT%" -u "%DB_USER%" -p"%DB_PASS%" -e "%SQL_CREATE%"
 )
 if errorlevel 1 goto :error
-echo [âœ“] æ•°æ®åº“å·²å°±ç»ª
+echo [?] Êı¾İ¿âÒÑ¾ÍĞ÷
 echo.
 
-echo [3/3] å¯¼å…¥ç§å­æ•°æ®ï¼š%SEED_SQL% ...
+echo [3/3] µ¼ÈëÖÖ×ÓÊı¾İ£º%SEED_SQL% ...
 if not exist "%SEED_SQL%" (
-  echo [é”™è¯¯] æœªæ‰¾åˆ° %SEED_SQL%
+  echo [´íÎó] Î´ÕÒµ½ %SEED_SQL%
   goto :error
 )
 
@@ -53,14 +53,14 @@ if "%DB_PASS%"=="" (
 )
 
 if errorlevel 1 goto :error
-echo [âœ“] æ•°æ®å¯¼å…¥å®Œæˆ
+echo [?] Êı¾İµ¼ÈëÍê³É
 echo.
 
 echo =========================================
-echo   å®Œæˆï¼
+echo   Íê³É£¡
 echo =========================================
-echo å‰å°: http://localhost/WebDB/frontend/web/
-echo åå°: http://localhost/WebDB/backend/web/
+echo Ç°Ì¨: http://localhost/WebDB/frontend/web/
+echo ºóÌ¨: http://localhost/WebDB/backend/web/
 echo.
 pause
 exit /b 0
@@ -68,7 +68,7 @@ exit /b 0
 :error
 echo.
 echo =========================================
-echo   å¤±è´¥ï¼šè¯·æ£€æŸ¥ä¸Šé¢çš„é”™è¯¯ä¿¡æ¯
+echo   Ê§°Ü£ºÇë¼ì²éÉÏÃæµÄ´íÎóĞÅÏ¢
 echo =========================================
 echo.
 pause
