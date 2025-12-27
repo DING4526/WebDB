@@ -52,11 +52,11 @@ if %errorlevel% neq 0 (
   goto :error
 )
 
-REM Install XAMPP if missing
+REM Install XAMPP to D:\XAMPP (robust)
 if exist "%XAMPP_DIR%\xampp-control.exe" (
-  echo [1/7] XAMPP detected.
+  echo [1/7] XAMPP detected: %XAMPP_DIR%
 ) else (
-  echo [1/7] XAMPP not found. Installing...
+  echo [1/7] XAMPP not found. Trying to install to: %XAMPP_DIR%
 
   if not exist "%~dp0%XAMPP_EXE%" (
     echo [ERROR] XAMPP installer not found next to this script:
@@ -64,20 +64,38 @@ if exist "%XAMPP_DIR%\xampp-control.exe" (
     goto :error
   )
 
-  REM Try silent install first
+  REM First try silent install (may be unsupported)
   start "" /wait "%~dp0%XAMPP_EXE%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /DIR="%XAMPP_DIR%"
 
-  REM If silent install did not place files, fall back to GUI
+  REM If still not installed, fallback to GUI and wait for user
   if not exist "%XAMPP_DIR%\xampp-control.exe" (
-    echo [WARN ] Silent install may not be supported. Opening GUI installer...
-    echo        Please install to: %XAMPP_DIR%
+    echo [WARN ] Silent install may not be supported on this installer.
+    echo        GUI installer will open now.
+    echo        IMPORTANT: Please install to: %XAMPP_DIR%
     start "" "%~dp0%XAMPP_EXE%"
     echo.
-    echo After installation finishes, run this script again.
+    echo After installation completes, press any key to continue...
+    pause >nul
+  )
+
+  REM Wait a bit and re-check (handles installers that start late)
+  if not exist "%XAMPP_DIR%\xampp-control.exe" (
+    echo [INFO ] Waiting for XAMPP files to appear...
+    set /a _wait=0
+    :wait_xampp
+    if exist "%XAMPP_DIR%\xampp-control.exe" goto :xampp_ok
+    timeout /t 2 >nul
+    set /a _wait+=2
+    if !_wait! geq 600 goto :xampp_fail
+    goto :wait_xampp
+    :xampp_fail
+    echo [ERROR] XAMPP still not found in %XAMPP_DIR% after waiting.
+    echo         Please confirm you installed XAMPP to %XAMPP_DIR%.
     goto :error
   )
 )
 
+:xampp_ok
 echo [OK] XAMPP ready.
 echo.
 
