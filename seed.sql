@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： 127.0.0.1
--- 生成日期： 2025-12-25 03:14:20
+-- 生成日期： 2025-12-27 15:03:32
 -- 服务器版本： 10.4.32-MariaDB
 -- PHP 版本： 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 数据库： `team_project`
+-- 数据库： `yii2advanced`
 --
 
 -- --------------------------------------------------------
@@ -27,16 +27,12 @@ SET time_zone = "+00:00";
 -- 表的结构 `migration`
 --
 
+DROP TABLE IF EXISTS `migration`;
 CREATE TABLE `migration` (
   `version` varchar(180) NOT NULL,
   `apply_time` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `migration`
---
-
-TRUNCATE TABLE `migration`;
 --
 -- 转存表中的数据 `migration`
 --
@@ -62,6 +58,7 @@ INSERT INTO `migration` (`version`, `apply_time`) VALUES
 -- 表的结构 `tag`
 --
 
+DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL COMMENT '标签名',
@@ -69,11 +66,6 @@ CREATE TABLE `tag` (
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `tag`
---
-
-TRUNCATE TABLE `tag`;
 --
 -- 转存表中的数据 `tag`
 --
@@ -94,6 +86,7 @@ INSERT INTO `tag` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- 表的结构 `team`
 --
 
+DROP TABLE IF EXISTS `team`;
 CREATE TABLE `team` (
   `id` int(11) NOT NULL COMMENT '主键',
   `name` varchar(100) NOT NULL COMMENT '队名',
@@ -104,11 +97,6 @@ CREATE TABLE `team` (
   `updated_at` int(11) NOT NULL COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='团队表';
 
---
--- 插入之前先把表清空（truncate） `team`
---
-
-TRUNCATE TABLE `team`;
 --
 -- 转存表中的数据 `team`
 --
@@ -122,6 +110,7 @@ INSERT INTO `team` (`id`, `name`, `topic`, `intro`, `status`, `created_at`, `upd
 -- 表的结构 `team_member`
 --
 
+DROP TABLE IF EXISTS `team_member`;
 CREATE TABLE `team_member` (
   `id` int(11) NOT NULL COMMENT '主键',
   `team_id` int(11) NOT NULL COMMENT '所属团队ID',
@@ -136,11 +125,6 @@ CREATE TABLE `team_member` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='团队成员表';
 
 --
--- 插入之前先把表清空（truncate） `team_member`
---
-
-TRUNCATE TABLE `team_member`;
---
 -- 转存表中的数据 `team_member`
 --
 
@@ -154,6 +138,7 @@ INSERT INTO `team_member` (`id`, `team_id`, `user_id`, `name`, `student_no`, `ro
 -- 表的结构 `team_member_apply`
 --
 
+DROP TABLE IF EXISTS `team_member_apply`;
 CREATE TABLE `team_member_apply` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
@@ -170,11 +155,6 @@ CREATE TABLE `team_member_apply` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- 插入之前先把表清空（truncate） `team_member_apply`
---
-
-TRUNCATE TABLE `team_member_apply`;
---
 -- 转存表中的数据 `team_member_apply`
 --
 
@@ -187,6 +167,7 @@ INSERT INTO `team_member_apply` (`id`, `user_id`, `team_id`, `name`, `student_no
 -- 表的结构 `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
   `username` varchar(255) NOT NULL,
@@ -202,11 +183,6 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- 插入之前先把表清空（truncate） `user`
---
-
-TRUNCATE TABLE `user`;
---
 -- 转存表中的数据 `user`
 --
 
@@ -220,6 +196,7 @@ INSERT INTO `user` (`id`, `username`, `auth_key`, `password_hash`, `password_res
 -- 表的结构 `war_event`
 --
 
+DROP TABLE IF EXISTS `war_event`;
 CREATE TABLE `war_event` (
   `id` int(11) NOT NULL,
   `title` varchar(200) NOT NULL COMMENT '事件标题',
@@ -233,11 +210,6 @@ CREATE TABLE `war_event` (
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_event`
---
-
-TRUNCATE TABLE `war_event`;
 --
 -- 转存表中的数据 `war_event`
 --
@@ -275,6 +247,7 @@ INSERT INTO `war_event` (`id`, `title`, `event_date`, `stage_id`, `summary`, `co
 -- 表的结构 `war_event_person`
 --
 
+DROP TABLE IF EXISTS `war_event_person`;
 CREATE TABLE `war_event_person` (
   `id` int(11) NOT NULL,
   `event_id` int(11) NOT NULL COMMENT '事件',
@@ -284,11 +257,6 @@ CREATE TABLE `war_event_person` (
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_event_person`
---
-
-TRUNCATE TABLE `war_event_person`;
 --
 -- 转存表中的数据 `war_event_person`
 --
@@ -320,16 +288,12 @@ INSERT INTO `war_event_person` (`id`, `event_id`, `person_id`, `relation_type`, 
 -- 表的结构 `war_event_tag`
 --
 
+DROP TABLE IF EXISTS `war_event_tag`;
 CREATE TABLE `war_event_tag` (
   `event_id` int(11) NOT NULL,
   `tag_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_event_tag`
---
-
-TRUNCATE TABLE `war_event_tag`;
 --
 -- 转存表中的数据 `war_event_tag`
 --
@@ -351,6 +315,7 @@ INSERT INTO `war_event_tag` (`event_id`, `tag_id`) VALUES
 -- 表的结构 `war_media`
 --
 
+DROP TABLE IF EXISTS `war_media`;
 CREATE TABLE `war_media` (
   `id` int(11) NOT NULL,
   `type` varchar(20) NOT NULL DEFAULT 'image' COMMENT '类型 image/document',
@@ -361,11 +326,6 @@ CREATE TABLE `war_media` (
   `uploaded_at` int(11) NOT NULL COMMENT '上传时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_media`
---
-
-TRUNCATE TABLE `war_media`;
 --
 -- 转存表中的数据 `war_media`
 --
@@ -479,6 +439,7 @@ INSERT INTO `war_media` (`id`, `type`, `path`, `title`, `event_id`, `person_id`,
 -- 表的结构 `war_message`
 --
 
+DROP TABLE IF EXISTS `war_message`;
 CREATE TABLE `war_message` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT '提交用户ID(可空)',
@@ -491,11 +452,6 @@ CREATE TABLE `war_message` (
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_message`
---
-
-TRUNCATE TABLE `war_message`;
 --
 -- 转存表中的数据 `war_message`
 --
@@ -559,6 +515,7 @@ INSERT INTO `war_message` (`id`, `user_id`, `nickname`, `content`, `target_type`
 -- 表的结构 `war_person`
 --
 
+DROP TABLE IF EXISTS `war_person`;
 CREATE TABLE `war_person` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL COMMENT '姓名',
@@ -572,11 +529,6 @@ CREATE TABLE `war_person` (
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_person`
---
-
-TRUNCATE TABLE `war_person`;
 --
 -- 转存表中的数据 `war_person`
 --
@@ -609,16 +561,12 @@ INSERT INTO `war_person` (`id`, `name`, `role_type`, `birth_year`, `death_year`,
 -- 表的结构 `war_person_tag`
 --
 
+DROP TABLE IF EXISTS `war_person_tag`;
 CREATE TABLE `war_person_tag` (
   `person_id` int(11) NOT NULL,
   `tag_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_person_tag`
---
-
-TRUNCATE TABLE `war_person_tag`;
 --
 -- 转存表中的数据 `war_person_tag`
 --
@@ -638,6 +586,7 @@ INSERT INTO `war_person_tag` (`person_id`, `tag_id`) VALUES
 -- 表的结构 `war_stage`
 --
 
+DROP TABLE IF EXISTS `war_stage`;
 CREATE TABLE `war_stage` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL COMMENT '阶段名称',
@@ -650,11 +599,6 @@ CREATE TABLE `war_stage` (
   `updated_at` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_stage`
---
-
-TRUNCATE TABLE `war_stage`;
 --
 -- 转存表中的数据 `war_stage`
 --
@@ -669,6 +613,7 @@ INSERT INTO `war_stage` (`id`, `name`, `start_year`, `end_year`, `description`, 
 -- 表的结构 `war_visit_log`
 --
 
+DROP TABLE IF EXISTS `war_visit_log`;
 CREATE TABLE `war_visit_log` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT '访问用户ID(可空)',
@@ -677,11 +622,6 @@ CREATE TABLE `war_visit_log` (
   `visited_at` int(11) NOT NULL COMMENT '访问时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- 插入之前先把表清空（truncate） `war_visit_log`
---
-
-TRUNCATE TABLE `war_visit_log`;
 --
 -- 转存表中的数据 `war_visit_log`
 --
